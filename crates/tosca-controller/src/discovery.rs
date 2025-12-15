@@ -209,9 +209,7 @@ impl Discovery {
                 Err(RecvTimeoutError::Timeout)
             }
             result = receiver.recv_async() => {
-                // The only variant of `RecvError` is mapped to the
-                // corresponding variant in `RecvTimeoutError`.
-                result.map_err(std::convert::Into::into)
+                result.map_err(|_| RecvTimeoutError::Disconnected)
             }
         }
     }

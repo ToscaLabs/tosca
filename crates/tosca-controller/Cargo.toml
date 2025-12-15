@@ -26,7 +26,7 @@ tracing.workspace = true
 bytes.version = "1.11.0"
 bytes.default-features = false
 
-flume.version = "0.11"
+flume.version = "0.12"
 flume.default-features = false
 flume.features = ["async"]
 
