@@ -41,11 +41,17 @@ use topic::TopicBuilder;
 use super::events::interrupt::{
     Notifier,
     bool::{BoolFn, monitor_bool_event},
+    f32::{F32Fn, monitor_f32_event},
+    f64::{F64Fn, monitor_f64_event},
+    i32::{I32Fn, monitor_i32_event},
     u8::{U8Fn, monitor_u8_event},
 };
 use super::events::periodic::{
     PeriodicNotifier,
     bool::{PeriodicBoolFn, monitor_periodic_bool_event},
+    f32::{PeriodicF32Fn, monitor_periodic_f32_event},
+    f64::{PeriodicF64Fn, monitor_periodic_f64_event},
+    i32::{PeriodicI32Fn, monitor_periodic_i32_event},
     u8::{PeriodicU8Fn, monitor_periodic_u8_event},
 };
 
@@ -406,6 +412,240 @@ where
         let task = monitor_periodic_u8_event(event, pin, periodic_u8_notifier, func);
 
         self.spawn(name, task, |events| events.add_periodic_u8_event(event))
+    }
+
+    /// Monitors a pin with an [`Event<i32>`] notifier.
+    ///
+    /// Discard the event if it matches another.
+    #[inline]
+    #[must_use]
+    pub fn i32_event<F, Fut>(
+        self,
+        name: &'static str,
+        description: &'static str,
+        func: F,
+        pin: AnyPin<'static>,
+    ) -> Self
+    where
+        F: Fn(AnyPin<'static>, Notifier<i32>) -> Fut + Send + Sync + 'static,
+        Fut: Future<Output = ()> + Send + Sync + 'static,
+    {
+        let events_ref = self.events.i32_events_as_slice();
+        let len = events_ref.len();
+
+        for value in events_ref {
+            if value.name == name {
+                info!(
+                    "The event `{}` is equal to `{}`, discard it.",
+                    value.name, name
+                );
+                return self;
+            }
+        }
+
+        let event = Event::i32(name).description(description);
+        let i32_notifier = Notifier::i32(len);
+        // We need to do this because embassy tasks do not support generics.
+        let func: I32Fn = Box::new(move |pin, i32_notifier| Box::pin(func(pin, i32_notifier)));
+        let task = monitor_i32_event(event, pin, i32_notifier, func);
+
+        self.spawn(name, task, |events| events.add_i32_event(event))
+    }
+
+    /// Monitors a pin with a [`PeriodicEvent<i32>`] notifier.
+    ///
+    /// Discard the event if it matches another.
+    #[inline]
+    #[must_use]
+    pub fn periodic_i32<F, Fut>(
+        self,
+        name: &'static str,
+        description: &'static str,
+        interval: Duration,
+        func: F,
+        pin: AnyPin<'static>,
+    ) -> Self
+    where
+        F: Fn(AnyPin<'static>, PeriodicNotifier<i32>) -> Fut + Send + Sync + 'static,
+        Fut: Future<Output = ()> + Send + Sync + 'static,
+    {
+        let events_ref = self.events.periodic_i32_events_as_slice();
+        let len = events_ref.len();
+
+        for value in events_ref {
+            if value.event.name == name {
+                info!(
+                    "The event `{}` is equal to `{}`, discard it.",
+                    value.event.name, name
+                );
+                return self;
+            }
+        }
+
+        let event = PeriodicEvent::i32(Event::i32(name).description(description), interval);
+        let periodic_i32_notifier = PeriodicNotifier::i32(len, interval);
+        // We need to do this because embassy tasks do not support generics.
+        let func: PeriodicI32Fn =
+            Box::new(move |pin, i32_notifier| Box::pin(func(pin, i32_notifier)));
+        let task = monitor_periodic_i32_event(event, pin, periodic_i32_notifier, func);
+
+        self.spawn(name, task, |events| events.add_periodic_i32_event(event))
+    }
+
+    /// Monitors a pin with an [`Event<f32>`] notifier.
+    ///
+    /// Discard the event if it matches another.
+    #[inline]
+    #[must_use]
+    pub fn f32_event<F, Fut>(
+        self,
+        name: &'static str,
+        description: &'static str,
+        func: F,
+        pin: AnyPin<'static>,
+    ) -> Self
+    where
+        F: Fn(AnyPin<'static>, Notifier<f32>) -> Fut + Send + Sync + 'static,
+        Fut: Future<Output = ()> + Send + Sync + 'static,
+    {
+        let events_ref = self.events.f32_events_as_slice();
+        let len = events_ref.len();
+
+        for value in events_ref {
+            if value.name == name {
+                info!(
+                    "The event `{}` is equal to `{}`, discard it.",
+                    value.name, name
+                );
+                return self;
+            }
+        }
+
+        let event = Event::f32(name).description(description);
+        let f32_notifier = Notifier::f32(len);
+        // We need to do this because embassy tasks do not support generics.
+        let func: F32Fn = Box::new(move |pin, f32_notifier| Box::pin(func(pin, f32_notifier)));
+        let task = monitor_f32_event(event, pin, f32_notifier, func);
+
+        self.spawn(name, task, |events| events.add_f32_event(event))
+    }
+
+    /// Monitors a pin with a [`PeriodicEvent<f32>`] notifier.
+    ///
+    /// Discard the event if it matches another.
+    #[inline]
+    #[must_use]
+    pub fn periodic_f32<F, Fut>(
+        self,
+        name: &'static str,
+        description: &'static str,
+        interval: Duration,
+        func: F,
+        pin: AnyPin<'static>,
+    ) -> Self
+    where
+        F: Fn(AnyPin<'static>, PeriodicNotifier<f32>) -> Fut + Send + Sync + 'static,
+        Fut: Future<Output = ()> + Send + Sync + 'static,
+    {
+        let events_ref = self.events.periodic_f32_events_as_slice();
+        let len = events_ref.len();
+
+        for value in events_ref {
+            if value.event.name == name {
+                info!(
+                    "The event `{}` is equal to `{}`, discard it.",
+                    value.event.name, name
+                );
+                return self;
+            }
+        }
+
+        let event = PeriodicEvent::f32(Event::f32(name).description(description), interval);
+        let periodic_f32_notifier = PeriodicNotifier::f32(len, interval);
+        // We need to do this because embassy tasks do not support generics.
+        let func: PeriodicF32Fn =
+            Box::new(move |pin, f32_notifier| Box::pin(func(pin, f32_notifier)));
+        let task = monitor_periodic_f32_event(event, pin, periodic_f32_notifier, func);
+
+        self.spawn(name, task, |events| events.add_periodic_f32_event(event))
+    }
+
+    /// Monitors a pin with an [`Event<f64>`] notifier.
+    ///
+    /// Discard the event if it matches another.
+    #[inline]
+    #[must_use]
+    pub fn f64_event<F, Fut>(
+        self,
+        name: &'static str,
+        description: &'static str,
+        func: F,
+        pin: AnyPin<'static>,
+    ) -> Self
+    where
+        F: Fn(AnyPin<'static>, Notifier<f64>) -> Fut + Send + Sync + 'static,
+        Fut: Future<Output = ()> + Send + Sync + 'static,
+    {
+        let events_ref = self.events.f64_events_as_slice();
+        let len = events_ref.len();
+
+        for value in events_ref {
+            if value.name == name {
+                info!(
+                    "The event `{}` is equal to `{}`, discard it.",
+                    value.name, name
+                );
+                return self;
+            }
+        }
+
+        let event = Event::f64(name).description(description);
+        let f64_notifier = Notifier::f64(len);
+        // We need to do this because embassy tasks do not support generics.
+        let func: F64Fn = Box::new(move |pin, f64_notifier| Box::pin(func(pin, f64_notifier)));
+        let task = monitor_f64_event(event, pin, f64_notifier, func);
+
+        self.spawn(name, task, |events| events.add_f64_event(event))
+    }
+
+    /// Monitors a pin with a [`PeriodicEvent<f64>`] notifier.
+    ///
+    /// Discard the event if it matches another.
+    #[inline]
+    #[must_use]
+    pub fn periodic_f64<F, Fut>(
+        self,
+        name: &'static str,
+        description: &'static str,
+        interval: Duration,
+        func: F,
+        pin: AnyPin<'static>,
+    ) -> Self
+    where
+        F: Fn(AnyPin<'static>, PeriodicNotifier<f64>) -> Fut + Send + Sync + 'static,
+        Fut: Future<Output = ()> + Send + Sync + 'static,
+    {
+        let events_ref = self.events.periodic_f64_events_as_slice();
+        let len = events_ref.len();
+
+        for value in events_ref {
+            if value.event.name == name {
+                info!(
+                    "The event `{}` is equal to `{}`, discard it.",
+                    value.event.name, name
+                );
+                return self;
+            }
+        }
+
+        let event = PeriodicEvent::f64(Event::f64(name).description(description), interval);
+        let periodic_f64_notifier = PeriodicNotifier::f64(len, interval);
+        // We need to do this because embassy tasks do not support generics.
+        let func: PeriodicF64Fn =
+            Box::new(move |pin, f64_notifier| Box::pin(func(pin, f64_notifier)));
+        let task = monitor_periodic_f64_event(event, pin, periodic_f64_notifier, func);
+
+        self.spawn(name, task, |events| events.add_periodic_f64_event(event))
     }
 
     /// Runs the task that transmits events over the network.

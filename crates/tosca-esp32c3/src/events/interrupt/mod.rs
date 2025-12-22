@@ -1,4 +1,7 @@
 pub(crate) mod bool;
+pub(crate) mod f32;
+pub(crate) mod f64;
+pub(crate) mod i32;
 pub(crate) mod u8;
 
 use core::marker::PhantomData;
