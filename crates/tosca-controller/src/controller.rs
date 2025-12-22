@@ -84,9 +84,11 @@ impl DeviceSender<'_> {
     ///
     /// An error is returned when the given route **does** not exist.
     pub fn request(&self, route: &str) -> Result<RequestSender<'_>, Error> {
-        let request = self.device.request(route).ok_or(sender_error(format!(
-            "Error in retrieving the request with route `{route}`."
-        )))?;
+        let request = self.device.request(route).ok_or_else(|| {
+            sender_error(format!(
+                "Error in retrieving the request with route `{route}`."
+            ))
+        })?;
 
         let skip = if request.hazards.is_empty() {
             false
@@ -288,9 +290,11 @@ impl Controller {
             return Err(sender_error("No devices found."));
         }
 
-        let device = self.devices.get(id).ok_or(sender_error(format!(
-            "Error in retrieving the device with identifier {id}."
-        )))?;
+        let device = self.devices.get(id).ok_or_else(|| {
+            sender_error(format!(
+                "Error in retrieving the device with identifier {id}."
+            ))
+        })?;
         Ok(DeviceSender {
             controller: self,
             device,
