@@ -322,11 +322,11 @@ where
         }
 
         let event = PeriodicEvent::bool(Event::bool(name).description(description), interval);
-        let periodic_u8_notifier = PeriodicNotifier::bool(len, interval);
+        let periodic_bool_notifier = PeriodicNotifier::bool(len, interval);
         // We need to do this because embassy tasks do not support generics.
         let func: PeriodicBoolFn =
-            Box::new(move |pin, u8_notifier| Box::pin(func(pin, u8_notifier)));
-        let task = monitor_periodic_bool_event(event, pin, periodic_u8_notifier, func);
+            Box::new(move |pin, bool_notifier| Box::pin(func(pin, bool_notifier)));
+        let task = monitor_periodic_bool_event(event, pin, periodic_bool_notifier, func);
 
         self.spawn(name, task, |events| events.add_periodic_bool_event(event))
     }
