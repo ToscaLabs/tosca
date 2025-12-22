@@ -27,6 +27,12 @@ pub struct NetworkInformation {
     pub name: String,
     /// Device addresses.
     pub addresses: HashSet<IpAddr>,
+    /// Device Wi-Fi MAC address.
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub wifi_mac: Option<[u8; 6]>,
+    /// Device Ethernet MAC address.
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub ethernet_mac: Option<[u8; 6]>,
     /// Device port.
     pub port: u16,
     /// Device properties.
@@ -48,10 +54,26 @@ impl NetworkInformation {
         Self {
             name,
             addresses,
+            wifi_mac: None,
+            ethernet_mac: None,
             port,
             properties,
             last_reachable_address,
         }
+    }
+
+    /// Sets Wi-Fi MAC address.
+    #[must_use]
+    pub const fn wifi_mac(mut self, mac: [u8; 6]) -> Self {
+        self.wifi_mac = Some(mac);
+        self
+    }
+
+    /// Sets Ethernet MAC address.
+    #[must_use]
+    pub const fn ethernet_mac(mut self, mac: [u8; 6]) -> Self {
+        self.ethernet_mac = Some(mac);
+        self
     }
 }
 
@@ -383,6 +405,8 @@ pub(crate) mod tests {
             properties,
             complete_address,
         )
+        .wifi_mac([0x02, 0x11, 0x22, 0x33, 0x44, 0x55])
+        .ethernet_mac([0x06, 0xAA, 0xBB, 0xCC, 0xDD, 0xEE])
     }
 
     fn create_description(device_kind: DeviceKind, main_route: &str) -> Description {

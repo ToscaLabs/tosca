@@ -262,7 +262,7 @@ impl Discovery {
                             device_data.main_route.into_owned(),
                         );
 
-                        let network_info = NetworkInformation::new(
+                        let mut network_info = NetworkInformation::new(
                             service.fullname,
                             service
                                 .addresses
@@ -273,6 +273,14 @@ impl Discovery {
                             service.txt_properties.into_property_map_str(),
                             complete_address,
                         );
+
+                        if let Some(mac) = device_data.wifi_mac {
+                            network_info = network_info.wifi_mac(mac);
+                        }
+
+                        if let Some(mac) = device_data.ethernet_mac {
+                            network_info = network_info.ethernet_mac(mac);
+                        }
 
                         let events = device_data.events_description.map(Events::new);
 
