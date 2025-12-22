@@ -107,6 +107,63 @@ impl private::TypeName for u8 {
     const TYPE: &'static str = "u8";
 }
 
+impl Event<i32> {
+    /// Creates an [`Event<i32>`].
+    #[must_use]
+    pub const fn i32(name: &'static str) -> Self {
+        Self {
+            #[cfg(not(feature = "deserialize"))]
+            name,
+            #[cfg(feature = "deserialize")]
+            name: alloc::borrow::Cow::Borrowed(name),
+            description: None,
+            value: 0,
+        }
+    }
+}
+
+impl private::TypeName for i32 {
+    const TYPE: &'static str = "i32";
+}
+
+impl Event<f32> {
+    /// Creates an [`Event<f32>`].
+    #[must_use]
+    pub const fn f32(name: &'static str) -> Self {
+        Self {
+            #[cfg(not(feature = "deserialize"))]
+            name,
+            #[cfg(feature = "deserialize")]
+            name: alloc::borrow::Cow::Borrowed(name),
+            description: None,
+            value: 0.,
+        }
+    }
+}
+
+impl private::TypeName for f32 {
+    const TYPE: &'static str = "f32";
+}
+
+impl Event<f64> {
+    /// Creates an [`Event<f64>`].
+    #[must_use]
+    pub const fn f64(name: &'static str) -> Self {
+        Self {
+            #[cfg(not(feature = "deserialize"))]
+            name,
+            #[cfg(feature = "deserialize")]
+            name: alloc::borrow::Cow::Borrowed(name),
+            description: None,
+            value: 0.,
+        }
+    }
+}
+
+impl private::TypeName for f64 {
+    const TYPE: &'static str = "f64";
+}
+
 impl<T: Clone + Copy + private::TypeName> Event<T> {
     /// Sets the event description.
     #[must_use]
@@ -189,6 +246,30 @@ impl PeriodicEvent<u8> {
     }
 }
 
+impl PeriodicEvent<i32> {
+    /// Creates a [`PeriodicEvent<i32>`].
+    #[must_use]
+    pub const fn i32(event: Event<i32>, interval: Duration) -> Self {
+        Self { event, interval }
+    }
+}
+
+impl PeriodicEvent<f32> {
+    /// Creates a [`PeriodicEvent<f32>`].
+    #[must_use]
+    pub const fn f32(event: Event<f32>, interval: Duration) -> Self {
+        Self { event, interval }
+    }
+}
+
+impl PeriodicEvent<f64> {
+    /// Creates a [`PeriodicEvent<f64>`].
+    #[must_use]
+    pub const fn f64(event: Event<f64>, interval: Duration) -> Self {
+        Self { event, interval }
+    }
+}
+
 #[derive(Debug, Clone, PartialEq, Serialize)]
 #[cfg_attr(feature = "deserialize", derive(serde::Deserialize))]
 /// The topic on which the events will be published over the network.
@@ -228,9 +309,21 @@ pub struct Events {
     #[serde(skip_serializing_if = "Vec::is_empty", default)]
     u8_events: Vec<Event<u8>>,
     #[serde(skip_serializing_if = "Vec::is_empty", default)]
+    i32_events: Vec<Event<i32>>,
+    #[serde(skip_serializing_if = "Vec::is_empty", default)]
+    f32_events: Vec<Event<f32>>,
+    #[serde(skip_serializing_if = "Vec::is_empty", default)]
+    f64_events: Vec<Event<f64>>,
+    #[serde(skip_serializing_if = "Vec::is_empty", default)]
     periodic_bool_events: Vec<PeriodicEvent<bool>>,
     #[serde(skip_serializing_if = "Vec::is_empty", default)]
     periodic_u8_events: Vec<PeriodicEvent<u8>>,
+    #[serde(skip_serializing_if = "Vec::is_empty", default)]
+    periodic_i32_events: Vec<PeriodicEvent<i32>>,
+    #[serde(skip_serializing_if = "Vec::is_empty", default)]
+    periodic_f32_events: Vec<PeriodicEvent<f32>>,
+    #[serde(skip_serializing_if = "Vec::is_empty", default)]
+    periodic_f64_events: Vec<PeriodicEvent<f64>>,
 }
 
 impl fmt::Display for Events {
@@ -247,6 +340,24 @@ impl fmt::Display for Events {
             }
         }
 
+        if !self.i32_events.is_empty() {
+            for i32_event in &self.i32_events {
+                i32_event.fmt(f)?;
+            }
+        }
+
+        if !self.f32_events.is_empty() {
+            for f32_event in &self.f32_events {
+                f32_event.fmt(f)?;
+            }
+        }
+
+        if !self.f64_events.is_empty() {
+            for f64_event in &self.f64_events {
+                f64_event.fmt(f)?;
+            }
+        }
+
         if !self.periodic_bool_events.is_empty() {
             for periodic_bool_event in &self.periodic_bool_events {
                 periodic_bool_event.fmt(f)?;
@@ -256,6 +367,24 @@ impl fmt::Display for Events {
         if !self.periodic_u8_events.is_empty() {
             for periodic_u8_event in &self.periodic_u8_events {
                 periodic_u8_event.fmt(f)?;
+            }
+        }
+
+        if !self.periodic_i32_events.is_empty() {
+            for periodic_i32_event in &self.periodic_i32_events {
+                periodic_i32_event.fmt(f)?;
+            }
+        }
+
+        if !self.periodic_f32_events.is_empty() {
+            for periodic_f32_event in &self.periodic_f32_events {
+                periodic_f32_event.fmt(f)?;
+            }
+        }
+
+        if !self.periodic_f64_events.is_empty() {
+            for periodic_f64_event in &self.periodic_f64_events {
+                periodic_f64_event.fmt(f)?;
             }
         }
 
@@ -270,8 +399,14 @@ impl Events {
         Self {
             bool_events: Vec::new(),
             u8_events: Vec::new(),
+            i32_events: Vec::new(),
+            f32_events: Vec::new(),
+            f64_events: Vec::new(),
             periodic_bool_events: Vec::new(),
             periodic_u8_events: Vec::new(),
+            periodic_i32_events: Vec::new(),
+            periodic_f32_events: Vec::new(),
+            periodic_f64_events: Vec::new(),
         }
     }
 
@@ -283,8 +418,14 @@ impl Events {
         Self {
             bool_events: Vec::with_capacity(size),
             u8_events: Vec::with_capacity(size),
+            i32_events: Vec::with_capacity(size),
+            f32_events: Vec::with_capacity(size),
+            f64_events: Vec::with_capacity(size),
             periodic_bool_events: Vec::with_capacity(size),
             periodic_u8_events: Vec::with_capacity(size),
+            periodic_i32_events: Vec::with_capacity(size),
+            periodic_f32_events: Vec::with_capacity(size),
+            periodic_f64_events: Vec::with_capacity(size),
         }
     }
 
@@ -304,6 +445,30 @@ impl Events {
         self
     }
 
+    /// Adds a sequence of [`Event<i32>`].
+    #[inline]
+    #[must_use]
+    pub fn i32_events(mut self, i32_events: Vec<Event<i32>>) -> Self {
+        self.i32_events = i32_events;
+        self
+    }
+
+    /// Adds a sequence of [`Event<f32>`].
+    #[inline]
+    #[must_use]
+    pub fn f32_events(mut self, f32_events: Vec<Event<f32>>) -> Self {
+        self.f32_events = f32_events;
+        self
+    }
+
+    /// Adds a sequence of [`Event<f64>`].
+    #[inline]
+    #[must_use]
+    pub fn f64_events(mut self, f64_events: Vec<Event<f64>>) -> Self {
+        self.f64_events = f64_events;
+        self
+    }
+
     /// Adds a sequence of [`PeriodicEvent<bool>`].
     #[inline]
     #[must_use]
@@ -320,6 +485,30 @@ impl Events {
         self
     }
 
+    /// Adds a sequence of [`PeriodicEvent<i32>`].
+    #[inline]
+    #[must_use]
+    pub fn periodic_i32_events(mut self, periodic_i32_events: Vec<PeriodicEvent<i32>>) -> Self {
+        self.periodic_i32_events = periodic_i32_events;
+        self
+    }
+
+    /// Adds a sequence of [`PeriodicEvent<f32>`].
+    #[inline]
+    #[must_use]
+    pub fn periodic_f32_events(mut self, periodic_f32_events: Vec<PeriodicEvent<f32>>) -> Self {
+        self.periodic_f32_events = periodic_f32_events;
+        self
+    }
+
+    /// Adds a sequence of [`PeriodicEvent<f64>`].
+    #[inline]
+    #[must_use]
+    pub fn periodic_f64_events(mut self, periodic_f64_events: Vec<PeriodicEvent<f64>>) -> Self {
+        self.periodic_f64_events = periodic_f64_events;
+        self
+    }
+
     /// Adds a single [`Event<bool>`].
     #[inline]
     pub fn add_bool_event(&mut self, bool_event: Event<bool>) {
@@ -330,6 +519,24 @@ impl Events {
     #[inline]
     pub fn add_u8_event(&mut self, u8_event: Event<u8>) {
         self.u8_events.push(u8_event);
+    }
+
+    /// Adds a single [`Event<i32>`].
+    #[inline]
+    pub fn add_i32_event(&mut self, i32_event: Event<i32>) {
+        self.i32_events.push(i32_event);
+    }
+
+    /// Adds a single [`Event<f32>`].
+    #[inline]
+    pub fn add_f32_event(&mut self, f32_event: Event<f32>) {
+        self.f32_events.push(f32_event);
+    }
+
+    /// Adds a single [`Event<f64>`].
+    #[inline]
+    pub fn add_f64_event(&mut self, f64_event: Event<f64>) {
+        self.f64_events.push(f64_event);
     }
 
     /// Adds a single [`PeriodicEvent<bool>`].
@@ -344,6 +551,24 @@ impl Events {
         self.periodic_u8_events.push(periodic_u8_event);
     }
 
+    /// Adds a single [`PeriodicEvent<i32>`].
+    #[inline]
+    pub fn add_periodic_i32_event(&mut self, periodic_i32_event: PeriodicEvent<i32>) {
+        self.periodic_i32_events.push(periodic_i32_event);
+    }
+
+    /// Adds a single [`PeriodicEvent<f32>`].
+    #[inline]
+    pub fn add_periodic_f32_event(&mut self, periodic_f32_event: PeriodicEvent<f32>) {
+        self.periodic_f32_events.push(periodic_f32_event);
+    }
+
+    /// Adds a single [`PeriodicEvent<f64>`].
+    #[inline]
+    pub fn add_periodic_f64_event(&mut self, periodic_f64_event: PeriodicEvent<f64>) {
+        self.periodic_f64_events.push(periodic_f64_event);
+    }
+
     /// Updates the [`Event<bool>`] value located at the given index.
     #[inline]
     pub fn update_bool_value(&mut self, index: usize, value: bool) {
@@ -356,6 +581,24 @@ impl Events {
         self.u8_events[index].update_value(value);
     }
 
+    /// Updates the [`Event<i32>`] value located at the given index.
+    #[inline]
+    pub fn update_i32_value(&mut self, index: usize, value: i32) {
+        self.i32_events[index].update_value(value);
+    }
+
+    /// Updates the [`Event<f32>`] value located at the given index.
+    #[inline]
+    pub fn update_f32_value(&mut self, index: usize, value: f32) {
+        self.f32_events[index].update_value(value);
+    }
+
+    /// Updates the [`Event<f64>`] value located at the given index.
+    #[inline]
+    pub fn update_f64_value(&mut self, index: usize, value: f64) {
+        self.f64_events[index].update_value(value);
+    }
+
     /// Updates the [`PeriodicEvent<bool>`] value located at the given index.
     #[inline]
     pub fn update_periodic_bool_value(&mut self, index: usize, value: bool) {
@@ -366,6 +609,24 @@ impl Events {
     #[inline]
     pub fn update_periodic_u8_value(&mut self, index: usize, value: u8) {
         self.periodic_u8_events[index].event.update_value(value);
+    }
+
+    /// Updates the [`PeriodicEvent<i32>`] value located at the given index.
+    #[inline]
+    pub fn update_periodic_i32_value(&mut self, index: usize, value: i32) {
+        self.periodic_i32_events[index].event.update_value(value);
+    }
+
+    /// Updates the [`PeriodicEvent<f32>`] value located at the given index.
+    #[inline]
+    pub fn update_periodic_f32_value(&mut self, index: usize, value: f32) {
+        self.periodic_f32_events[index].event.update_value(value);
+    }
+
+    /// Updates the [`PeriodicEvent<f64>`] value located at the given index.
+    #[inline]
+    pub fn update_periodic_f64_value(&mut self, index: usize, value: f64) {
+        self.periodic_f64_events[index].event.update_value(value);
     }
 
     /// Returns an immutable slice to a sequence of [`Event<bool>`].
@@ -382,6 +643,27 @@ impl Events {
         self.u8_events.as_slice()
     }
 
+    /// Returns an immutable slice to a sequence of [`Event<i32>`].
+    #[inline]
+    #[must_use]
+    pub fn i32_events_as_slice(&self) -> &[Event<i32>] {
+        self.i32_events.as_slice()
+    }
+
+    /// Returns an immutable slice to a sequence of [`Event<f32>`].
+    #[inline]
+    #[must_use]
+    pub fn f32_events_as_slice(&self) -> &[Event<f32>] {
+        self.f32_events.as_slice()
+    }
+
+    /// Returns an immutable slice to a sequence of [`Event<f64>`].
+    #[inline]
+    #[must_use]
+    pub fn f64_events_as_slice(&self) -> &[Event<f64>] {
+        self.f64_events.as_slice()
+    }
+
     /// Returns an immutable slice to a sequence of [`PeriodicEvent<bool>`].
     #[inline]
     #[must_use]
@@ -396,13 +678,40 @@ impl Events {
         self.periodic_u8_events.as_slice()
     }
 
+    /// Returns an immutable slice to a sequence of [`PeriodicEvent<i32>`].
+    #[inline]
+    #[must_use]
+    pub fn periodic_i32_events_as_slice(&self) -> &[PeriodicEvent<i32>] {
+        self.periodic_i32_events.as_slice()
+    }
+
+    /// Returns an immutable slice to a sequence of [`PeriodicEvent<f32>`].
+    #[inline]
+    #[must_use]
+    pub fn periodic_f32_events_as_slice(&self) -> &[PeriodicEvent<f32>] {
+        self.periodic_f32_events.as_slice()
+    }
+
+    /// Returns an immutable slice to a sequence of [`PeriodicEvent<f64>`].
+    #[inline]
+    #[must_use]
+    pub fn periodic_f64_events_as_slice(&self) -> &[PeriodicEvent<f64>] {
+        self.periodic_f64_events.as_slice()
+    }
+
     /// Checks whether [`Events`] is empty.
     #[must_use]
     pub const fn is_empty(&self) -> bool {
         self.bool_events.is_empty()
             && self.u8_events.is_empty()
+            && self.i32_events.is_empty()
+            && self.f32_events.is_empty()
+            && self.f64_events.is_empty()
             && self.periodic_bool_events.is_empty()
             && self.periodic_u8_events.is_empty()
+            && self.periodic_i32_events.is_empty()
+            && self.periodic_f32_events.is_empty()
+            && self.periodic_f64_events.is_empty()
     }
 }
 
@@ -444,6 +753,7 @@ mod tests {
     const DEFAULT_DURATION: Duration = Duration::from_secs(1);
 
     #[test]
+    #[allow(clippy::similar_names)]
     fn test_all_event_kinds() {
         let bool_event = Event::bool("bool_event").description("A bool event");
         assert_eq!(
@@ -465,6 +775,33 @@ mod tests {
             deserialize::<PeriodicEvent<u8>>(serialize(&periodic_u8_event)),
             periodic_u8_event
         );
+
+        let i32_event = Event::i32("i32_event").description("An i32 event");
+        assert_eq!(deserialize::<Event<i32>>(serialize(&i32_event)), i32_event);
+
+        let periodic_i32_event = PeriodicEvent::i32(i32_event, DEFAULT_DURATION);
+        assert_eq!(
+            deserialize::<PeriodicEvent<i32>>(serialize(&periodic_i32_event)),
+            periodic_i32_event
+        );
+
+        let f32_event = Event::f32("f32_event").description("An f32 event");
+        assert_eq!(deserialize::<Event<f32>>(serialize(&f32_event)), f32_event);
+
+        let periodic_f32_event = PeriodicEvent::f32(f32_event, DEFAULT_DURATION);
+        assert_eq!(
+            deserialize::<PeriodicEvent<f32>>(serialize(&periodic_f32_event)),
+            periodic_f32_event
+        );
+
+        let f64_event = Event::f64("f64_event").description("An f64 event");
+        assert_eq!(deserialize::<Event<f64>>(serialize(&f64_event)), f64_event);
+
+        let periodic_f64_event = PeriodicEvent::f64(f64_event, DEFAULT_DURATION);
+        assert_eq!(
+            deserialize::<PeriodicEvent<f64>>(serialize(&periodic_f64_event)),
+            periodic_f64_event
+        );
     }
 
     #[test]
@@ -478,17 +815,30 @@ mod tests {
     }
 
     #[test]
+    #[allow(clippy::similar_names)]
     fn test_events_with_all_event_kinds() {
         let bool_event = Event::bool("bool_event").description("A bool event");
         let periodic_bool_event = PeriodicEvent::bool(bool_event.clone(), DEFAULT_DURATION);
         let u8_event = Event::u8("u8_event").description("An u8 event");
         let periodic_u8_event = PeriodicEvent::u8(u8_event.clone(), DEFAULT_DURATION);
+        let i32_event = Event::i32("i32_event").description("An i32 event");
+        let periodic_i32_event = PeriodicEvent::i32(i32_event.clone(), DEFAULT_DURATION);
+        let f32_event = Event::f32("f32_event").description("An f32 event");
+        let periodic_f32_event = PeriodicEvent::f32(f32_event.clone(), DEFAULT_DURATION);
+        let f64_event = Event::f64("f64_event").description("An f64 event");
+        let periodic_f64_event = PeriodicEvent::f64(f64_event.clone(), DEFAULT_DURATION);
 
         let mut events = Events::empty();
         events.add_bool_event(bool_event);
         events.add_periodic_bool_event(periodic_bool_event);
         events.add_u8_event(u8_event);
         events.add_periodic_u8_event(periodic_u8_event);
+        events.add_i32_event(i32_event);
+        events.add_periodic_i32_event(periodic_i32_event);
+        events.add_f32_event(f32_event);
+        events.add_periodic_f32_event(periodic_f32_event);
+        events.add_f64_event(f64_event);
+        events.add_periodic_f64_event(periodic_f64_event);
 
         assert_eq!(deserialize::<Events>(serialize(&events)), events);
     }
