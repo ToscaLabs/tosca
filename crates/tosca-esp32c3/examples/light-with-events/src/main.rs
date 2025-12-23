@@ -316,6 +316,7 @@ async fn main(spawner: Spawner) {
         .await
         .expect("Failed to run the events manager");
 
+    #[allow(clippy::large_futures)]
     Server::<TX_SIZE, RX_SIZE, MAXIMUM_HEADERS_COUNT, _>::new(device, Mdns::new(rng))
         .keepalive_timeout(TIMEOUT)
         .run(stack, spawner)

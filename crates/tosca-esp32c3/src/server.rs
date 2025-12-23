@@ -45,6 +45,14 @@ const DEFAULT_SERVER_PORT: u16 = 80;
 // https://github.com/esp-rs/esp-mbedtls/blob/main/examples/edge_server.rs#L56-L57,
 // the server is configured to handle a maximum of 2 simultaneous
 // open connections (sockets).
+//
+// NOTE:
+// Using more than 1 client increases the size of the async `Server::run`
+// future, as TCP buffers and connection state are embedded in the future
+// itself. This may trigger `clippy::large_futures` when using
+// `-D clippy::pedantic`.
+// In the examples of this crate, this warning is intentionally suppressed
+// at the `Server::run` call site where it arises.
 const NUMBER_OF_CLIENTS: usize = 2;
 
 // Maximum request size in bytes.
