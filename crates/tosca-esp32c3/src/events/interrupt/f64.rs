@@ -38,6 +38,29 @@ pub(crate) async fn monitor_f64_event(
     leak(pin, f64_notifier).await;
 }
 
+pub(crate) type F64FnPinless = Box<
+    dyn Fn(Notifier<f64>) -> Pin<Box<dyn Future<Output = ()> + Send + Sync + 'static>>
+        + Send
+        + Sync
+        + 'static,
+>;
+
+#[embassy_executor::task]
+pub(crate) async fn monitor_f64_event_pinless(
+    event_f64: Event<f64>,
+    f64_notifier: Notifier<f64>,
+    func: F64FnPinless,
+) {
+    f64_notifier.init_event(event_f64).await;
+
+    // We leak the function since this task will live until the end of the
+    // process. We also free the memory.
+    let leak = Box::leak(func);
+
+    // Run the function.
+    leak(f64_notifier).await;
+}
+
 impl Notifier<f64> {
     /// Updates the [`Event<f64>`].
     #[inline]

@@ -38,6 +38,29 @@ pub(crate) async fn monitor_f32_event(
     leak(pin, f32_notifier).await;
 }
 
+pub(crate) type F32FnPinless = Box<
+    dyn Fn(Notifier<f32>) -> Pin<Box<dyn Future<Output = ()> + Send + Sync + 'static>>
+        + Send
+        + Sync
+        + 'static,
+>;
+
+#[embassy_executor::task]
+pub(crate) async fn monitor_f32_event_pinless(
+    event_f32: Event<f32>,
+    f32_notifier: Notifier<f32>,
+    func: F32FnPinless,
+) {
+    f32_notifier.init_event(event_f32).await;
+
+    // We leak the function since this task will live until the end of the
+    // process. We also free the memory.
+    let leak = Box::leak(func);
+
+    // Run the function.
+    leak(f32_notifier).await;
+}
+
 impl Notifier<f32> {
     /// Updates the [`Event<f32>`].
     #[inline]

@@ -39,6 +39,29 @@ pub(crate) async fn monitor_periodic_bool_event(
     leak(pin, periodic_bool_notifier).await;
 }
 
+pub(crate) type PeriodicBoolFnPinless = Box<
+    dyn Fn(PeriodicNotifier<bool>) -> Pin<Box<dyn Future<Output = ()> + Send + Sync + 'static>>
+        + Send
+        + Sync
+        + 'static,
+>;
+
+#[embassy_executor::task]
+pub(crate) async fn monitor_periodic_bool_event_pinless(
+    periodic_event_bool: PeriodicEvent<bool>,
+    periodic_bool_notifier: PeriodicNotifier<bool>,
+    func: PeriodicBoolFnPinless,
+) {
+    periodic_bool_notifier.init_event(periodic_event_bool).await;
+
+    // We leak the function since this task will live until the end of the
+    // process. We also free the memory.
+    let leak = Box::leak(func);
+
+    // Run the function.
+    leak(periodic_bool_notifier).await;
+}
+
 impl PeriodicNotifier<bool> {
     /// Updates the [`PeriodicEvent<bool>`] and then waits for a determined
     /// time interval before checking again the event.

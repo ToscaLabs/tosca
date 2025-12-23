@@ -39,6 +39,29 @@ pub(crate) async fn monitor_periodic_i32_event(
     leak(pin, periodic_i32_notifier).await;
 }
 
+pub(crate) type PeriodicI32FnPinless = Box<
+    dyn Fn(PeriodicNotifier<i32>) -> Pin<Box<dyn Future<Output = ()> + Send + Sync + 'static>>
+        + Send
+        + Sync
+        + 'static,
+>;
+
+#[embassy_executor::task]
+pub(crate) async fn monitor_periodic_i32_event_pinless(
+    periodic_event_i32: PeriodicEvent<i32>,
+    periodic_i32_notifier: PeriodicNotifier<i32>,
+    func: PeriodicI32FnPinless,
+) {
+    periodic_i32_notifier.init_event(periodic_event_i32).await;
+
+    // We leak the function since this task will live until the end of the
+    // process. We also free the memory.
+    let leak = Box::leak(func);
+
+    // Run the function.
+    leak(periodic_i32_notifier).await;
+}
+
 impl PeriodicNotifier<i32> {
     /// Updates the [`PeriodicEvent<i32>`] and then waits for a determined
     /// time interval before checking again the event.
