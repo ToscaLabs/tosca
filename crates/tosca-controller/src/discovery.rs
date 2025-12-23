@@ -238,7 +238,12 @@ impl Discovery {
                 info!("Complete address: {complete_address}");
 
                 // Contact devices to retrieve their data
-                match reqwest::get(&complete_address).await {
+                match reqwest::Client::new()
+                    .get(&complete_address)
+                    .header("Connection", "close")
+                    .send()
+                    .await
+                {
                     Ok(response) => {
                         let device_data: DeviceData = response.json().await?;
 
