@@ -39,8 +39,13 @@ use crate::state::{State, ValueFromRef};
 // Default port.
 const DEFAULT_SERVER_PORT: u16 = 80;
 
-// Number of sockets used for the HTTP server
-const SERVER_SOCKETS: usize = 1;
+// The maximum number of clients the HTTP server can support simultaneously.
+//
+// Referring to the official ESP example at:
+// https://github.com/esp-rs/esp-mbedtls/blob/main/examples/edge_server.rs#L56-L57,
+// the server is configured to handle a maximum of 2 simultaneous
+// open connections (sockets).
+const NUMBER_OF_CLIENTS: usize = 2;
 
 // Maximum request size in bytes.
 const MAXIMUM_REQUEST_SIZE: usize = 128;
@@ -275,7 +280,7 @@ where
             is_https,
         } = self;
 
-        let buffers = TcpBuffers::<SERVER_SOCKETS, TX_SIZE, RX_SIZE>::new();
+        let buffers = TcpBuffers::<NUMBER_OF_CLIENTS, TX_SIZE, RX_SIZE>::new();
         let tcp = Tcp::new(stack, &buffers);
 
         let address = get_ip(stack).await;
@@ -325,7 +330,7 @@ where
         H: Handler,
         Error: From<A::Error>,
     {
-        let mut server = EdgeServer::<SERVER_SOCKETS, RX_SIZE, MAXIMUM_HEADERS_COUNT>::new();
+        let mut server = EdgeServer::<NUMBER_OF_CLIENTS, RX_SIZE, MAXIMUM_HEADERS_COUNT>::new();
 
         // Run server.
         server
