@@ -20,7 +20,7 @@ tosca-controller.path = "../../"
 tosca-controller.version = "0.1"
 tosca-controller.default-features = false
 
-askama.version = "0.14"
+askama.version = "0.15"
 
 axum.version = "0.8"
 axum.default-features = false
