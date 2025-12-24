@@ -108,7 +108,7 @@ corresponding crate subdirectory and execute the `cargo test` command.
 
 Licensed under
 
-- [MIT License](LICENSE-MIT)
+- [MIT License](LICENSE)
 
 ## Contribution
 
