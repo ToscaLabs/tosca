@@ -1284,14 +1284,12 @@ dependencies = [
 
 [[package]]
 name = "rust-mqtt"
-version = "0.3.1"
+version = "0.4.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "a9d4e054be48b0882a44a0f6c653685ff245404c99ea0d2f7a86b99b743a786a"
+checksum = "62317fa1ee34a89a8307fd8a5fd59a3c4c63e48aa332b351b7bdb84e7377b5c0"
 dependencies = [
- "embedded-io 0.6.1",
- "embedded-io-async 0.6.1",
+ "embedded-io-async 0.7.0",
  "heapless 0.9.2",
- "rand_core 0.9.3",
 ]
 
 [[package]]
