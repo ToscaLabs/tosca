@@ -116,7 +116,7 @@ at your option.
 ## Contribution
 
 Contributions are welcome via pull request.
-The [Rust Code of Conduct](https://www.rust-lang.org/policies/code-of-conduct) 
+The [Rust Code of Conduct](https://www.rust-lang.org/policies/code-of-conduct)
 applies.
 
 Unless explicitly stated otherwise, all contributions will be licensed under
