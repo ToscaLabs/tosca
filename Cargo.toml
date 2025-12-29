@@ -11,11 +11,16 @@ members = [
 exclude = ["crates/tosca-esp32c3"]
 
 [workspace.package]
-description = "A secure IoT framework"
+version = "0.1.0"
+authors = ["Michele Valsesia <michele.valsesia@toscalabs.org>"]
+description = "A secure IoT framework."
 edition = "2024"
 license = "Apache-2.0 OR MIT"
+repository = "https://github.com/ToscaLabs/tosca"
+categories = ["iot"]
+keywords = ["iot", "framework", "library", "controller", "devices"]
+rust-version = "1.90"
 readme = "README.md"
-version = "0.1.0"
 
 [workspace.lints.clippy]
 
