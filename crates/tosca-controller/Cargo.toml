@@ -2,9 +2,16 @@
 name = "tosca-controller"
 version.workspace = true
 edition.workspace = true
-authors = ["Michele Valsesia <luni-4@hotmail.it>"]
-description = "A controller to orchestrate Tosca devices within a network."
+authors = ["Michele Valsesia <michele.valsesia@toscalabs.org>"]
+description = "Define a controller to manage interactions with Tosca devices across a network."
+keywords = ["iot", "controller", "methods", "events", "data"]
+documentation = "https://docs.rs/tosca-controller"
+readme.workspace = true
 license.workspace = true
+
+[features]
+stream = ["dep:futures-util", "tosca/stream"]
+default = ["stream"]
 
 [dependencies]
 tosca.path = "../tosca"
@@ -60,6 +67,6 @@ tracing-subscriber.version = "0.3"
 tracing-subscriber.default-features = false
 tracing-subscriber.features = ["ansi", "fmt"]
 
-[features]
-stream = ["dep:futures-util", "tosca/stream"]
-default = ["stream"]
+[package.metadata.docs.rs]
+features = ["default"]
+rustdoc-args = ["--cfg", "docsrs"]
