@@ -56,7 +56,7 @@ jobs:
 
       - name: Run cargo doc (tosca-esp32c3)
         working-directory: crates/tosca-esp32c3
-        run: RUSTDOCFLAGS="-D warnings" cargo doc --verbose
+        run: RUSTDOCFLAGS="-D warnings" cargo doc --verbose --no-deps
 
       - name: Build (tosca-esp32c3)
         working-directory: crates/tosca-esp32c3
