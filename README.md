@@ -17,24 +17,45 @@ unchanged for an extended period.
 > This approach aims to provide clearer and more precise APIs, shaped by user
 feedback and suggestions during the initial stages of the project.
 
-`tosca` is an IoT framework thought to be secure, flexible and customizable.
+`tosca` is a versatile, customizable, and secure IoT framework.
 
-On one hand, it provides a set of APIs to build firmware for microcontrollers
-with various hardware architectures, while on the other hand, it offers APIs
-for developing software to interact with those devices.
+- **Versatile**: On one hand, the crate offers APIs to build firmware for
+  microcontrollers with various hardware architectures, supporting both
+  bare-metal and OS-based devices.
+  On the other hand, it supplies APIs for creating software that interacts
+  with these devices.
 
-From a structural perspective, this repository is a Cargo workspace
-made up of several crates.
+- **Customizable**: Most of the APIs are designed as a sequence of blocks, where
+  each block represents a single feature or a set of features that can be easily
+  added or removed by simply adding or deleting lines of code. As an example, if
+  your device supports events, you simply need to add the event APIs to your
+  firmware server to send the data to its controller. You do not have to touch
+  those APIs if your firmware do not use events.
 
-The main one is [tosca](./crates/tosca), a Rust library crate that serves as the
-primary interface for all the other crates. It can:
+- **Secure**: Written in [Rust](https://rust-lang.org/), a language known for
+  its focus on performance and reliability. Its rich type system and ownership
+  model guarantees memory safety and thread safety, eliminating many classes of
+  bugs at compile-time.
 
-- Create and manage **REST** routes, including their route parameters
-- Describe a device, including its structure, internal data, and methods
-- Associate hazards with a device
+## Framework Structure
 
-To ensure compatibility with embedded devices, this library is `no_std`, so
-it links to the `core`-crate instead of the `std`-crate.
+The main crate is [tosca](./crates/tosca):
+a library that acts as an interface between a device and a controller.
+All other `tosca` crates must incorporate it in some way into their API
+definition.
+
+It can:
+
+- Create and manage **REST** routes to issue commands from a
+  controller to a device.
+- Describe a device, including the structure of its firmware, its internal data
+  and methods, as well as information about its resource consumption at the
+  economic and energy levels.
+- Associate hazards with a route to describe the risks of a device
+  operation.
+
+To ensure compatibility with embedded devices, this library is `no_std`, thus
+linking to the `core`-crate instead of the `std`-crate.
 
 The [tosca-os](./crates/tosca-os) and [tosca-esp32c3](./crates/tosca-esp32c3)
 are two Rust libraries crates for building firmware. They integrate the `tosca`
@@ -64,6 +85,11 @@ you can find some examples demonstrating various methods for receiving events
 from devices.
 
 ## Building
+
+This repository is a Cargo workspace composed of several crates. Dependencies
+common to all crates are defined in the root `Cargo.toml`, ensuring they are
+compiled once and their resulting binaries shared across all crates.
+The same approach is applied to the `tosca` metadata.
 
 To build the entire workspace with the `debug` profile from the root of the
 repository, run:
