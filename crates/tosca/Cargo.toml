@@ -2,9 +2,17 @@
 name = "tosca"
 version.workspace = true
 edition.workspace = true
-authors = ["Michele Valsesia <luni-4@hotmail.it>"]
-description = "Tosca communication interface for general-purpose devices."
+authors = ["Michele Valsesia <michele.valsesia@toscalabs.org>"]
+description = "Tosca communication interface between a device and a controller."
+keywords = ["iot", "interface", "data"]
+documentation = "https://docs.rs/tosca"
+readme.workspace = true
 license.workspace = true
+
+[features]
+stream = []
+deserialize = []
+default = ["deserialize"]
 
 [dependencies]
 hashbrown.workspace = true
@@ -20,7 +28,6 @@ serde.features = ["derive", "alloc"]
 serde_json.workspace = true
 serde_json.features = ["alloc"]
 
-[features]
-stream = []
-deserialize = []
-default = ["deserialize"]
+[package.metadata.docs.rs]
+features = ["default"]
+rustdoc-args = ["--cfg", "docsrs"]
