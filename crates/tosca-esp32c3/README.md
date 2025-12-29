@@ -1,7 +1,9 @@
 <div align="center">
+
 # `tosca-esp32c3`
 
 [![LICENSE][license badge]][license]
+
 </div>
 
 A Rust library crate designed to develop `Tosca` firmware on `ESP32-C3`

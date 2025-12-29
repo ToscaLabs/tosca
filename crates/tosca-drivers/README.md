@@ -1,7 +1,9 @@
 <div align="center">
+
 # `tosca-drivers`
 
 [![LICENSE][license badge]][license]
+
 </div>
 
 A Rust library crate providing architecture-agnostic drivers for various sensors

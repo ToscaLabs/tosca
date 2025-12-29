@@ -1,7 +1,9 @@
 <div align="center">
+
 # `tosca`
 
 [![LICENSE][license badge]][license]
+
 </div>
 
 This library acts as an interface between a device and a controller.
