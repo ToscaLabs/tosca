@@ -106,7 +106,7 @@ jobs:
         uses: dtolnay/rust-toolchain@stable
 
       - name: Generate docs
-        run: cargo doc --verbose --no-deps
+        run: RUSTDOCFLAGS="-D warnings" cargo doc --verbose --no-deps
 
 ################################## CODE COVERAGE LAYER ##################################
 
