@@ -11,8 +11,10 @@ members = [
 exclude = ["crates/tosca-esp32c3"]
 
 [workspace.package]
+description = "A secure IoT framework"
 edition = "2024"
 license = "Apache-2.0 OR MIT"
+readme = "README.md"
 version = "0.1.0"
 
 [workspace.lints.clippy]
