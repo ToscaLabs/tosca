@@ -8,7 +8,7 @@ keywords = ["iot", "iot-library", "controller", "devices", "device-events", "dat
 documentation = "https://docs.rs/tosca-controller"
 readme.workspace = true
 license.workspace = true
-rust-version.worskpace = true
+rust-version.workspace = true
 
 [features]
 stream = ["dep:futures-util", "tosca/stream"]
