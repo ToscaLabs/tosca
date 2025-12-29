@@ -8,7 +8,7 @@ A receiver for events produced by `tosca` devices. It scans the network for
 `tosca` devices, subscribes to their brokers to receive events, and displays
 their data in real-time on a web page using SSE technology.
 """
-license = "MIT"
+license = "Apache-2.0 OR MIT"
 publish = false
 
 [dependencies]

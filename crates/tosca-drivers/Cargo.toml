@@ -4,7 +4,7 @@ version = "0.1.0"
 edition = "2024"
 authors = ["Alex Leonte <m.alex.leonte@gmail.com>"]
 description = "A Rust library providing architecture-agnostic drivers for various sensors and devices"
-license = "MIT"
+license = "Apache-2.0 OR MIT"
 
 [dependencies]
 embedded-hal = "1.0.0"

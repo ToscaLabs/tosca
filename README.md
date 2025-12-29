@@ -106,9 +106,12 @@ corresponding crate subdirectory and execute the `cargo test` command.
 
 ## License
 
-Licensed under
+Licensed under either of
 
+- [Apache License, Version 2.0](LICENSE-APACHE)
 - [MIT License](LICENSE-MIT)
+
+at your option.
 
 ## Contribution
 
@@ -117,16 +120,16 @@ The [Rust Code of Conduct](https://www.rust-lang.org/policies/code-of-conduct)
 applies.
 
 Unless explicitly stated otherwise, all contributions will be licensed under
-the project defined license, without any additional terms or conditions.
+the project defined licenses, without any additional terms or conditions.
 
 <!-- Links -->
 [actions]: https://github.com/ToscaLabs/tosca/actions
 [codecov]: https://codecov.io/gh/ToscaLabs/tosca
-[license]: https://github.com/ToscaLabs/tosca/blob/master/LICENSE-MIT
+[license]: https://github.com/ToscaLabs/tosca?tab=readme-ov-file#license
 [`embedded-hal`]: https://crates.io/crates/embedded-hal
 [`embedded-hal-async`]: https://crates.io/crates/embedded-hal-async
 
 <!-- Badges -->
 [actions badge]: https://github.com/ToscaLabs/tosca/workflows/ci/badge.svg
 [codecov badge]: https://codecov.io/gh/ToscaLabs/tosca/branch/master/graph/badge.svg
-[license badge]: https://img.shields.io/badge/license-MIT-blue.svg
+[license badge]: https://img.shields.io/badge/license-Apache--2.0_OR_MIT-blue.svg

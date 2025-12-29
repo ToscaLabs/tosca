@@ -4,7 +4,7 @@ version = "0.1.0"
 edition = "2024"
 authors = ["Michele Valsesia <luni-4@hotmail.it>"]
 description = "A light implemented with the tosca-os crate."
-license = "MIT"
+license = "Apache-2.0 OR MIT"
 publish = false
 
 [dependencies]

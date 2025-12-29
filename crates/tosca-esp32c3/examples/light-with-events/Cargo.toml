@@ -8,7 +8,7 @@ description = """
 A simple stateless light for an ESP32-C3 board that sends events
 to an external process in response to changes to internal sensors.
 """
-license = "MIT"
+license = "Apache-2.0 OR MIT"
 publish = false
 
 [dependencies]

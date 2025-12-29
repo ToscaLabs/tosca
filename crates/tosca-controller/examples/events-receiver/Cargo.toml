@@ -7,7 +7,7 @@ description = """
 A receiver for events produced by `tosca` devices. It scans the network for
 `tosca` devices and subscribes to their brokers to receive these events.
 """
-license = "MIT"
+license = "Apache-2.0 OR MIT"
 publish = false
 
 [dependencies]

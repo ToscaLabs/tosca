@@ -33,10 +33,10 @@ tosca-drivers.features = ["bh1750", "dht22"] # only include needed drivers
 ```
 
 <!-- Links -->
-[license]: https://github.com/ToscaLabs/tosca/blob/master/LICENSE-MIT
+[license]: https://github.com/ToscaLabs/tosca?tab=readme-ov-file#license
 [`embedded-hal`]: https://crates.io/crates/embedded-hal
 [`embedded-hal-async`]: https://crates.io/crates/embedded-hal-async
 [`Fritzing`]: https://fritzing.org/download/
 
 <!-- Badges -->
-[license badge]: https://img.shields.io/badge/license-MIT-blue.svg
+[license badge]: https://img.shields.io/badge/license-Apache--2.0_OR_MIT-blue.svg

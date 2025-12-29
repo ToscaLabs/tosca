@@ -5,7 +5,7 @@ rust-version = "1.89"
 edition = "2024"
 authors = ["Michele Valsesia <luni-4@hotmail.it>"]
 description = "A simple stateful light for an ESP32-C3 board."
-license = "MIT"
+license = "Apache-2.0 OR MIT"
 publish = false
 
 [dependencies]

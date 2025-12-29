@@ -65,7 +65,7 @@ For example, to start the streaming, one must write
 `http://your-hostname.local:3000/camera/stream` on the browser.
 
 <!-- Links -->
-[license]: https://github.com/ToscaLabs/tosca/blob/master/LICENSE-MIT
+[license]: https://github.com/ToscaLabs/tosca?tab=readme-ov-file#license
 
 <!-- Badges -->
-[license badge]: https://img.shields.io/badge/license-MIT-blue.svg
+[license badge]: https://img.shields.io/badge/license-Apache--2.0_OR_MIT-blue.svg

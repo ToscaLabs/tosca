@@ -63,7 +63,7 @@ Wi-Fi credentials (`SSID` and `PASSWORD`)
 - Pin the project to a specific `nightly` version for more stability, if needed
 
 <!-- Links -->
-[license]: https://github.com/ToscaLabs/tosca/blob/master/LICENSE-MIT
+[license]: https://github.com/ToscaLabs/tosca?tab=readme-ov-file#license
 
 <!-- Badges -->
-[license badge]: https://img.shields.io/badge/license-MIT-blue.svg
+[license badge]: https://img.shields.io/badge/license-Apache--2.0_OR_MIT-blue.svg
