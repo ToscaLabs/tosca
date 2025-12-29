@@ -8,6 +8,7 @@ keywords = ["iot", "iot-library", "firmware", "operating-systems"]
 documentation = "https://docs.rs/tosca-os"
 readme.workspace = true
 license.workspace = true
+repository.workspace = true
 rust-version.workspace = true
 
 [features]

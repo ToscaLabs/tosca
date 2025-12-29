@@ -8,6 +8,7 @@ keywords = ["iot", "iot-library", "devices", "sensors", "data"]
 documentation = "https://docs.rs/tosca-drivers"
 readme.workspace = true
 license.workspace = true
+repository.workspace = true
 rust-version.workspace = true
 
 [features]
