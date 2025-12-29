@@ -30,4 +30,4 @@ serde_json.features = ["alloc"]
 
 [package.metadata.docs.rs]
 features = ["default"]
-rustdoc-args = ["--cfg", "docsrs"]
+rustdoc-args = ["--cfg", "docsrs", "-D", "warnings"]

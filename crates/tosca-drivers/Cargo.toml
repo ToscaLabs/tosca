@@ -26,4 +26,4 @@ tokio = { version = "1.48.0", features = ["macros", "rt-multi-thread", "time"] }
 
 [package.metadata.docs.rs]
 features = ["default"]
-rustdoc-args = ["--cfg", "docsrs"]
+rustdoc-args = ["--cfg", "docsrs", "-D", "warnings"]

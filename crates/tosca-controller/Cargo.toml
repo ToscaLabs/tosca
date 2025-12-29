@@ -69,4 +69,4 @@ tracing-subscriber.features = ["ansi", "fmt"]
 
 [package.metadata.docs.rs]
 features = ["default"]
-rustdoc-args = ["--cfg", "docsrs"]
+rustdoc-args = ["--cfg", "docsrs", "-D", "warnings"]
