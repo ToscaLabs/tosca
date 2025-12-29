@@ -1,10 +1,20 @@
 [package]
 name = "tosca-drivers"
-version = "0.1.0"
-edition = "2024"
+version.workspace = true
+edition.workspace = true
 authors = ["Alex Leonte <m.alex.leonte@gmail.com>"]
-description = "A Rust library providing architecture-agnostic drivers for various sensors and devices"
-license = "Apache-2.0 OR MIT"
+description = "A library providing architecture-agnostic drivers for various sensors and devices."
+keywords = ["iot", "iot-library", "devices", "sensors", "data"]
+documentation = "https://docs.rs/tosca-drivers"
+readme.workspace = true
+license.workspace = true
+
+[features]
+default = ["dht22", "bh1750", "am312", "ds18b20"]
+dht22 = []
+bh1750 = []
+am312 = []
+ds18b20 = []
 
 [dependencies]
 embedded-hal = "1.0.0"
@@ -14,9 +24,6 @@ embedded-hal-async = "1.0.0"
 embedded-hal-mock = { version = "0.11.1", features = ["embedded-hal-async"] }
 tokio = { version = "1.48.0", features = ["macros", "rt-multi-thread", "time"] }
 
-[features]
-default = ["dht22", "bh1750", "am312", "ds18b20"]
-dht22 = []
-bh1750 = []
-am312 = []
-ds18b20 = []
+[package.metadata.docs.rs]
+features = ["default"]
+rustdoc-args = ["--cfg", "docsrs"]
