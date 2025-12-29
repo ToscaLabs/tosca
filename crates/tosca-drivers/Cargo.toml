@@ -8,6 +8,7 @@ keywords = ["iot", "iot-library", "devices", "sensors", "data"]
 documentation = "https://docs.rs/tosca-drivers"
 readme.workspace = true
 license.workspace = true
+rust-version.workspace = true
 
 [features]
 default = ["dht22", "bh1750", "am312", "ds18b20"]

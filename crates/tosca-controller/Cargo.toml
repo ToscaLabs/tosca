@@ -2,12 +2,13 @@
 name = "tosca-controller"
 version.workspace = true
 edition.workspace = true
-authors = ["Michele Valsesia <michele.valsesia@toscalabs.org>"]
+authors.workspace = true
 description = "A library for building a controller that manages all Tosca devices across a network."
 keywords = ["iot", "iot-library", "controller", "devices", "device-events", "data"]
 documentation = "https://docs.rs/tosca-controller"
 readme.workspace = true
 license.workspace = true
+rust-version.worskpace = true
 
 [features]
 stream = ["dep:futures-util", "tosca/stream"]

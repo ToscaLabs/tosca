@@ -2,12 +2,13 @@
 name = "tosca"
 version.workspace = true
 edition.workspace = true
-authors = ["Michele Valsesia <michele.valsesia@toscalabs.org>"]
+authors.workspace = true
 description = "A library for interfacing a controller with a device."
 keywords = ["iot", "iot-library", "interface", "data", "methods"]
 documentation = "https://docs.rs/tosca"
 readme.workspace = true
 license.workspace = true
+rust-version.workspace = true
 
 [features]
 stream = []

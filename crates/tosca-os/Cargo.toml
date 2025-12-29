@@ -2,12 +2,13 @@
 name = "tosca-os"
 version.workspace = true
 edition.workspace = true
-authors = ["Michele Valsesia <michele.valsesia@toscalabs.org>"]
+authors.workspace = true
 description = "A library for building Tosca firmware that runs on operating systems."
 keywords = ["iot", "iot-library", "firmware", "operating-systems"]
 documentation = "https://docs.rs/tosca-os"
 readme.workspace = true
 license.workspace = true
+rust-version.workspace = true
 
 [features]
 stream = ["dep:futures-core", "dep:tokio-util", "tosca/stream"]
