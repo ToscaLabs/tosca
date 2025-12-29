@@ -2,9 +2,16 @@
 name = "tosca-os"
 version.workspace = true
 edition.workspace = true
-authors = ["Michele Valsesia <luni-4@hotmail.it>"]
-description = "Tosca library for building firmware running on operating systems."
+authors = ["Michele Valsesia <michele.valsesia@toscalabs.org>"]
+description = "A library for building firmware that runs on operating systems."
+keywords = ["iot", "iot-library", "firmware", "operating-systems"]
+documentation = "https://docs.rs/tosca-os"
+readme.workspace = true
 license.workspace = true
+
+[features]
+stream = ["dep:futures-core", "dep:tokio-util", "tosca/stream"]
+default = ["stream"]
 
 [dependencies]
 tosca.path = "../tosca"
@@ -40,6 +47,6 @@ tokio-util.optional = true
 windows-sys.version = "0.61.0"
 windows-sys.features = ["Win32_NetworkManagement_IpHelper", "Win32_Foundation", "Win32_Networking_WinSock", "Win32_NetworkManagement_Ndis"]
 
-[features]
-stream = ["dep:futures-core", "dep:tokio-util", "tosca/stream"]
-default = ["stream"]
+[package.metadata.docs.rs]
+features = ["default"]
+rustdoc-args = ["--cfg", "docsrs"]
