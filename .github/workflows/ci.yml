@@ -32,16 +32,16 @@ concurrency:
 
 jobs:
 
-  # Enable consistent use of `RUST_PREVIOUS_VERSION` across different jobs
+  # Enable consistent use of `RUST_MINIMAL_VERSION` across different jobs
   prepare-checks:
     runs-on: ubuntu-latest
 
     outputs:
-      rust-prev-version: ${{ env.RUST_PREVIOUS_VERSION }}
+      rust-minimal-version: ${{ env.RUST_MINIMAL_VERSION }}
 
     steps:
-      - name: Set rust-prev-version output
-        run: echo "rust-prev-version=${RUST_PREVIOUS_VERSION}" >> $GITHUB_OUTPUT
+      - name: Set rust-minimal-version output
+        run: echo "rust-minimal-version=${RUST_MINIMAL_VERSION}" >> $GITHUB_OUTPUT
 
 ################################## FORMAT AND LINTS LAYER ######################
 
@@ -70,22 +70,22 @@ jobs:
     strategy:
       matrix:
         platform: [ubuntu-latest, macos-latest, windows-latest, ubuntu-24.04-arm]
-        rust: [stable, prev]
+        rust: [stable, minimal-version]
 
     runs-on: ${{ matrix.platform }}
 
     steps:
       - uses: actions/checkout@v6
 
-      - name: Debug matrix and previous
+      - name: Debug matrix and minimal version
         run: |
           echo "Matrix rust: ${{ matrix.rust }}"
-          echo "Prepare-checks rust-prev-version: ${{ needs.prepare-checks.outputs.rust-prev-version }}"
+          echo "Prepare-checks rust-minimal-version: ${{ needs.prepare-checks.outputs.rust-minimal-version }}"
 
       - name: Install Rust toolchain
         uses: dtolnay/rust-toolchain@stable
         with:
-          toolchain: ${{ matrix.rust == 'prev' && needs.prepare-checks.outputs.rust-prev-version || 'stable' }}
+          toolchain: ${{ matrix.rust == 'minimal-version' && needs.prepare-checks.outputs.rust-minimal-version || 'stable' }}
 
       - name: Build
         run: cargo build --all-targets --verbose
