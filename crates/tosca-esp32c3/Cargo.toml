@@ -2,8 +2,11 @@
 name = "tosca-esp32c3"
 version = "0.1.0"
 edition = "2024"
-authors = ["Michele Valsesia <luni-4@hotmail.it>"]
-description = "A Rust library crate designed for developing Tosca firmware on ESP32-C3 boards."
+authors = ["Michele Valsesia <michele.valsesia@toscalabs.org>"]
+description = "A library for building Tosca firmware that runs on ESP32-C3 boards."
+keywords = ["iot", "iot-library", "firmware", "device", "esp32-c3"]
+documentation = "https://docs.rs/tosca-esp32c3"
+readme = "README.md"
 license = "Apache-2.0 OR MIT"
 
 [dependencies]
@@ -74,3 +77,6 @@ serde_json.features = ["alloc"]
 # Static cell
 static_cell.version = "2.1.1"
 static_cell.features = ["nightly"]
+
+[package.metadata.docs.rs]
+rustdoc-args = ["--cfg", "docsrs"]
