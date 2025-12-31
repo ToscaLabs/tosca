@@ -19,28 +19,28 @@ feedback and suggestions during the initial stages of the project.
 
 `tosca` is a versatile, customizable, and secure IoT framework.
 
-- **Versatile**: On one hand, the crate offers APIs to build firmware for
+- **Versatile**: The framework offers APIs to build firmware for
   microcontrollers with various hardware architectures, supporting both
   bare-metal and OS-based devices.
-  On the other hand, it supplies APIs for creating software that interacts
+  At the same time, it also supplies APIs for creating software that interacts
   with these devices.
 
-- **Customizable**: Most of the APIs are designed as a sequence of blocks, where
-  each block represents a single feature or a set of features that can be easily
-  added or removed by simply adding or deleting lines of code. As an example, if
+- **Customizable**: Most of the APIs are designed as a sequence of code blocks,
+  where each block represents a single feature or a set of features. These
+  blocks can be combined by adding or removing lines of code. As an example, if
   your device supports events, you simply need to add the event APIs to your
   firmware server to send the data to its controller. You do not have to touch
   those APIs if your firmware do not use events.
 
 - **Secure**: Written in [Rust](https://rust-lang.org/), a language known for
   its focus on performance and reliability. Its rich type system and ownership
-  model guarantees memory safety and thread safety, eliminating many classes of
+  model guarantees memory and thread safety, preventing many classes of
   bugs at compile-time.
 
 ## Framework Structure
 
 The main crate is [tosca](./crates/tosca):
-a library that acts as an interface between a device and a controller.
+a library that acts as an interface between a device and its controller.
 All other `tosca` crates must incorporate it in some way into their API
 definition.
 
