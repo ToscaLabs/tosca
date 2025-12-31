@@ -22,8 +22,10 @@ const RESET: u8 = 0x07;
 const MTREG_HIGH: u8 = 0x40;
 const MTREG_LOW: u8 = 0x60;
 
-const MTREG_MIN: u8 = 31; // Minimum allowed MTreg value.
-const MTREG_MAX: u8 = 254; // Maximum allowed MTreg value.
+/// Minimum allowed MTreg value.
+pub const MTREG_MIN: u8 = 31;
+/// Maximum allowed MTreg value.
+pub const MTREG_MAX: u8 = 254;
 const DEFAULT_MTREG: u8 = 69; // Default per datasheet.
 
 /// Errors that may occur while interacting with the BH1750 sensor.
