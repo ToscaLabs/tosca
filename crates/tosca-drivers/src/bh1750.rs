@@ -176,7 +176,7 @@ where
 
     /// Sets the measurement time register (`MTreg`) to adjust sensitivity.
     ///
-    /// The value is clamped between [`Bh1750::MTREG_MIN`] and [`Bh1750::MTREG_MAX`].
+    /// The value is clamped between [`MTREG_MIN`] and [`MTREG_MAX`].
     ///
     /// # Errors
     ///
