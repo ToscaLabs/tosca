@@ -321,7 +321,7 @@ map! {
 }
 
 impl ParametersData {
-    /// Retrieves a reference to the [`PatameterKind`] associated with the
+    /// Retrieves a reference to the [`ParameterKind`] associated with the
     /// given key.
     #[must_use]
     #[inline]
