@@ -100,153 +100,151 @@ fn f64_max() -> f64 {
     f64::MAX
 }
 
-/// All supported kinds of route input parameters.
+/// All supported kinds of route parameters.
 #[derive(Debug, Clone, PartialEq, Serialize)]
 #[cfg_attr(feature = "deserialize", derive(serde::Deserialize))]
 pub enum ParameterKind {
     /// A [`bool`] value.
     Bool {
-        /// The initial [`bool`] value, but also the default one
-        /// in case of missing input parameter.
+        /// The initial [`bool`] value, also used as the default
+        /// when the parameter is missing.
         default: bool,
     },
     /// An [`u8`] value.
     U8 {
-        /// The initial [`u8`] value, but also the default one
-        /// in case of a missing input parameter.
+        /// The initial [`u8`] value, also used as the default
+        /// when the parameter is missing.
         default: u8,
-        /// The minimum [`u8`] value allowed.
+        /// The minimum allowed [`u8`] value.
         #[serde(skip_serializing_if = "is_u8_max")]
         #[serde(default)]
         min: u8,
-        /// The maximum [`u8`] value allowed.
+        /// The maximum allowed [`u8`] value.
         #[serde(skip_serializing_if = "is_u8_min")]
         #[serde(default = "u8_max")]
         max: u8,
     },
     /// An [`u16`] value.
     U16 {
-        /// The initial [`u16`] value, but also the default one
-        /// in case of a missing input parameter.
+        /// The initial [`u16`] value, also used as the default
+        /// when the parameter is missing.
         default: u16,
-        /// The minimum [`u16`] value allowed.
+        /// The minimum allowed [`u16`] value.
         #[serde(skip_serializing_if = "is_u16_max")]
         #[serde(default)]
         min: u16,
-        /// The maximum [`u16`] value allowed.
+        /// The maximum allowed [`u16`] value.
         #[serde(skip_serializing_if = "is_u16_min")]
         #[serde(default = "u16_max")]
         max: u16,
     },
     /// An [`u32`] value.
     U32 {
-        /// The initial [`u32`] value, but also the default one
-        /// in case of a missing input parameter.
+        /// The initial [`u32`] value, also used as the default
+        /// when the parameter is missing.
         default: u32,
-        /// The minimum [`u32`] value allowed.
+        /// The minimum allowed [`u32`] value.
         #[serde(skip_serializing_if = "is_u32_max")]
         #[serde(default)]
         min: u32,
-        /// The maximum [`u32`] allowed value.
+        /// The maximum allowed [`u32`] value.
         #[serde(skip_serializing_if = "is_u32_min")]
         #[serde(default = "u32_max")]
         max: u32,
     },
     /// An [`u64`] value.
     U64 {
-        /// The initial [`u64`] value, but also the default one
-        /// in case of a missing input parameter.
+        /// The initial [`u64`] value, also used as the default
+        /// when the parameter is missing.
         default: u64,
-        /// The minimum [`u64`] value allowed.
+        /// The minimum allowed [`u64`] value.
         #[serde(skip_serializing_if = "is_u64_max")]
         #[serde(default)]
         min: u64,
-        /// The maximum [`u64`] allowed value.
+        /// The maximum allowed [`u64`] value.
         #[serde(skip_serializing_if = "is_u64_min")]
         #[serde(default = "u64_max")]
         max: u64,
     },
     /// A [`f32`] value.
     F32 {
-        /// The initial [`f32`] value, but also the default one
-        /// in case of a missing input parameter.
+        /// The initial [`f32`] value, also used as the default
+        /// when the parameter is missing.
         default: f32,
-        /// The minimum [`f32`] value allowed.
+        /// The minimum allowed [`f32`] value.
         #[serde(skip_serializing_if = "is_f32_max")]
         #[serde(default = "f32_min")]
         min: f32,
-        /// The maximum [`f32`] allowed value.
+        /// The maximum allowed [`f32`] value.
         #[serde(skip_serializing_if = "is_f32_min")]
         #[serde(default = "f32_max")]
         max: f32,
-        /// The decimal step associated with the [`f32`] value.
+        /// The decimal step for the [`f32`] value.
         #[serde(skip_serializing_if = "is_f32_min")]
         #[serde(default)]
         step: f32,
     },
     /// A [`f64`] value.
     F64 {
-        /// The initial [`f64`] value, but also the default one
-        /// in case of a missing input.
+        /// The initial [`f64`] value, also used as the default
+        /// when the parameter is missing.
         default: f64,
-        /// The minimum [`f64`] value allowed.
+        /// The minimum allowed [`f64`] value.
         #[serde(skip_serializing_if = "is_f64_max")]
         #[serde(default = "f64_min")]
         min: f64,
-        /// The maximum [`f64`] allowed value.
+        /// The maximum allowed [`f64`] value.
         #[serde(skip_serializing_if = "is_f64_min")]
         #[serde(default = "f64_max")]
         max: f64,
-        /// The decimal step associated with the [`f64`] value.
+        /// The decimal step for the [`f64`] value.
         #[serde(skip_serializing_if = "is_f64_min")]
         #[serde(default)]
         step: f64,
     },
     /// A range of [`u32`] values.
     RangeU32 {
-        /// Minimum [`u32`] value allowed.
+        /// The minimum allowed [`u32`] value.
         min: u32,
-        /// Maximum [`u32`] value allowed.
+        /// The maximum allowed [`u32`] value.
         max: u32,
-        /// The [`u32`] step necessary to pass from one allowed value
-        /// to another one in the range.
+        /// The [`u32`] step between consecutive allowed values in the range.
         step: u32,
-        /// Initial [`u32`] range value.
+        /// The default [`u32`] value for the range.
         default: u32,
     },
     /// A range of [`u64`] values.
     RangeU64 {
-        /// Minimum [`u64`] value allowed.
+        /// The minimum allowed [`u64`] value.
         min: u64,
-        /// Maximum [`u64`] value allowed.
+        /// The maximum allowed [`u64`] value.
         max: u64,
-        /// The [`u64`] step necessary to pass from one allowed value
-        /// to another one in the range.
+        /// The [`u64`] step between consecutive allowed values in the range.
         step: u64,
-        /// Initial [`u64`] range value.
+        /// The default [`u64`] value for the range.
         default: u64,
     },
     /// A range of [`f64`] values.
     RangeF64 {
-        /// The minimum [`f64`] value allowed.
+        /// The minimum allowed [`f64`] value.
         min: f64,
-        /// Maximum [`f64`] value allowed.
+        /// The maximum allowed [`f64`] value.
         max: f64,
-        /// The [`f64`] step necessary to pass from one allowed value
-        /// to another one in the range. It is always a positive value.
+        /// The [`f64`] step between consecutive allowed values in the range.
+        /// Always a positive value.
         step: f64,
-        /// Initial [`f64`] range value.
+        /// The default [`f64`] value for the range.
         default: f64,
     },
-    /// A characters sequence.
+    /// A sequence of characters.
     CharsSequence {
-        /// A character sequence representing the default value.
+        /// A sequence of characters representing the default value.
         default: Cow<'static, str>,
     },
 }
 
 impl ParameterKind {
-    /// Returns the name associated with a [`ParameterKind`].
+    /// Returns the name of the [`ParameterKind`].
     #[must_use]
     pub const fn name(&self) -> &'static str {
         match self {
@@ -264,7 +262,7 @@ impl ParameterKind {
         }
     }
 
-    /// Returns the type associated with a [`ParameterKind`] as a [`&str`].
+    /// Returns the type of the [`ParameterKind`].
     #[must_use]
     pub const fn as_type(&self) -> &'static str {
         match self {
@@ -280,7 +278,7 @@ impl ParameterKind {
     }
 }
 
-/// Floating point decimal precision.
+/// The decimal precision of a floating-point value.
 #[derive(Debug, Clone, Copy, PartialEq, Serialize)]
 #[cfg_attr(feature = "deserialize", derive(serde::Deserialize))]
 pub enum DecimalPrecision {
@@ -290,7 +288,7 @@ pub enum DecimalPrecision {
     TwoDigits,
     /// Three digits.
     ThreeDigits,
-    /// Any digits.
+    /// Any sequence of digits.
     Any,
 }
 
@@ -315,7 +313,7 @@ impl DecimalPrecision {
 }
 
 map! {
-  /// A map that associates each parameter name with its
+  /// A map associating each parameter name with its
   /// corresponding [`ParameterKind`].
   #[derive(Debug, Clone, PartialEq, Serialize)]
   #[cfg_attr(feature = "deserialize", derive(serde::Deserialize))]
@@ -323,8 +321,8 @@ map! {
 }
 
 impl ParametersData {
-    /// Retrieves the value associated with the specified key
-    /// from [`ParametersData`].
+    /// Retrieves a reference to the [`PatameterKind`] associated with the
+    /// given key.
     #[must_use]
     #[inline]
     pub fn get(&self, key: &str) -> Option<&ParameterKind> {
@@ -332,7 +330,7 @@ impl ParametersData {
     }
 }
 
-/// Route input parameters.
+/// Route parameters.
 #[derive(Debug, Clone)]
 pub struct Parameters(IndexMap<&'static str, ParameterKind, DefaultHashBuilder>);
 
@@ -343,7 +341,7 @@ impl Default for Parameters {
 }
 
 impl Parameters {
-    /// Creates a [`Parameters`].
+    /// Creates [`Parameters`].
     #[must_use]
     #[inline]
     pub fn new() -> Self {
@@ -371,7 +369,7 @@ impl Parameters {
         )
     }
 
-    /// Adds an [`u8`] parameter with limits.
+    /// Adds an [`u8`] parameter with specified limits.
     #[must_use]
     #[inline]
     pub fn u8_with_limits(self, name: &'static str, default: u8, min: u8, max: u8) -> Self {
@@ -392,7 +390,7 @@ impl Parameters {
         )
     }
 
-    /// Adds an [`u16`] parameter with limits.
+    /// Adds an [`u16`] parameter with specified limits.
     #[must_use]
     #[inline]
     pub fn u16_with_limits(self, name: &'static str, default: u16, min: u16, max: u16) -> Self {
@@ -413,7 +411,7 @@ impl Parameters {
         )
     }
 
-    /// Adds an [`u32`] parameter with limits.
+    /// Adds an [`u32`] parameter with specified limits.
     #[must_use]
     #[inline]
     pub fn u32_with_limits(self, name: &'static str, default: u32, min: u32, max: u32) -> Self {
@@ -434,7 +432,7 @@ impl Parameters {
         )
     }
 
-    /// Adds an [`u64`] parameter with limits.
+    /// Adds an [`u64`] parameter with specified limits.
     #[must_use]
     #[inline]
     pub fn u64_with_limits(self, name: &'static str, default: u64, min: u64, max: u64) -> Self {
@@ -456,7 +454,7 @@ impl Parameters {
         )
     }
 
-    /// Adds a [`f32`] parameter with limits.
+    /// Adds a [`f32`] parameter with specified limits.
     #[must_use]
     #[inline]
     pub fn f32_with_limits(
@@ -493,7 +491,7 @@ impl Parameters {
         )
     }
 
-    /// Adds a [`f64`] parameter with limits.
+    /// Adds a [`f64`] parameter with specified limits.
     #[must_use]
     #[inline]
     pub fn f64_with_limits(
@@ -596,7 +594,7 @@ impl Parameters {
         )
     }
 
-    /// Adds a characters sequence with a determined length.
+    /// Adds a sequence of characters.
     #[must_use]
     #[inline]
     pub fn characters_sequence(
@@ -614,7 +612,7 @@ impl Parameters {
 
     /// Serializes [`Parameters`] data.
     ///
-    /// It consumes the data.
+    /// **It consumes the parameter.**
     #[must_use]
     #[inline]
     pub fn serialize_data(self) -> ParametersData {
@@ -625,14 +623,14 @@ impl Parameters {
         data
     }
 
-    /// Checks whether [`Parameters`] is empty.
+    /// Checks if [`Parameters`] is empty.
     #[must_use]
     #[inline]
     pub fn is_empty(&self) -> bool {
         self.0.is_empty()
     }
 
-    /// Iterates over all [`Parameters`] names.
+    /// Iterates over the names of [`Parameters`].
     #[must_use]
     #[inline]
     pub fn names(&self) -> Keys<'_, &str, ParameterKind> {
@@ -645,26 +643,26 @@ impl Parameters {
     }
 }
 
-/// All supported parameter values extracted from or
-/// used to construct a request.
+/// All supported parameter values extracted from the payload of an incoming
+/// request linked to a route.
 #[derive(Debug, PartialEq, Deserialize)]
 #[serde(untagged)]
 pub enum ParameterValue {
     /// A [`bool`] value.
     Bool(bool),
-    /// A [`u8`] value.
+    /// An [`u8`] value.
     U8(u8),
-    /// A [`u16`] value.
+    /// An [`u16`] value.
     U16(u16),
-    /// A [`u32`] value.
+    /// An [`u32`] value.
     U32(u32),
-    /// A [`u64`] value.
+    /// An [`u64`] value.
     U64(u64),
     /// A [`f32`] value.
     F32(f32),
     /// A [`f64`] value.
     F64(f64),
-    /// A characters sequence.
+    /// A sequence of characters.
     CharsSequence(Cow<'static, str>),
 }
 
@@ -685,7 +683,7 @@ impl core::fmt::Display for ParameterValue {
 }
 
 impl ParameterValue {
-    /// Creates a [`ParameterValue`] from [`ParameterKind`].
+    /// Creates a [`ParameterValue`] from a [`ParameterKind`].
     #[must_use]
     pub fn from_parameter_kind(parameter_kind: &ParameterKind) -> Self {
         match parameter_kind {
@@ -706,7 +704,7 @@ impl ParameterValue {
         }
     }
 
-    /// Returns the type associated with a [`ParameterValue`] as a [`&str`].
+    /// Returns the type of the [`ParameterValue`].
     #[must_use]
     pub const fn as_type(&self) -> &'static str {
         match self {
@@ -747,7 +745,8 @@ impl ParameterValue {
     }
 }
 
-/// Route input parameters values.
+/// A map associating each parameter name with its
+/// corresponding [`ParameterValue`].
 #[derive(Debug, PartialEq, Deserialize)]
 pub struct ParametersValues<'a>(IndexMap<Cow<'a, str>, ParameterValue, DefaultHashBuilder>);
 
@@ -836,7 +835,7 @@ impl<'a> ParametersValues<'a> {
         self.parameter_value(name, ParameterValue::F64(value))
     }
 
-    /// Adds a characters sequence.
+    /// Adds a sequence of characters.
     #[inline]
     pub fn characters_sequence(
         &mut self,
@@ -848,7 +847,7 @@ impl<'a> ParametersValues<'a> {
 
     /// Retrieves a [`ParameterValue`] by name.
     ///
-    /// If [`None`], the parameter does not exist.
+    /// Returns [`None`] if the parameter does not exist.
     #[must_use]
     #[inline]
     pub fn get<'b>(&'b self, name: impl Into<Cow<'b, str>>) -> Option<&'b ParameterValue> {
@@ -865,12 +864,10 @@ impl<'a> ParametersValues<'a> {
     }
 }
 
-/// Parameter payload data.
-///
-/// A payload consists of parameter metadata ([`ParameterKind`]) and
-/// its associated value ([`ParameterValue`]).
+/// Parameter data payload, consisting of a [`ParameterKind`] and a
+/// [`ParameterValue`].
 pub struct ParameterPayload {
-    /// Parameter metadata.
+    /// Parameter kind.
     pub kind: ParameterKind,
     /// Parameter value.
     pub value: ParameterValue,
@@ -885,7 +882,7 @@ impl ParameterPayload {
 }
 
 map! {
-  /// A map that associates each parameter name with its
+  /// A map associating each parameter name with its
   /// corresponding [`ParameterPayload`].
   pub struct ParametersPayloads<'a>(IndexMap<Cow<'a, str>, ParameterPayload, DefaultHashBuilder>);
 }
@@ -893,7 +890,7 @@ map! {
 impl<'a> ParametersPayloads<'a> {
     /// Retrieves a [`ParameterPayload`] by name.
     ///
-    /// If [`None`], the parameter does not exist.
+    /// Returns [`None`] if the parameter does not exist.
     #[must_use]
     #[inline]
     pub fn get<'b>(&'b self, name: impl Into<Cow<'b, str>>) -> Option<&'b ParameterPayload> {
@@ -904,7 +901,7 @@ impl<'a> ParametersPayloads<'a> {
     ///
     /// **It consumes the parameter.**
     ///
-    /// If [`None`], the parameter does not exist.
+    /// Returns [`None`] if the parameter does not exist.
     #[must_use]
     #[inline]
     pub fn extract(&mut self, name: impl Into<Cow<'a, str>>) -> Option<ParameterPayload> {

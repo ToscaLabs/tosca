@@ -34,7 +34,7 @@ pub const ALL_HAZARDS: &[Hazard] = &[
     Hazard::WaterFlooding,
 ];
 
-/// All possible hazards for a device action.
+/// All possible hazards for a device route.
 #[derive(Clone, Copy, PartialEq, Eq, Hash, Serialize)]
 #[cfg_attr(feature = "deserialize", derive(serde::Deserialize))]
 pub enum Hazard {
@@ -118,7 +118,7 @@ impl core::fmt::Display for Hazard {
 }
 
 impl Hazard {
-    /// Returns an [`Hazard`] name.
+    /// Returns the [`Hazard`] name.
     #[must_use]
     pub const fn name(&self) -> &'static str {
         match self {
@@ -149,7 +149,7 @@ impl Hazard {
         }
     }
 
-    /// Returns an [`Hazard`] description.
+    /// Returns the [`Hazard`] description.
     #[must_use]
     pub const fn description(&self) -> &'static str {
         match self {
@@ -212,9 +212,9 @@ impl Hazard {
         }
     }
 
-    /// Returns the [`Category`] associated with an [`Hazard`].
+    /// Returns the [`Category`] associated with the [`Hazard`].
     ///
-    /// An hazard is **always** associated with **only** one category.
+    /// A hazard is **always** associated with **exactly one** one category.
     #[must_use]
     pub const fn category(&self) -> Category {
         match self {
@@ -245,7 +245,7 @@ impl Hazard {
         }
     }
 
-    /// Returns the identifier associated with an [`Hazard`].
+    /// Returns the identifier associated with the [`Hazard`].
     #[must_use]
     pub const fn id(&self) -> u16 {
         match self {
@@ -276,10 +276,10 @@ impl Hazard {
         }
     }
 
-    /// Returns an [`Hazard`] from an integer identifier.
+    /// Returns the [`Hazard`] associated with the given integer identifier.
     ///
-    /// The return value is [`None`] when the identifier is not correct or
-    /// it does not exist.
+    /// The return value is [`None`] when the identifier is invalid or does
+    /// not exist.
     #[must_use]
     pub const fn from_id(id: u16) -> Option<Self> {
         match id {
@@ -311,7 +311,7 @@ impl Hazard {
         }
     }
 
-    /// Returns the [`HazardData`] of an [`Hazard`].
+    /// Returns the [`HazardData`] constructed from the given [`Hazard`].
     #[must_use]
     pub const fn data(&self) -> HazardData {
         HazardData {
@@ -332,7 +332,7 @@ set! {
 }
 
 impl Hazards {
-    /// Initializes [`Hazards`] from an array of [`Hazard`]s.
+    /// Constructs [`Hazards`] from an array of [`Hazard`]s.
     #[must_use]
     #[inline]
     pub fn init_from_hazards<const N: usize>(input_elements: [Hazard; N]) -> Self {
@@ -367,11 +367,11 @@ pub const ALL_CATEGORIES: &[Category] = &[Category::Safety, Category::Privacy, C
 /// Hazard categories.
 #[derive(Clone, Copy, PartialEq, Eq, Hash, Serialize, Deserialize)]
 pub enum Category {
-    /// Category which includes all financial-related hazards.
+    /// Category including all financial-related hazards.
     Financial,
-    /// Category which includes all privacy-related hazards.
+    /// Category including all privacy-related hazards.
     Privacy,
-    /// Category which includes all safety-related hazards.
+    /// Category including all safety-related hazards.
     Safety,
 }
 

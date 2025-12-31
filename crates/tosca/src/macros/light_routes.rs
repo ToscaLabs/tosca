@@ -61,31 +61,31 @@ macro_rules! mandatory_route {
                 self
             }
 
-            #[doc = "Returns the route path"]
+            #[doc = "Returns the route path."]
             #[must_use]
             pub fn route(&self ) -> &str {
                 self.route.route()
             }
 
-            #[doc = concat!("Returns [`RestKind`].")]
+            #[doc = concat!("Returns the [`RestKind`].")]
             #[must_use]
             pub const fn kind(&self) -> RestKind {
                 self.route.kind()
             }
 
-            #[doc = concat!("Returns [`Hazards`].")]
+            #[doc = concat!("Returns all route [`Hazards`].")]
             #[must_use]
             pub const fn hazards(&self) -> &Hazards {
                self.route.hazards()
             }
 
-            #[doc = concat!("Returns [`Parameters`].")]
+            #[doc = concat!("Returns all route [`Parameters`].")]
             #[must_use]
             pub const fn parameters(&self) -> &Parameters {
                 self.route.parameters()
             }
 
-            #[doc = "Returns the internal [`Route`] instance."]
+            #[doc = "Returns the internal [`Route`]."]
             #[must_use]
             pub fn into_route(self) -> Route {
                 self.route
@@ -94,7 +94,7 @@ macro_rules! mandatory_route {
     };
 
     (@method_fn get, $name:ident, $path:expr) => {
-        #[doc = concat!("Creates a new [`", stringify!($name), "`] through a REST `GET` API.")]
+        #[doc = concat!("Creates a [`", stringify!($name), "`] through a `GET` API.")]
         #[must_use]
         #[inline]
         pub fn get(name: &'static str) -> Self {
@@ -105,7 +105,7 @@ macro_rules! mandatory_route {
     };
 
     (@method_fn put, $name:ident, $path:expr) => {
-        #[doc = concat!("Creates a new [`", stringify!($name), "`] through a REST `PUT` API.")]
+        #[doc = concat!("Creates a [`", stringify!($name), "`] through a `PUT` API.")]
         #[must_use]
         #[inline]
         pub fn put(name: &'static str) -> Self {
@@ -116,7 +116,7 @@ macro_rules! mandatory_route {
     };
 
     (@method_fn post, $name:ident, $path:expr) => {
-        #[doc = concat!("Creates a new [`", stringify!($name), "`] through a REST `POST` API.")]
+        #[doc = concat!("Creates a [`", stringify!($name), "`] through a `POST` API.")]
         #[must_use]
         #[inline]
         pub fn post(name: &'static str) -> Self {
@@ -127,7 +127,7 @@ macro_rules! mandatory_route {
     };
 
     (@method_fn delete, $name:ident, $path:expr) => {
-        #[doc = concat!("Creates a new [`", stringify!($name), "`] through a REST `DELETE` API.")]
+        #[doc = concat!("Creates a [`", stringify!($name), "`] through a `DELETE` API.")]
         #[must_use]
         #[inline]
         pub fn delete(name: &'static str) -> Self {

@@ -4,11 +4,11 @@ use serde::Serialize;
 
 use crate::device::DeviceInfo;
 
-/// The header name associated with a response which failed to serialize its
-/// values.
+/// The header value associated with a response sent by a device which had
+/// failed to serialize its values.
 ///
-/// This constant signals to the controller that a serialization error occurred
-/// on the device, causing the discarding of the invalid response.
+/// This constant signals to the controller to discard the invalid response
+/// because a serialization error occurred on a device.
 pub const SERIALIZATION_ERROR: &str = "Serialization-Error";
 
 /// Response kinds.
@@ -23,7 +23,7 @@ pub enum ResponseKind {
     /// the data produced during a device operation.
     Serial,
     /// This response transmits a JSON message over the network containing
-    /// a device's energy and economy information.
+    /// a device energy and economy information.
     Info,
     /// This response transmits a stream of data, represented as a
     /// sequence of bytes, over the network.

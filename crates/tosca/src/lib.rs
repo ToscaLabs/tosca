@@ -1,29 +1,26 @@
-//! The communication interface among an Tosca device and an Tosca controller.
+//! The communication interface among a `tosca` device and its controller.
 //!
-//! This crate contains a series of APIs to:
+//! This crate provides APIs to:
 //!
-//! - Encode and decode the information about a device structure and
-//!   all of its routes. A route is an address which a controller can invoke
-//!   to execute one or more device operations.
-//! - Manage the hazards which might occur when the operations invoked by a
-//!   route are executed. Hazards describe all safety, privacy, and financial
-//!   problems associated with a route invocation. They can also be employed
-//!   to manage the events occurring on a device.
-//! - Manage the possible input parameters of a route. An input parameter
-//!   might represent an external information needed to perform a device
-//!   operation or a condition to block or allow determined instructions.
-//!   For example, a boolean parameter might delineate the on/off states of a
-//!   light, but also a condition to discriminate among these two states.
-//!   Instead, a range-of-floats parameter might be adopted to control the
-//!   light brightness state.
+//! - Encode and decode information about a device structure and its routes.
+//!   A route is a path that allows a controller to start one or
+//!   more tasks on a device. Each route is always associated with a response.
+//! - Manage hazards that may arise during the execution of a route.
+//!   Hazards describe safety, privacy, and financial risks, and are always
+//!   associated with a route.
+//! - Manage route parameters. Parameters may represent external
+//!   information required for device tasks or conditions that control whether
+//!   instructions are executed. For example, a boolean parameter might control
+//!   the on/off state of a light, while a float range might adjust its
+//!   brightness state.
 //!
-//! To share data among a device and a controller, each structure of this
-//! interface must be both serializable and deserializable.
-//! A device fills in these structures with the desired data, while a controller
-//! consumes their content to retrieve the device information.
+//! Data exchange between the device and controller requires structures to be
+//! serializable and deserializable. A device serializes these structures
+//! while the controller deserializes them and uses the data for its tasks.
+//! A device can avoid importing deserialization functions by disabling the
+//! `deserialize` feature at compile time.
 //!
-//! This crate can be used both on `std` and `no_std` environments. The `alloc`
-//! feature allows heap-allocations and it is enabled by default.
+//! This crate can be compiled for both `std` and `no_std` environments.
 
 #![forbid(unsafe_code)]
 #![deny(missing_docs)]
@@ -33,19 +30,19 @@ extern crate alloc;
 
 mod macros;
 
-/// Description of a device with its routes information.
+/// Description of a device and its associated routes.
 pub mod device;
-/// Information about the economy device aspects.
+/// Economic information about a device.
 pub mod economy;
-/// Information about the energy device aspects.
+/// Energy-related information about a device.
 pub mod energy;
-/// Events descriptions and methods.
+/// Event descriptions and methods.
 pub mod events;
-/// Hazards descriptions and methods.
+/// Hazard descriptions and methods.
 pub mod hazards;
-/// Route input parameters.
+/// Route parameters.
 pub mod parameters;
-/// All supported responses returned by a device action.
+/// All supported responses from a device.
 pub mod response;
 /// Definition of device routes.
 pub mod route;

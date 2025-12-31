@@ -14,7 +14,7 @@ use crate::response::ResponseKind;
 
 use crate::macros::{mandatory_route, set};
 
-/// `REST` requests kind.
+/// The kind of `REST` request.
 #[derive(Debug, Clone, Copy, PartialEq, Eq, Hash, Serialize)]
 #[cfg_attr(feature = "deserialize", derive(serde::Deserialize))]
 pub enum RestKind {
@@ -54,7 +54,7 @@ pub struct RouteData {
     #[serde(skip_serializing_if = "Hazards::is_empty")]
     #[serde(default = "Hazards::new")]
     pub hazards: Hazards,
-    /// Input parameters associated with a route.
+    /// Route parameters.
     #[serde(skip_serializing_if = "ParametersData::is_empty")]
     #[serde(default = "ParametersData::new")]
     pub parameters: ParametersData,
@@ -78,14 +78,14 @@ impl RouteData {
     }
 }
 
-/// A server route configuration.
+/// A route configuration.
 #[derive(Debug, Clone, Serialize)]
 #[cfg_attr(feature = "deserialize", derive(serde::Deserialize))]
 pub struct RouteConfig {
-    /// Route.
+    /// Route data.
     #[serde(flatten)]
     pub data: RouteData,
-    /// **_REST_** kind..
+    /// The kind of `REST` request.
     #[serde(rename = "REST kind")]
     pub rest_kind: RestKind,
     /// Response kind.
@@ -133,7 +133,7 @@ set! {
 }
 
 impl RouteConfigs {
-    /// Merges the provided [`RouteConfigs`] with the current one.
+    /// Merges the given [`RouteConfigs`] with the current one.
     #[must_use]
     #[inline]
     pub fn merge(mut self, other: Self) -> Self {
@@ -142,10 +142,10 @@ impl RouteConfigs {
     }
 }
 
-/// A server route.
+/// A route definition.
 ///
-/// It represents a specific `REST` API which, when invoked, runs a task on
-/// a remote device.
+/// Identifies a specific `REST` route that runs a task on a device when
+/// invoked.
 #[derive(Debug)]
 pub struct Route {
     // Name.
@@ -178,28 +178,28 @@ impl core::hash::Hash for Route {
 }
 
 impl Route {
-    /// Creates a new [`Route`] through a REST `GET` API.
+    /// Creates a [`Route`] through a `GET` API.
     #[must_use]
     #[inline]
     pub fn get(name: &'static str, path: &'static str) -> Self {
         Self::init(RestKind::Get, name, path)
     }
 
-    /// Creates a new [`Route`] through a REST `PUT` API.
+    /// Creates a [`Route`] through a `PUT` API.
     #[must_use]
     #[inline]
     pub fn put(name: &'static str, path: &'static str) -> Self {
         Self::init(RestKind::Put, name, path)
     }
 
-    /// Creates a new [`Route`] through a REST `POST` API.
+    /// Creates a [`Route`] through a `POST` API.
     #[must_use]
     #[inline]
     pub fn post(name: &'static str, path: &'static str) -> Self {
         Self::init(RestKind::Post, name, path)
     }
 
-    /// Creates a new [`Route`] through a REST `DELETE` API.
+    /// Creates a [`Route`] through a `DELETE` API.
     #[must_use]
     #[inline]
     pub fn delete(name: &'static str, path: &'static str) -> Self {
@@ -265,7 +265,7 @@ impl Route {
         self.path
     }
 
-    /// Returns [`RestKind`].
+    /// Returns the [`RestKind`].
     #[must_use]
     pub const fn kind(&self) -> RestKind {
         self.rest_kind
@@ -283,8 +283,7 @@ impl Route {
         &self.parameters
     }
 
-    /// Removes any prohibited [`Hazard`]s and returns an updated version of
-    /// the [`Route`].
+    /// Removes prohibited [`Hazard`]s returning an updated [`Route`].
     #[must_use]
     #[inline]
     pub fn remove_prohibited_hazards(mut self, allowed_hazards: &[Hazard]) -> Self {
@@ -302,7 +301,7 @@ impl Route {
 
     /// Serializes [`Route`] data.
     ///
-    /// It consumes the data.
+    /// **It consumes the route.**
     #[must_use]
     #[inline]
     pub fn serialize_data(self) -> RouteConfig {

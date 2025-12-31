@@ -35,12 +35,9 @@ impl core::fmt::Display for DeviceKind {
 
 /// Device environment.
 ///
-/// Some information about the device environment on which a firmware runs on.
-/// It might be an operating system or the name of the underlying hardware
-/// architecture.
-///
-/// This enumerator allows to discriminate the different implementations among
-/// the supported architectures on a controller side.
+/// Specifies the underlying hardware architecture of a device,
+/// allowing the controller to perform different operations based on
+/// the device environment.
 #[derive(Debug, Clone, Copy, PartialEq, Serialize)]
 #[cfg_attr(feature = "deserialize", derive(serde::Deserialize))]
 pub enum DeviceEnvironment {
@@ -65,7 +62,7 @@ pub struct DeviceInfo {
 }
 
 impl DeviceInfo {
-    /// Creates a [`DeviceInfo`].
+    /// Creates an empty [`DeviceInfo`].
     #[must_use]
     pub fn empty() -> Self {
         Self {
@@ -118,7 +115,7 @@ pub struct DeviceData {
 }
 
 impl DeviceData {
-    /// Creates a [`DeviceData`].
+    /// Creates [`DeviceData`].
     #[must_use]
     pub fn new(
         kind: DeviceKind,
@@ -142,7 +139,7 @@ impl DeviceData {
         }
     }
 
-    /// Sets the device description.
+    /// Sets a device description.
     #[must_use]
     pub fn description(mut self, description: impl Into<alloc::borrow::Cow<'static, str>>) -> Self {
         self.description = Some(description.into());
