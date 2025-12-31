@@ -93,6 +93,9 @@ pub(crate) fn create_requests(
 }
 
 /// Request information.
+///
+/// Each request is identified by the data of its associated route and the
+/// corresponding response.
 pub struct RequestInfo<'device> {
     /// Route name.
     pub route: &'device str,
@@ -103,6 +106,8 @@ pub struct RequestInfo<'device> {
     /// Route hazards.
     pub hazards: &'device Hazards,
     /// Parameters data.
+    ///
+    /// If the request has no parameters, the reference will be empty.
     pub parameters_data: &'device ParametersData,
     /// Response kind.
     pub response_kind: ResponseKind,
@@ -121,12 +126,10 @@ impl<'device> RequestInfo<'device> {
     }
 }
 
-/// A device request.
+/// A device request to be sent to a device.
 ///
-/// It defines a request to be sent to a device.
-///
-/// A request can be plain, hence without any input parameter, or with some
-/// parameters which are used to personalize device operations.
+/// A request can either be plain, with no associated parameters, or include
+/// parameters that serve as inputs for device tasks.
 #[derive(Debug, PartialEq, Serialize)]
 pub struct Request {
     pub(crate) kind: RestKind,
@@ -139,7 +142,7 @@ pub struct Request {
 }
 
 impl Request {
-    /// Returns an immutable reference to request [`Hazards`].
+    /// Returns an immutable reference to the request [`Hazards`].
     #[must_use]
     pub fn hazards(&self) -> &Hazards {
         &self.hazards
@@ -151,7 +154,7 @@ impl Request {
         self.kind
     }
 
-    /// Returns an immutable reference to [`ParametersData`] associated with
+    /// Returns an immutable reference to the [`ParametersData`] associated with
     /// a request.
     ///
     /// If [`None`], the request **does not** contain any [`ParametersData`].

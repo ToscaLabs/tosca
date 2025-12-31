@@ -5,17 +5,17 @@ use tracing::error;
 /// All possible error kinds.
 #[derive(Debug, Copy, Clone, PartialEq)]
 pub enum ErrorKind {
-    /// Errors caused by the discovery process.
+    /// Errors encountered during the discovery service.
     Discovery,
-    /// Errors caused by sending requests to a device.
+    /// Errors encountered when sending requests to a device.
     Request,
-    /// Errors caused by a wrong input parameter.
+    /// Errors caused by a wrong parameter.
     WrongParameter,
-    /// Errors in receiving a json response.
+    /// Errors encountered while parsing a `json` response.
     JsonResponse,
-    /// Errors in receiving a bytes stream response.
+    /// Errors encountered while parsing a byte stream response.
     StreamResponse,
-    /// Errors in building the mechanism to send a request to a device.
+    /// Errors encountered while constructing the request sender.
     Sender,
     /// Errors related to event management.
     Events,

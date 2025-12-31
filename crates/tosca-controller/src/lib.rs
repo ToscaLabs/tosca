@@ -1,45 +1,46 @@
-//! The `tosca-controller` library crate offers a set of APIs to manage,
-//! orchestrate, and interact with all `tosca`-compliant devices within a
+//! The `tosca-controller` library provides a set of APIs for managing,
+//! orchestrating, and interacting with all `tosca` devices within a
 //! network.
 //!
-//! A device is compliant with the `tosca` architecture if its firmware is built
-//! using the `tosca` APIs designed for the relative microcontroller.
+//! A device is considered compliant with `tosca` if its firmware is built
+//! using the APIs of the `tosca` framework designed for the device's underlying
+//! hardware architecture.
 //!
-//! The core functionalities of this crate include:
+//! Core functionalities of this crate include:
 //!
 //! - Discovering all devices within the network that are compliant with the
 //!   `tosca` architecture
-//! - Constructing and sending _REST_ requests to `tosca` devices to trigger
-//!   one or more of their operations
-//! - Defining security and privacy policies to allow or block requests
+//! - Constructing and sending `REST` requests to `tosca` devices to trigger
+//!   their tasks
+//! - Defining privacy policies to allow or block requests to a device
 //! - Intercepting device events by subscribing to the brokers where
 //!   they are published
 //!
 //! To optimize system resource usage, `tosca-controller` leverages `tokio` as
-//! an asynchronous executor. This improves performance by allowing concurrent
-//! execution of independent tasks. If the underlying machine is multi-threaded,
-//! the performance boost is further amplified, as tasks are distributed across
-//! multiple threads too.
+//! an asynchronous executor, allowing concurrent execution of independent
+//! tasks. This approach improves performance, especially when running on
+//! multi-threaded systems, where tasks are distributed across
+//! multiple threads for additional efficiency.
 
 #![forbid(unsafe_code)]
 #![deny(missing_docs)]
 
 /// A controller for interacting with `tosca` devices.
 pub mod controller;
-/// A device definition along with its operations.
+/// Device data along with its associated methods.
 pub mod device;
-/// A mechanism for discovering all `tosca` devices in a network.
+/// A service for discovering all `tosca` devices within a network.
 pub mod discovery;
 /// Error management.
 pub mod error;
-/// Events data.
+/// All events data.
 pub mod events;
-/// A privacy and security policy manager that determines whether `REST`
-/// requests can be sent or blocked.
+/// A privacy policy manager that blocks or allows the requests to devices
+/// based on a set of privacy rules.
 pub mod policy;
-/// Request data and its methods.
+/// Request data and the associated methods.
 pub mod request;
-/// All supported methods and data for device responses.
+/// All supported methods and data for handling `tosca` device responses.
 pub mod response;
 
 #[cfg(test)]

@@ -22,12 +22,12 @@ use crate::request::create_requests;
 // It defines the default top-level domain for a service.
 const TOP_LEVEL_DOMAIN: &str = "local";
 
-/// Service transport protocol.
+/// The discovery service transport protocol.
 #[derive(Debug, PartialEq)]
 pub enum TransportProtocol {
-    /// TCP service.
+    /// TCP-based service.
     TCP,
-    /// UDP service.
+    /// UDP-based service.
     UDP,
 }
 
@@ -48,9 +48,10 @@ impl TransportProtocol {
     }
 }
 
-/// Devices discovery.
+/// Device discovery service.
 ///
-/// It detects all `tosca`-compliant [`Device`]s in a network.
+/// A service for identifying and registering all `tosca` devices within
+/// a network.
 #[derive(Debug, PartialEq)]
 pub struct Discovery {
     domain: Cow<'static, str>,
@@ -63,7 +64,7 @@ pub struct Discovery {
 }
 
 impl Discovery {
-    /// Creates a [`Discovery`].
+    /// Creates [`Discovery`].
     #[must_use]
     #[inline]
     pub fn new(domain: impl Into<Cow<'static, str>>) -> Self {
@@ -78,7 +79,9 @@ impl Discovery {
         }
     }
 
-    /// Sets a different timeout.
+    /// Sets the service timeout.
+    ///
+    /// The entire discovery process will last for the given timeout value.
     #[must_use]
     pub const fn timeout(mut self, timeout: Duration) -> Self {
         self.timeout = timeout;
@@ -92,7 +95,9 @@ impl Discovery {
         self
     }
 
-    /// Changes service domain.
+    /// Sets the service domain.
+    ///
+    /// The domain searched for by the service. i.e. tosca
     #[must_use]
     #[inline]
     pub fn domain(mut self, domain: impl Into<Cow<'static, str>>) -> Self {
@@ -101,6 +106,8 @@ impl Discovery {
     }
 
     /// Sets the service top-level domain.
+    ///
+    /// A common top-level domain is `.local`.
     #[must_use]
     #[inline]
     pub fn top_level_domain(mut self, top_level_domain: impl Into<Cow<'static, str>>) -> Self {
@@ -108,14 +115,14 @@ impl Discovery {
         self
     }
 
-    /// Do not discover devices with `IPv6` interfaces.
+    /// Excludes devices with `IPv6` interfaces from the discovery service.
     #[must_use]
     pub const fn disable_ipv6(mut self) -> Self {
         self.disable_ipv6 = true;
         self
     }
 
-    /// Disables the given IP address.
+    /// Excludes the device with the given `IP` from the discovery service.
     #[must_use]
     #[inline]
     pub fn disable_ip(mut self, ip: impl Into<IpAddr>) -> Self {
@@ -123,7 +130,7 @@ impl Discovery {
         self
     }
 
-    /// Disables the given network interface.
+    /// Disables the given network interface from the discovery service.
     #[must_use]
     pub const fn disable_network_interface(mut self, network_interface: &'static str) -> Self {
         self.disable_network_interface = Some(network_interface);

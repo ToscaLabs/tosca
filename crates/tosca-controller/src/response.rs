@@ -26,14 +26,13 @@ where
 pub struct OkResponseParser(ReqwestResponse);
 
 impl OkResponseParser {
-    /// Parses the internal response body with the intent of retrieving
-    /// an [`OkResponse`].
+    /// Parses the internal response body to retrieve an [`OkResponse`].
     ///
     /// # Errors
     ///
-    /// The response body does not contain a valid [`OkResponse`].
-    /// A parsing error is raised either because the given format is not correct
-    /// or because binary data contains some syntactic or semantic errors.
+    /// If the response body does not contain a valid [`OkResponse`], a
+    /// parsing error will be raised. This may occur due to an incorrect format
+    /// or because the binary data contains syntactic or semantic errors.
     pub async fn parse_body(self) -> Result<OkResponse> {
         json_response::<OkResponse>(self.0).await
     }
@@ -47,14 +46,13 @@ impl OkResponseParser {
 pub struct SerialResponseParser(ReqwestResponse);
 
 impl SerialResponseParser {
-    /// Parses the internal response body with the intent of retrieving
-    /// a [`SerialResponse`].
+    /// Parses the internal response body to retrieve a [`SerialResponse`].
     ///
     /// # Errors
     ///
-    /// The response body does not contain a valid [`SerialResponse`].
-    /// A parsing error is raised either because the given format is not correct
-    /// or because binary data contains some syntactic or semantic errors.
+    /// If the response body does not contain a valid [`SerialResponse`], a
+    /// parsing error will be raised. This may occur due to an incorrect format
+    /// or because the binary data contains syntactic or semantic errors.
     pub async fn parse_body<T: Serialize + DeserializeOwned>(self) -> Result<SerialResponse<T>> {
         json_response::<SerialResponse<T>>(self.0).await
     }
@@ -68,14 +66,13 @@ impl SerialResponseParser {
 pub struct InfoResponseParser(ReqwestResponse);
 
 impl InfoResponseParser {
-    /// Parses the internal response body with the intent of retrieving
-    /// an [`InfoResponse`].
+    /// Parses the internal response body to retrieve an [`InfoResponse`].
     ///
     /// # Errors
     ///
-    /// The response body does not contain a valid [`InfoResponse`].
-    /// A parsing error is raised either because the given format is not correct
-    /// or because binary data contains some syntactic or semantic errors.
+    /// If the response body does not contain a valid [`InfoResponse`], a
+    /// parsing error will be raised. This may occur due to an incorrect format
+    /// or because the binary data contains syntactic or semantic errors.
     pub async fn parse_body(self) -> Result<InfoResponse> {
         json_response::<InfoResponse>(self.0).await
     }
@@ -85,18 +82,17 @@ impl InfoResponseParser {
     }
 }
 
-/// A stream response.
+/// A byte stream response body parser.
 #[cfg(feature = "stream")]
 pub struct StreamResponse(ReqwestResponse);
 
 #[cfg(feature = "stream")]
 impl StreamResponse {
-    /// Consumes the internal response body opening a bytes stream.
+    /// Opens a bytes stream from the response received from a device.
     ///
     /// # Errors
     ///
-    /// Stream data are not retrieved correctly because of network failures or
-    /// data corruption.
+    /// Byte stream parsing may fail due to network errors or data corruption.
     pub fn open_stream(self) -> impl futures_util::Stream<Item = Result<bytes::Bytes>> {
         use futures_util::TryStreamExt;
         self.0.bytes_stream().map_err(|e| {
@@ -112,12 +108,11 @@ impl StreamResponse {
     }
 }
 
-/// All supported device response kinds.
+/// All response types supported by a `tosca` device.
 ///
-/// Each response includes a dedicated body parser responsible for
-/// analyzing its internal data.
+/// Each response includes a dedicated body parser to extract the embedded data.
 pub enum Response {
-    /// A skipped response occurs when a request has not been sent because of
+    /// A skipped response indicates a request that is not sent due to
     /// privacy policy rules.
     Skipped,
     /// An [`OkResponse`] body.
@@ -126,7 +121,7 @@ pub enum Response {
     SerialBody(SerialResponseParser),
     /// An [`InfoResponse`] body.
     InfoBody(InfoResponseParser),
-    /// A stream response body.
+    /// A byte stream response body.
     #[cfg(feature = "stream")]
     StreamBody(StreamResponse),
 }

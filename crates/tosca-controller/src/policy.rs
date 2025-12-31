@@ -6,8 +6,8 @@ use tosca::hazards::Hazards;
 
 /// A privacy policy manager.
 ///
-/// A privacy policy can be applied to all requests sent to devices or just to
-/// specific ones.
+/// It allows or blocks the requests to devices, or to a specific device,
+/// according to a set of privacy rules.
 #[derive(Debug, PartialEq)]
 pub struct Policy {
     block_on_hazards: Hazards,
@@ -15,8 +15,8 @@ pub struct Policy {
 }
 
 impl Policy {
-    /// Creates a [`Policy`] to block the sending of all requests with
-    /// the given [`Hazards`].
+    /// Creates a [`Policy`] to block **all** requests that have the given
+    /// [`Hazards`] in their routes.
     #[must_use]
     #[inline]
     pub fn new(block_on_hazards: Hazards) -> Self {
@@ -26,8 +26,8 @@ impl Policy {
         }
     }
 
-    /// Creates a [`Policy`] to block the sending of requests for the
-    /// [`crate::device::Device`] with the given identifier and [`Hazards`].
+    /// Creates a [`Policy`] to block **all** [`crate::device::Device`] id
+    /// requests that have the given [`Hazards`] in their routes.
     #[must_use]
     #[inline]
     pub fn only_local_policy(id: usize, hazards: Hazards) -> Self {
@@ -35,8 +35,8 @@ impl Policy {
         policy.block_device_on_hazards(id, hazards)
     }
 
-    /// Adds a [`Policy`] rule to block the sending of requests for the
-    /// [`crate::device::Device`] with the given identifier and [`Hazards`].
+    /// Adds a new [`Policy`] to block **all** [`crate::device::Device`] id
+    /// requests that have the given [`Hazards`] in their routes.
     #[must_use]
     #[inline]
     pub fn block_device_on_hazards(mut self, id: usize, hazards: Hazards) -> Self {

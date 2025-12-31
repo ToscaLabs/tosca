@@ -29,27 +29,25 @@ pub struct RequestSender<'controller> {
 }
 
 impl RequestSender<'_> {
-    /// Sends a request to a device, getting in return a [`Response`].
+    /// Sends a request to a device and returns a [`Response`].
     ///
     /// # Errors
     ///
-    /// While sending a request to a device, some network failures or timeouts
-    /// can prevent the effective sending. Moreover, the same issues can also
-    /// affect the returned response.
+    /// Network failures or timeouts may prevent the request from being sent
+    /// and affect the returned response as well.
     pub async fn send(&self) -> Result<Response, Error> {
         self.request
             .retrieve_response(self.skip, || async { self.request.plain_send().await })
             .await
     }
 
-    /// Sends a request to a device with the given [`ParametersValues`],
-    /// getting in return a [`Response`].
+    /// Sends a request to a device with the given [`ParametersValues`]
+    /// and returns a [`Response`].
     ///
     /// # Errors
     ///
-    /// While sending a request to a device, some network failures or timeouts
-    /// can prevent the effective sending. Moreover, the same issues can also
-    /// affect the returned response.
+    /// Network failures or timeouts may prevent the request from being sent
+    /// and affect the returned response as well.
     pub async fn send_with_parameters(
         &self,
         parameters: &ParametersValues<'_>,
@@ -67,7 +65,9 @@ impl RequestSender<'_> {
     }
 }
 
-/// A sender for the requests of a determined device.
+/// A device sender.
+///
+/// It generates multiple unique request senders for a device.
 #[derive(Debug, PartialEq)]
 pub struct DeviceSender<'controller> {
     controller: &'controller Controller,
@@ -76,13 +76,14 @@ pub struct DeviceSender<'controller> {
 }
 
 impl DeviceSender<'_> {
-    /// Builds the [`RequestSender`] for the given request, identified by its
-    /// route, associated with this [`DeviceSender`] instance.
+    /// Builds a [`RequestSender`] for the given route.
     ///
+    /// The generated request sender is tightly bound to the device sender and
+    /// cannot function independently.
     ///
     /// # Errors
     ///
-    /// An error is returned when the given route **does** not exist.
+    /// An error is returned if the given route **does** not exist.
     pub fn request(&self, route: &str) -> Result<RequestSender<'_>, Error> {
         let request = self.device.request(route).ok_or_else(|| {
             sender_error(format!(
@@ -136,14 +137,15 @@ impl DeviceSender<'_> {
     }
 }
 
-/// A controller for sending requests.
+/// A controller for interacting with `tosca` devices.
 ///
-/// It sends or does not send requests to devices according to:
+/// The main functionalities include:
 ///
-/// - A privacy policy
-///
-/// When the controller receives a response from a device, it forwards it
-/// directly to the caller.
+/// - Discovering `tosca` devices on the network and registering them in memory.
+/// - Sending requests to a specific device identified by its ID, awaiting a
+///   response, and forwarding it directly to the caller.
+/// - Controlling request sending by allowing or blocking requests based on the
+///   defined privacy policy.
 #[derive(Debug, PartialEq)]
 pub struct Controller {
     discovery: Discovery,
@@ -152,7 +154,7 @@ pub struct Controller {
 }
 
 impl Controller {
-    /// Creates a [`Controller`] given a [`Discovery`] configuration.
+    /// Creates a [`Controller`] from a [`Discovery`] configuration.
     #[must_use]
     #[inline]
     pub fn new(discovery: Discovery) -> Self {
@@ -164,10 +166,9 @@ impl Controller {
     }
 
     /// Creates a [`Controller`] from a [`Discovery`] configuration and
-    /// a set of initial [`Devices`].
+    /// an initial set of [`Devices`].
     ///
-    /// This method might be useful when [`Devices`] are retrieved from
-    /// a database.
+    /// This method is useful when [`Devices`] are retrieved from database.
     #[must_use]
     #[inline]
     pub fn from_devices(discovery: Discovery, devices: Devices) -> Self {
@@ -178,7 +179,7 @@ impl Controller {
         }
     }
 
-    /// Sets a [`Policy`].
+    /// Defines a [`Policy`] while constructing a [`Controller`].
     #[must_use]
     #[inline]
     pub fn policy(mut self, privacy_policy: Policy) -> Self {
@@ -186,28 +187,29 @@ impl Controller {
         self
     }
 
-    /// Change preset [`Policy`].
+    /// Changes the [`Policy`].
     #[inline]
     pub fn change_policy(&mut self, privacy_policy: Policy) {
         self.privacy_policy = privacy_policy;
     }
 
-    /// Discovers all available [`Devices`] in a network.
+    /// Discovers all available [`Devices`] on the network.
     ///
     /// # Errors
     ///
     /// ## Discovery Errors
     ///
-    /// During a discovery process some of the most common errors are the
-    /// impossibility to connect to a network, disable a particular interface,
-    /// or close the discovery process itself.
+    /// During the discovery process, common errors include:
+    ///
+    /// - Inability to connect to the network
+    /// - Failure to disable a particular network interface
+    /// - Issues terminating the discovery process.
     ///
     /// ## Sending Requests Errors
     ///
-    /// While sending a request to a device to obtain the description of its
-    /// structure and all of its routes, some network failures or
-    /// timeouts can prevent the effective sending.
-    /// Moreover, the same issues can also affect the return response.
+    /// When sending a request to a device to retrieve its structure description
+    /// and routes, network failures or timeouts may prevent the request from
+    /// being sent and affect the returned response as well.
     #[inline]
     pub async fn discover(&mut self) -> Result<(), Error> {
         self.devices = self.discovery.discover().await?;
@@ -267,13 +269,13 @@ impl Controller {
         Ok(rx)
     }
 
-    /// Returns an immutable reference to the internal [`Devices`].
+    /// Returns an immutable reference to [`Devices`].
     #[must_use]
     pub const fn devices(&self) -> &Devices {
         &self.devices
     }
 
-    /// Returns a mutable reference to the internal [`Devices`].
+    /// Returns a mutable reference to [`Devices`].
     #[must_use]
     pub const fn devices_mut(&mut self) -> &mut Devices {
         &mut self.devices
@@ -283,7 +285,7 @@ impl Controller {
     ///
     /// # Errors
     ///
-    /// An error is returned when there are no devices or the given index
+    /// An error is returned if no devices are found or if the given index
     /// **does** not exist.
     pub fn device(&self, id: usize) -> Result<DeviceSender<'_>, Error> {
         if self.devices.is_empty() {

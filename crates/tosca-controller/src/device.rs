@@ -18,31 +18,38 @@ pub(crate) fn build_device_address(scheme: &str, address: &IpAddr, port: u16) ->
     format!("{scheme}://{address}:{port}")
 }
 
-/// Device network information.
+/// Network information for a `tosca` device.
 ///
-/// All data needed to contact a device in a network.
+/// It contains all the necessary data to contact a `tosca` device within
+/// a network.
 #[derive(Debug, PartialEq, Clone, Serialize)]
 pub struct NetworkInformation {
-    /// Device complete name.
+    /// Full device name.
     pub name: String,
-    /// Device addresses.
+    /// Device `IP` addresses.
     pub addresses: HashSet<IpAddr>,
     /// Device Wi-Fi MAC address.
+    ///
+    /// If [`None`], the Wi-Fi MAC address is not present.
     #[serde(skip_serializing_if = "Option::is_none")]
     pub wifi_mac: Option<[u8; 6]>,
     /// Device Ethernet MAC address.
+    ///
+    /// If [`None`], the Ethernet MAC address is not present.
     #[serde(skip_serializing_if = "Option::is_none")]
     pub ethernet_mac: Option<[u8; 6]>,
-    /// Device port.
+    /// The port on which the device is listening.
     pub port: u16,
     /// Device properties.
     pub properties: HashMap<String, String>,
     /// Device last reachable address.
+    ///
+    /// Prevents regenerating the full device address every time.
     pub last_reachable_address: String,
 }
 
 impl NetworkInformation {
-    /// Creates a [`NetworkInformation`].
+    /// Creates [`NetworkInformation`].
     #[must_use]
     pub const fn new(
         name: String,
@@ -62,14 +69,14 @@ impl NetworkInformation {
         }
     }
 
-    /// Sets Wi-Fi MAC address.
+    /// Sets the Wi-Fi MAC address.
     #[must_use]
     pub const fn wifi_mac(mut self, mac: [u8; 6]) -> Self {
         self.wifi_mac = Some(mac);
         self
     }
 
-    /// Sets Ethernet MAC address.
+    /// Sets the Ethernet MAC address.
     #[must_use]
     pub const fn ethernet_mac(mut self, mac: [u8; 6]) -> Self {
         self.ethernet_mac = Some(mac);
@@ -79,7 +86,7 @@ impl NetworkInformation {
 
 /// Device description.
 ///
-/// All properties which describe a device.
+/// All properties defining a device.
 #[derive(Debug, PartialEq, Serialize)]
 pub struct Description {
     /// Device kind.
@@ -102,7 +109,7 @@ impl Description {
     }
 }
 
-/// A compliant device.
+/// A `tosca` device.
 #[derive(Debug, Serialize)]
 pub struct Device {
     // Information needed to contact a device in a network.
@@ -131,10 +138,10 @@ impl PartialEq for Device {
 
 impl Device {
     /// Creates a [`Device`] from [`NetworkInformation`], [`Description`],
-    /// and [`RouteConfigs`] data.
+    /// and [`RouteConfigs`].
     ///
-    /// This method might be useful when a device might be created from data
-    /// contained in a database.
+    /// This method can be useful when creating a device from data stored
+    /// in a database.
     #[must_use]
     pub fn new(
         network_info: NetworkInformation,
@@ -182,7 +189,8 @@ impl Device {
         self.events.as_ref().map(|events| &events.description)
     }
 
-    /// Returns requests information as a vector of [`RequestInfo`].
+    /// Returns a [`RequestInfo`] vector containing the information
+    /// for each request.
     #[must_use]
     #[inline]
     pub fn requests_info(&self) -> Vec<RequestInfo<'_>> {
@@ -192,7 +200,7 @@ impl Device {
             .collect()
     }
 
-    /// Returns the number of available requests for a device.
+    /// Returns the total number of requests associated with the device.
     #[must_use]
     #[inline]
     pub fn requests_count(&self) -> usize {
@@ -214,7 +222,9 @@ impl Device {
         self.events.is_some()
     }
 
-    /// Checks if an event receiver for a [`Device`] is running.
+    /// Checks if the event receiver is currently running.
+    ///
+    /// Always returns `false` if the [`Device`] does not support events.
     #[must_use]
     pub const fn is_event_receiver_running(&self) -> bool {
         self.event_handle.is_some()
@@ -323,7 +333,7 @@ impl<'a> IntoIterator for &'a mut Devices {
 }
 
 impl Devices {
-    /// Creates a [`Device`]s collection.
+    /// Creates [`Devices`].
     #[must_use]
     pub const fn new() -> Self {
         Self(Vec::new())
@@ -341,21 +351,21 @@ impl Devices {
         self.0.push(device);
     }
 
-    /// Checks whether the collection is empty.
+    /// Checks if [`Devices`] is empty.
     #[must_use]
     #[inline]
     pub fn is_empty(&self) -> bool {
         self.0.is_empty()
     }
 
-    /// Returns the number of [`Device`] contained in a collection.
+    /// Returns the number of [`Device`] in the collection.
     #[must_use]
     #[inline]
     pub fn len(&self) -> usize {
         self.0.len()
     }
 
-    /// Gets a [`Device`] reference identified by the given index.
+    /// Retrieves a reference to the [`Device`] at the given index.
     #[must_use]
     #[inline]
     pub fn get(&self, index: usize) -> Option<&Device> {

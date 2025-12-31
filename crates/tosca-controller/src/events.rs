@@ -24,7 +24,7 @@ const KEEP_ALIVE_TIME: Duration = Duration::from_secs(5);
 
 /// Event payload transmitted by the global asynchronous receiver task.
 ///
-/// The event payload contains a device identifier and its event data.
+/// The payload consists of a device identifier and its associated event data.
 #[derive(Debug)]
 pub struct EventPayload {
     /// Device identifier.
