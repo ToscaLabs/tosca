@@ -97,7 +97,7 @@ impl Discovery {
 
     /// Sets the service domain.
     ///
-    /// The domain searched for by the service. i.e. tosca
+    /// The domain searched by the service. i.e. tosca
     #[must_use]
     #[inline]
     pub fn domain(mut self, domain: impl Into<Cow<'static, str>>) -> Self {
