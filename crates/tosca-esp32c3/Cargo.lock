@@ -27,6 +27,12 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "9e1b586273c5702936fe7b7d6896644d8be71e6314cfe09d3167c95f712589e8"
 
 [[package]]
+name = "base64"
+version = "0.22.1"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "72b3254f16251a8381aa12e40e3c4d2f0199f8c6508fbecb9d91f575e0fbb8c6"
+
+[[package]]
 name = "bitfield"
 version = "0.19.4"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -218,17 +224,17 @@ dependencies = [
 
 [[package]]
 name = "edge-http"
-version = "0.6.1"
+version = "0.7.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "16f9b24aa48b6e43e6316a02bed8291f8a856cb6d4e63a2f533d35d74d04141d"
+checksum = "7b983fa8c1e7fa8a104583f0798fecdda484b9976b4638b0b6d309cd0a87720e"
 dependencies = [
- "base64",
- "edge-nal",
+ "base64 0.22.1",
+ "edge-nal 0.6.0",
  "embassy-futures",
  "embassy-sync 0.7.2",
- "embassy-time 0.4.0",
- "embedded-io-async 0.6.1",
- "heapless 0.8.0",
+ "embassy-time 0.5.0",
+ "embedded-io-async 0.7.0",
+ "heapless 0.9.2",
  "httparse",
  "sha1_smol",
 ]
@@ -240,7 +246,7 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "d07725570484c42bbf289cb1b55bb6e941cef107993ee8a0f317e5fed7538165"
 dependencies = [
  "domain",
- "edge-nal",
+ "edge-nal 0.5.0",
  "embassy-futures",
  "embassy-sync 0.7.2",
  "embassy-time 0.4.0",
@@ -258,12 +264,22 @@ dependencies = [
 ]
 
 [[package]]
+name = "edge-nal"
+version = "0.6.0"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "f3c7d7163586cb9d457a34561a644aa957ce870226729bf6c9c8beeaead7e0d8"
+dependencies = [
+ "embassy-time 0.5.0",
+ "embedded-io-async 0.7.0",
+]
+
+[[package]]
 name = "edge-nal-embassy"
 version = "0.7.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "fb09ea0c604bbcb694ecf9cf6596bc5f59bbb5360b68c3e471b61ae9a55a8533"
 dependencies = [
- "edge-nal",
+ "edge-nal 0.5.0",
  "embassy-futures",
  "embassy-net",
  "embedded-io-async 0.6.1",
@@ -1441,7 +1457,7 @@ version = "0.3.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "f2c04b93fc15d79b39c63218f15e3fdffaa4c227830686e3b7c5f41244eb3e50"
 dependencies = [
- "base64",
+ "base64 0.13.1",
  "proc-macro2",
  "quote",
  "syn 1.0.109",
@@ -1545,7 +1561,7 @@ dependencies = [
  "critical-section",
  "edge-http",
  "edge-mdns",
- "edge-nal",
+ "edge-nal 0.5.0",
  "edge-nal-embassy",
  "embassy-executor",
  "embassy-net",

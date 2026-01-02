@@ -20,7 +20,7 @@ tosca.default-features = false
 critical-section.version = "1.2.0"
 
 # HTTP server
-edge-http.version = "0.6.1"
+edge-http.version = "0.7.0"
 
 # mDNS service
 edge-mdns.version = "0.6.1"
