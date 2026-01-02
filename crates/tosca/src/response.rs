@@ -25,8 +25,7 @@ pub enum ResponseKind {
     /// This response transmits a JSON message over the network containing
     /// a device energy and economy information.
     Info,
-    /// This response transmits a stream of data, represented as a
-    /// sequence of bytes, over the network.
+    /// This response transmits a byte stream of data over the network.
     #[cfg(feature = "stream")]
     Stream,
 }
