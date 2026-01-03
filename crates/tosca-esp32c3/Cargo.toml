@@ -80,4 +80,5 @@ serde_json.features = ["alloc"]
 static_cell.version = "2.1.1"
 
 [package.metadata.docs.rs]
+default-target = "riscv32imc-unknown-none-elf"
 rustdoc-args = ["--cfg", "docsrs"]
