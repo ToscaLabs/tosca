@@ -152,7 +152,7 @@ mod os_mac {
                 continue;
             }
 
-            // Skip if interface type is unknown or unparseable.
+            // Skip if interface type is unknown or unparsable.
             let Some(iface_type) = get_interface_type(&iface_path) else {
                 continue;
             };
