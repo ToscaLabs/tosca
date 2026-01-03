@@ -1,16 +1,22 @@
 //! # DHT22 Driver
 //!
-//! This crate provides an architecture-agnostic driver for the DHT22 temperature and humidity sensor.
-//! The driver is primarily synchronous to meet the strict timing requirements of the custom sensor's single-wire protocol.
-//! Only the initial start signal uses a brief asynchronous wait to initiate communication without blocking the executor,
-//! while all subsequent timing-critical operations are handled using precise blocking delays to ensure correct measurements.
+//! This module provides an architecture-agnostic driver for the `DHT22`
+//! temperature and humidity sensor.
+//! The driver is synchronous to meet the strict timing requirements of the
+//! sensor's single-wire protocol.
+//! The initial start signal uses a brief asynchronous wait to initiate
+//! communication without blocking the executor, while all subsequent
+//! timing-critical operations use precise blocking delays to ensure accurate
+//! measurements.
 //!
-//! The DHT22 provides measurements of:
-//! - **Humidity** in relative humidity percentage (%RH)
-//! - **Temperature** in degrees Celsius (°C)
+//! The `DHT22` sensor provides the following measurements:
+//! - **Humidity**: Relative humidity as a percentage (% RH)
+//! - **Temperature**: Temperature in degrees Celsius (°C)
 //!
-//! For detailed information and specifications, see the [datasheet](https://www.alldatasheet.com/datasheet-pdf/pdf/1132459/ETC2/DHT22.html)
-//! and a description of the proprietary [communication protocol](https://www.ocfreaks.com/basics-interfacing-dht11-dht22-humidity-temperature-sensor-mcu/).
+//! For detailed specifications, refer to the
+//! [datasheet](https://www.alldatasheet.com/datasheet-pdf/pdf/1132459/ETC2/DHT22.html)
+//! and the description of the proprietary
+//! [communication protocol](https://www.ocfreaks.com/basics-interfacing-dht11-dht22-humidity-temperature-sensor-mcu/).
 
 use core::result::Result::{self, Err, Ok};
 
@@ -26,16 +32,16 @@ const BIT_SAMPLE_DELAY_US: u32 = 35; // Time after which to sample the data bit.
 const POLL_DELAY_US: u32 = 1; // Delay between pin state polls when waiting for edges.
 const MAX_ATTEMPTS: usize = 100; // Maximum polling iterations before timeout.
 
-/// Represents a single humidity and temperature measurement.
+/// A single humidity and temperature measurement.
 #[derive(Debug, Clone, Copy)]
 pub struct Measurement {
-    /// Relative humidity in RH%.
+    /// Relative humidity as a percentage (% RH).
     pub humidity: f32,
-    /// Temperature in °C.
+    /// Temperature in degrees Celsius (°C).
     pub temperature: f32,
 }
 
-/// Errors that may occur while interacting with the DHT22 sensor.
+/// Errors that may occur when interacting with the `DHT22` sensor.
 #[derive(Debug)]
 pub enum Dht22Error<E> {
     /// GPIO pin errors.
@@ -52,7 +58,7 @@ impl<E> From<E> for Dht22Error<E> {
     }
 }
 
-/// DHT22 driver.
+/// The `DHT22` driver.
 pub struct Dht22<P, D>
 where
     P: InputPin + OutputPin,
@@ -70,7 +76,7 @@ where
     P: InputPin + OutputPin,
     D: SyncDelay + AsyncDelay,
 {
-    /// Creates a new [`Dht22`] driver with the given pin and delay provider.
+    /// Creates a [`Dht22`] driver for the given pin and delay provider.
     #[must_use]
     pub fn new(pin: P, delay: D) -> Self {
         Self { pin, delay }
@@ -80,9 +86,10 @@ where
     ///
     /// # Errors
     ///
-    /// Returns an error if reading from the pin fails, if the sensor does not
-    /// respond within the expected timing window, or if the received data fails
-    /// checksum validation.
+    /// Returns an error if:
+    /// - Reading from the pin fails
+    /// - The sensor does not respond within the expected timing window
+    /// - The received data fails checksum validation
     pub fn read(&mut self) -> Result<Measurement, Dht22Error<P::Error>> {
         // Initiate communication by sending the start signal to the sensor.
         self.send_start_signal()?;

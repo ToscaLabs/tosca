@@ -1,14 +1,18 @@
 //! # AM312 Driver
 //!
-//! This crate provides an asynchronous, architecture-agnostic driver for the AM312 PIR motion sensor,
-//! which signals motion via a digital pin:
-//! - **High** when movement is detected.
-//! - **Low** when no movement is detected.
+//! This module provides an asynchronous, architecture-agnostic driver for the
+//! `AM312 PIR` motion sensor, which detects motion via a digital pin:
 //!
-//! After power-on, the AM312 requires a calibration period of typically 10 to 60 seconds before motion readings are reliable.
-//! Therefore, make sure to wait for this period before calling any motion detection methods.
+//! - **High** when movement is detected
+//! - **Low** when no movement is detected
 //!
-//! For detailed information and specifications, see the [datasheet](https://www.alldatasheet.com/datasheet-pdf/pdf/1179499/ETC2/AM312.html).
+//! After power-on, the `AM312` requires a calibration period of 10 to 60
+//! seconds before motion readings become reliable.
+//! Therefore, ensure this waiting period has passed before invoking any motion
+//! detection methods.
+//!
+//! For detailed specifications, refer to the
+//! [datasheet](https://www.alldatasheet.com/datasheet-pdf/pdf/1179499/ETC2/AM312.html).
 
 use core::result::Result;
 
@@ -19,7 +23,7 @@ use embedded_hal_async::digital::Wait;
 
 const DEBOUNCE_MS: u32 = 50;
 
-/// AM312 driver.
+/// The `AM312` driver.
 pub struct Am312<P, D>
 where
     P: InputPin + Wait,
@@ -34,7 +38,7 @@ where
     P: InputPin + Wait,
     D: DelayNs,
 {
-    /// Creates a new [`Am312`] driver with the given input pin.
+    /// Creates an [`Am312`] driver with the given input pin.
     #[must_use]
     #[inline]
     pub fn new(pin: P, delay: D) -> Self {
@@ -79,7 +83,7 @@ where
         }
     }
 
-    /// Returns whether motion is currently detected.
+    /// Returns `true` if motion is currently detected.
     ///
     /// # Errors
     ///

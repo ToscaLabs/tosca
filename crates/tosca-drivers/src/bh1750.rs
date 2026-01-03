@@ -1,11 +1,14 @@
 //! # BH1750 Driver
 //!
-//! This crate provides an asynchronous, architecture-agnostic driver for the BH1750 ambient light sensor,
-//! allowing reading of light intensity in lux over the I²C protocol.
+//! This module provides an asynchronous, architecture-agnostic driver for the
+//! `BH1750` ambient light sensor, enabling the reading of light intensity in
+//! lux over the I²C protocol.
 //!
-//! The driver implements all instructions of the sensor's instruction set architecture.
+//! The driver implements all instructions of the sensor instruction set
+//! architecture.
 //!
-//! For detailed information and specifications, see the [datasheet](https://www.alldatasheet.com/datasheet-pdf/pdf/338083/ROHM/BH1750FVI.html).
+//! For detailed specifications, refer to the
+//! [datasheet](https://www.alldatasheet.com/datasheet-pdf/pdf/338083/ROHM/BH1750FVI.html).
 
 use core::result::Result::{self, Ok};
 
@@ -22,20 +25,21 @@ const RESET: u8 = 0x07;
 const MTREG_HIGH: u8 = 0x40;
 const MTREG_LOW: u8 = 0x60;
 
-/// Minimum allowed `MTreg` value.
+/// Minimum allowed value for the `MTreg` register.
 pub const MTREG_MIN: u8 = 31;
-/// Maximum allowed `MTreg` value.
+/// Maximum allowed value for `MTreg` register.
 pub const MTREG_MAX: u8 = 254;
 const DEFAULT_MTREG: u8 = 69; // Default per datasheet.
 
-/// Errors that may occur while interacting with the BH1750 sensor.
+/// Errors that may occur when interacting with the `BH1750` sensor.
 #[derive(Debug, Copy, Clone)]
 pub enum Bh1750Error<E> {
     /// I²C bus error.
     I2c(E),
-    /// Continous measurement not started.
+    /// Continuous measurement not started.
     ///
-    /// Occurs when attempting to read a continuous measurement before it has been started.
+    /// This error occurs when attempting to read a continuous measurement
+    /// before the measurement has started.
     ContinuousMeasurementNotStarted,
 }
 
@@ -45,31 +49,32 @@ impl<E> From<E> for Bh1750Error<E> {
     }
 }
 
-/// I²C address of the BH1750 sensor.
+/// I²C address of the `BH1750` sensor.
 ///
-/// The sensor supports two possible addresses depending on how the ADD pin is connected.
+/// The sensor supports two possible addresses, determined by the
+/// state of the ADD pin.
 #[derive(Debug, Clone, Copy)]
 pub enum Address {
-    /// Low: `0x23` when ADD is connected to GND or floating.
+    /// Low: `0x23` when the ADD is connected to GND or left floating.
     Low = 0x23,
-    /// High: `0x23` when ADD is connected to VCC.
+    /// High: `0x23` when the ADD is connected to VCC.
     High = 0x5C,
 }
 
-/// Measurement resolution modes for the BH1750 sensor.
+/// Measurement resolution modes for the `BH1750` sensor.
 #[derive(Debug, Clone, Copy)]
 pub enum Resolution {
     /// High resolution mode: 1 lx per count.
     ///
-    /// Measurement time is 120 ms, assuming default `MTreg` value.
+    /// The measurement time is 120 ms, assuming the default `MTreg` value.
     High,
     /// High resolution mode 2: 0.5 lx per count.
     ///
-    /// Measurement time is 120 ms, assuming default `MTreg` value.
+    /// The measurement time is 120 ms, assuming the default `MTreg` value.
     High2,
     /// Low resolution mode: 4 lx per count.
     ///
-    /// Measurement time is 16 ms, assuming default `MTreg` value.
+    /// The measurement time is 16 ms, assuming the default `MTreg` value.
     Low,
 }
 
@@ -114,7 +119,7 @@ impl Resolution {
     }
 }
 
-/// BH1750 driver.
+/// The `BH1750` driver.
 pub struct Bh1750<I2C, D>
 where
     D: DelayNs,
@@ -131,9 +136,10 @@ where
     I2C: I2c<u8, Error = E>,
     D: DelayNs,
 {
-    /// Creates a new [`Bh1750`] driver with the given I²C bus, delay provider, and address.
+    /// Creates a [`Bh1750`] driver with the given I²C bus, delay provider,
+    /// and address.
     ///
-    /// The `MTreg` is initialized to its default value.
+    /// The `MTreg` register is initialized to its default value.
     #[must_use]
     pub fn new(i2c: I2C, delay: D, address: Address) -> Self {
         Self {
@@ -149,7 +155,7 @@ where
     ///
     /// # Errors
     ///
-    /// Returns an error if the underlying I²C bus operation fails.
+    /// Returns an error if the I²C communication with the sensor fails.
     pub async fn power_on(&mut self) -> Result<(), Bh1750Error<E>> {
         self.send_instruction(POWER_ON).await
     }
@@ -158,7 +164,7 @@ where
     ///
     /// # Errors
     ///
-    /// Returns an error if the underlying I²C bus operation fails.
+    /// Returns an error if the I²C communication with the sensor fails.
     pub async fn power_down(&mut self) -> Result<(), Bh1750Error<E>> {
         self.send_instruction(POWER_DOWN).await
     }
@@ -169,18 +175,18 @@ where
     ///
     /// # Errors
     ///
-    /// Returns an error if the underlying I²C bus operation fails.
+    /// Returns an error if the I²C communication with the sensor fails.
     pub async fn reset(&mut self) -> Result<(), Bh1750Error<E>> {
         self.send_instruction(RESET).await
     }
 
     /// Sets the measurement time register (`MTreg`) to adjust sensitivity.
     ///
-    /// The value is clamped between [`MTREG_MIN`] and [`MTREG_MAX`].
+    /// The given value is clamped between [`MTREG_MIN`] and [`MTREG_MAX`].
     ///
     /// # Errors
     ///
-    /// Returns an error if writing to the sensor via I²C fails.
+    /// Returns an error if the I²C write operation to the sensor fails.
     pub async fn set_mtreg(&mut self, mtreg: u8) -> Result<(), Bh1750Error<E>> {
         let mt = mtreg.clamp(MTREG_MIN, MTREG_MAX);
 
@@ -198,11 +204,11 @@ where
 
     /// Performs a one-time measurement and returns the light level in lux.
     ///
-    /// The sensor automatically powers down after the measurement.
+    /// After the measurement, the sensor automatically powers down.
     ///
     /// # Errors
     ///
-    /// Returns an error if communication over I²C fails.
+    /// Returns an error if I²C communication with the sensor fails.
     pub async fn one_time_measurement(&mut self, res: Resolution) -> Result<f32, Bh1750Error<E>> {
         self.start_one_time_measurement(res).await?;
         self.delay.delay_ms(self.measurement_time_ms(res)).await;
@@ -211,11 +217,11 @@ where
         Ok(self.raw_to_lux(raw, res))
     }
 
-    /// Starts a continuous measurement at the given resolution.
+    /// Starts continuous measurement at the given resolution.
     ///
     /// # Errors
     ///
-    /// Returns an error if writing the configuration instruction via I²C fails.
+    /// Returns an error if the I²C configuration write fails.
     pub async fn start_continuous_measurement(
         &mut self,
         res: Resolution,
@@ -227,14 +233,13 @@ where
         Ok(())
     }
 
-    /// Reads the latest value from a continuous measurement in lux.
+    /// Reads the most recent value from a continuous measurement, in lux.
     ///
     /// # Errors
     ///
-    /// Returns:
-    /// - [`Bh1750Error::ContinuousMeasurementNotStarted`] if the caller attempts to read
-    ///   before starting continuous mode.
-    /// - An I²C error if communication with the device fails.
+    /// - [`Bh1750Error::ContinuousMeasurementNotStarted`] if the caller
+    ///   attempts to read before starting the continuous measurement mode.
+    /// - An I²C error if communication with the sensor fails.
     pub async fn read_continuous_measurement(&mut self) -> Result<f32, Bh1750Error<E>> {
         let res = self
             .continuous_resolution

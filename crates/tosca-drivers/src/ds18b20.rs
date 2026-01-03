@@ -1,15 +1,21 @@
 //! # DS18B20 Driver
 //!
-//! This crate provides a synchronous, architecture-agnostic driver for the DS18B20 digital temperature sensor.
-//! The driver is synchronous due to the device’s strict timing requirements.
+//! This module provides a synchronous, architecture-agnostic driver for
+//! the `DS18B20` digital temperature sensor.
+//! The driver is synchronous to meet the device’s strict timing requirements.
 //!
-//! The DS18B20 communicates over the 1-Wire bus and provides temperature readings with resolutions up to 12 bits.
-//! It performs temperature conversions internally and exposes the result via its scratchpad memory, which includes a CRC
-//! to ensure data integrity. The driver operates in *single-sensor mode*, using the `Skip ROM` command to address the
-//! device directly without specifying its unique 64-bit ROM code — an approach suitable when only one DS18B20 is connected
+//! The `DS18B20` communicates over the 1-Wire bus and provides temperature
+//! readings with up to 12-bit resolution.
+//! It performs temperature conversions internally and exposes the result
+//! through its scratchpad memory, which includes a CRC to ensure data
+//! integrity.
+//! The driver operates in *single-sensor mode* using the `Skip ROM` command to
+//! address the device directly without needing its unique 64-bit ROM code,
+//! making it ideal for setups where **only one** `DS18B20` is connected
 //! to the bus.
 //!
-//! For detailed information and specifications, see the [datasheet](https://www.alldatasheet.com/datasheet-pdf/pdf/58557/DALLAS/DS18B20.html).
+//! For detailed specifications, refer to the
+//! [datasheet](https://www.alldatasheet.com/datasheet-pdf/pdf/58557/DALLAS/DS18B20.html).
 
 use core::result::Result;
 
@@ -44,14 +50,14 @@ const CMD_READ_SCRATCHPAD: u8 = 0xBE;
 // Each bit in the 12-bit temperature reading corresponds to 0.0625 °C.
 const TEMPERATURE_RESOLUTION_C_PER_LSB: f32 = 0.0625;
 
-/// Errors that may occur while interacting with the DS18B20 sensor.
+/// Errors that may occur when interacting with the `DS18B20` sensor.
 #[derive(Debug)]
 pub enum Ds18b20Error<E> {
-    /// GPIO pin I/O error.
+    /// Error related to GPIO pin I/O operations.
     Pin(E),
-    /// Data integrity error (CRC check failed).
+    /// Data integrity error due to CRC check failure.
     CrcMismatch,
-    /// No presence pulse detected (sensor not found on bus).
+    /// No presence pulse detected, sensor not found on bus.
     NoPresence,
 }
 
@@ -61,7 +67,7 @@ impl<E> From<E> for Ds18b20Error<E> {
     }
 }
 
-/// DS18B20 driver.
+/// The `DS18B20` driver.
 pub struct Ds18b20<P, D>
 where
     P: InputPin + OutputPin,
@@ -76,7 +82,7 @@ where
     P: InputPin + OutputPin,
     D: DelayNs,
 {
-    /// Creates a new [`Ds18b20`] driver with the given pin and delay provider.
+    /// Creates a [`Ds18b20`] driver for the given pin and delay provider.
     #[must_use]
     pub fn new(pin: P, delay: D) -> Self {
         Self { pin, delay }
@@ -87,7 +93,7 @@ where
     /// # Errors
     ///
     /// Returns an error if accessing the GPIO pin fails during the reset
-    /// or presence-detection sequence.
+    /// or presence detection sequence.
     pub fn reset(&mut self) -> Result<bool, Ds18b20Error<P::Error>> {
         self.pin.set_low()?;
         self.delay.delay_us(RESET_LOW_US);
@@ -103,15 +109,19 @@ where
     }
 
     /// Performs a full temperature measurement sequence:
-    /// 1. Initiates a temperature conversion.
-    /// 2. Waits for conversion to complete.
-    /// 3. Reads and CRC-verifies the scratchpad data.
-    /// 4. Returns the measured temperature in °C.
+    ///
+    /// 1. Initiates a temperature conversion
+    /// 2. Waits for the conversion to complete
+    /// 3. Reads and CRC-verifies the scratchpad data
+    /// 4. Returns the measured temperature in degrees Celsius (°C)
     ///
     /// # Errors
     ///
-    /// Returns an error if communicating with the sensor fails, if no device
-    /// responds on the bus, or if the scratchpad data fails CRC validation.
+    /// Returns an error if:
+    ///
+    /// - Communication with the sensor fails
+    /// - No device responds on the bus
+    /// - The scratchpad data fails CRC validation
     pub fn read_temperature(&mut self) -> Result<f32, Ds18b20Error<P::Error>> {
         // 1. Reset and check presence.
         if !self.reset()? {
