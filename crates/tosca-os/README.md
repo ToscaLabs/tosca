@@ -49,10 +49,10 @@ commands above.
 
 ## Building firmware examples
 
-The [examples](./examples) directory contains firmware implemented using
-the `tosca-os` crate. Each firmware is independent and can be moved to a
-separate repository by simply replacing the `path` of `git` dependencies with
-those from `crates.io`.
+The [examples](https://github.com/ToscaLabs/tosca/tree/master/crates/tosca-os/examples)
+directory contains firmware implemented using the `tosca-os` crate.
+Each firmware is independent and can be moved to a separate repository by
+simply replacing the `path` of `git` dependencies with those from `crates.io`.
 
 ## Statically-linked firmware binary
 

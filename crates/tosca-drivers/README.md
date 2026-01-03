@@ -11,19 +11,20 @@ and devices.
 
 This crate currently includes drivers for:
 
-- [**AM312**](./docs/am312.md): PIR motion sensor.
-- [**BH1750**](./docs/bh1750.md): ambient light sensor.
-- [**DHT22**](./docs/dht22.md): temperature and humidity sensor.
-- [**DS18B20**](./docs/ds18b20.md): temperature sensor.
+- [**AM312**](https://github.com/ToscaLabs/tosca/blob/master/crates/tosca-drivers/docs/am312.md): PIR motion sensor.
+- [**BH1750**](https://github.com/ToscaLabs/tosca/blob/master/crates/tosca-drivers/docs/bh1750.md): ambient light sensor.
+- [**DHT22**](https://github.com/ToscaLabs/tosca/blob/master/crates/tosca-drivers/docs/dht22.md): temperature and humidity sensor.
+- [**DS18B20**](https://github.com/ToscaLabs/tosca/blob/master/crates/tosca-drivers/docs/ds18b20.md): temperature sensor.
 
 All drivers are implemented using only the [`embedded-hal`] and
 [`embedded-hal-async`] traits, making them compatible with any platform that
 supports these abstractions.
 
 For each driver, a short documentation is provided containing a description and
-the wiring diagram in [docs](./docs/).
+the wiring diagram in [docs](https://github.com/ToscaLabs/tosca/tree/master/crates/tosca-drivers/docs).
 These diagrams were created using [`Fritzing`], an open-source tool,
-and the corresponding project files can be found in [fritzing](./docs/fritzing/).
+and the corresponding project files can be found in
+[fritzing](https://github.com/ToscaLabs/tosca/tree/master/crates/tosca-drivers/docs/fritzing).
 
 ## Features
 

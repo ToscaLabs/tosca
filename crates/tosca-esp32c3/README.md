@@ -42,9 +42,10 @@ cargo build --release
 
 ## Build process for firmware devices
 
-The [examples](./examples) directory includes firmware examples built with the
-`tosca-esp32c3` crate. Each example is independent from another and can be moved
-to a separate repository.
+The [examples](https://github.com/ToscaLabs/tosca/tree/master/crates/tosca-esp32c3/examples)
+directory includes firmware examples built with the `tosca-esp32c3` crate.
+Each example is independent from another and can be moved to a separate
+repository.
 
 To build a firmware run:
 

@@ -45,9 +45,10 @@ cargo build --release
 
 # Build Examples
 
-The [examples](./examples) directory includes some examples to interact with
-the `tosca` devices within a network. Each example is independent from another
-and can be moved to a separate repository.
+The [examples](https://github.com/ToscaLabs/tosca/tree/master/crates/tosca-controller/examples)
+directory includes some examples to interact with the `tosca` devices within
+a network. Each example is independent from another and can be moved to
+a separate repository.
 
 To build an example:
 
