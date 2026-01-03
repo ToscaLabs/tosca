@@ -6,37 +6,25 @@
 
 </div>
 
-A Rust library crate designed to develop `Tosca` firmware on `ESP32-C3`
-boards.
+A library crate for building firmware for `tosca` devices using an `ESP32-C3` 
+microcontroller.
 
-It offers APIs to:
+It provides APIs to:
 
 - Connect a device to a `Wi-Fi` access point
 - Build the network stack
 - Configure the `mDNS-SD` discovery service
+- Define events for specific route tasks
 - Initialize and run an `HTTP` server
 
-The device APIs have been conceived to assist developers in defining their
-own devices, minimizing as much as possible the ambiguities that may arise
-during firmware development.
-
-Some of the most common errors include:
-
-- Absence of the fundamental methods that define a device
-- Missing or incorrect hazard information for an operation
-
-To ensure device customization, there are also APIs to add
-device-specific operations. For example, an RGB light may require methods
-to control its colors individually, a feature that is not necessary for a
-basic light.
+The device APIs are designed to guide developers in defining their own
+devices, aiming to minimize the ambiguities that could arise during
+firmware development.
 
 Currently, only the [light](./src/devices/light.rs) device and its associated
-APIs have been implemented within the [src/devices](./src/devices) directory.
-However, this does not prevent other devices from being implemented without
-needing to change the overall crate structure.
-
-Multiple implementations of real devices integrated with different sensors can
-be found in the [examples](./examples) directory.
+APIs are implemented within the [src/devices](./src/devices) directory.
+However, this does not prevent the addition of other devices without altering
+the overall crate structure.
 
 ## Build Process
 
@@ -74,7 +62,7 @@ cargo run --release
 ```
 
 > [!IMPORTANT]
-> Always use the release profile [--release] when building esp-hal.
+> Always use the release profile `[--release]` when building esp-hal.
   The dev profile can potentially be one or more orders of magnitude
   slower than release profile, and may cause issues with timing-senstive
   peripherals and/or devices.
