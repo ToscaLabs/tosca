@@ -19,30 +19,28 @@ feedback and suggestions during the initial stages of the project.
 
 `tosca` is a versatile, customizable, and secure IoT framework.
 
-- **Versatile**: The framework offers APIs to build firmware for
-  microcontrollers with various hardware architectures, supporting both
-  bare-metal and OS-based devices.
+- **Versatile**: The framework offers APIs to develop firmware for various
+  hardware architectures, supporting both bare-metal and OS-based devices.
   At the same time, it also supplies APIs for creating software that interacts
-  with these devices.
+  with the firmware of these devices.
 
 - **Customizable**: Most of the APIs are designed as a sequence of code blocks,
   where each block represents a single feature or a set of features. These
-  blocks can be combined by adding or removing lines of code. As an example, if
-  your device supports events, you simply need to add the event APIs to your
-  firmware server to send the data to its controller. You do not have to touch
-  those APIs if your firmware do not use events.
+  blocks can be combined by adding or removing lines of code. For example, if
+  your device supports events, you only need to integrate the event APIs into
+  your firmware server to send the data to its controller. If your firmware does
+  not use events, there is no need to touch those APIs.
 
-- **Secure**: Written in [Rust](https://rust-lang.org/), a language known for
-  its focus on performance and reliability. Its rich type system and ownership
-  model guarantees memory and thread safety, preventing many classes of
-  bugs at compile-time.
+- **Secure**: Written in [Rust](https://rust-lang.org/), a language renowned
+  for its emphasis on performance and reliability. Its rich type system and
+  ownership  model guarantees memory and thread safety, preventing many classes
+  of bugs at compile-time.
 
 ## Framework Structure
 
 The main crate is [tosca](./crates/tosca):
-a library that acts as an interface between a device and its controller.
-All other `tosca` crates must incorporate it in some way into their API
-definition.
+a library that serves as the interface between a device and its controller.
+All other `tosca` crates must integrate this crate into their API definitions.
 
 It can:
 
