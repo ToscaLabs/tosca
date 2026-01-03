@@ -1,12 +1,12 @@
-//! `tosca-os` is  a library for building firmware for `tosca` devices running
-//! on operating systems.
+//! `tosca-os` is a library crate for building firmware for `tosca` devices
+//! running on operating systems.
 //!
-//! This crate targets firmware that requires more resources in terms of
-//! computing time, memory capacity, and interaction with external components
-//! than typical embedded devices.
+//! This crate targets devices that require more resources than typical embedded
+//! systems, such as computing time, memory capacity, and interaction
+//! with external components.
 //!
-//! Currently, only devices targeting `x86_64` and `ARM` architectures
-//! are supported and covered by automated tests.
+//! Currently, only firmware for `x86_64` and `ARM` architectures is supported
+//! and covered by automated tests.
 //!
 //! Device firmware consists of a description and a set of tasks, both exposed
 //! through a client-server architecture in which the firmware operates as the
@@ -14,23 +14,22 @@
 //!
 //! A device description is defined as a sequence of fields, such as the
 //! device name, the device kind, and other data used to establish a
-//! connection with the related controller.
+//! connection with the a controller.
 //!
-//! When a controller makes a request to the firmware through a specified device
-//! route, the firmware executes the corresponding task and sends a response
-//! back to the controller. Routes may also accept parameters to configure
-//! tasks.
+//! When a controller makes a request to the firmware through route, the
+//! firmware executes the corresponding task and sends a response! back to the
+//! controller.
+//! Routes may also accept parameters to configure tasks.
 //!
-//! Each route may have zero or more associated hazards, indicating potential
-//! risks for the task. Even when no hazards are declared, a route may still
-//! pose unknown risks to the device.
+//! Each route may have zero or more associated hazards, representing potential
+//! risks during task execution. Even if no hazards are declared, a route may
+//! still pose unknown risks to the device.
 //! In such cases, the controller must decide whether to allow or block the
-//! request based on its privacy policy rules.
+//! request based on its privacy policy.
 //!
 //! This crate **cannot** determine the outcome of device tasks at compile
-//! time, as they depend heavily on the runtime environment. Consequently,
-//! hazards are purely informational and help the controller decide whether to
-//! allow or block requests in accordance with privacy policies.
+//! time, as they depend on the runtime environment. Therefore, hazards
+//! only informs a controller of the **possible** risks that might arise.
 //!
 //! An `std` environment is required to obtain full crate functionality.
 
