@@ -34,7 +34,7 @@ mod macros;
 pub mod device;
 /// Economic information about a device.
 pub mod economy;
-/// Energy-related information about a device.
+/// Energy information about a device.
 pub mod energy;
 /// Event descriptions and methods.
 pub mod events;
@@ -42,9 +42,9 @@ pub mod events;
 pub mod hazards;
 /// Route parameters.
 pub mod parameters;
-/// All supported responses from a device.
+/// All possible responses from a device.
 pub mod response;
-/// Definition of device routes.
+/// Route definitions.
 pub mod route;
 
 #[cfg(test)]
