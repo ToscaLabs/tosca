@@ -6,70 +6,86 @@
 
 </div>
 
-This library crate provides a series of APIs to build a server which
-represents the firmware of an IoT device running on an operating system.
+`tosca-os` is a library crate for building firmware for `tosca` devices
+running on operating systems.
 
-Among its functionalities, it can interact send and receive data through
-REST APIs.
+This crate targets devices that require more resources than typical embedded
+systems, such as computing time, memory capacity, and interaction
+with external components.
 
-The implemented devices can be found inside the [examples](./examples)
-directory.
+Currently, only firmware for `x86_64` and `ARM` architectures is supported
+and covered by automated tests.
 
-## Building complete firmware devices
+## Building
 
-The directory [examples](./examples) contains firmware implemented with
-the `tosca-os` crate. Each firmware is independent from another one and it can
-be moved in a separate repository.
+To build the crate with the `debug` profile, run:
 
-Before any kind of build, run `cargo clean` to remove old builds configurations,
-and then run `cargo update` to update all dependencies.
+```console
+cargo build
+```
 
-# Statically-linked firmware device
+To build with the `release` profile, which enables all time
+and memory optimizations, run:
 
-In order to build a statically-linked firmware, run the following command:
+```console
+cargo build --release
+```
+
+## Testing
+
+To run the complete test suite:
+
+```console
+cargo test
+```
+
+## Features
+
+The `stream` feature enables all data and methods necessary to
+identify a multimedia stream sent from a device to a controller.
+
+To disable all features, add the `--no-default-features` option to any of the
+commands above.
+
+## Building firmware examples
+
+The [examples](./examples) directory contains firmware implemented using
+the `tosca-os` crate. Each firmware is independent and can be moved to a
+separate repository by simply replacing the `path` of `git` dependencies with
+those from `crates.io`.
+
+## Statically-linked firmware binary
+
+If a firmware cannot have system dependencies because it is a standalone
+software, a statically-linked binary is required. To achieve this using the
+`musl` toolchain, run the following command:
 
 ```bash
 cargo build --manifest-path examples/firmware_device/Cargo.toml [--release] --target=x86_64-unknown-linux-musl
 ```
 
-where `firmware_device` is the name of the example to build, while `--release`
-is an optional argument which enables all time and memory optimizations.
+where `firmware_device` is the name of the example to build, and `--release`
+is an optional argument that enables all time and memory optimizations.
 
-# Cross-compilation to aarch64 (ARM64) architecture
+## Cross-compiling to `aarch64` (ARM64) architecture
 
-Install a binary named [cross](https://github.com/cross-rs/cross) which allow
-to easily cross-compile Rust projects using Docker, without messing with
-custom `Dockerfile`s.
+Install the [cross](https://github.com/cross-rs/cross) binary to easily
+cross-compile Rust projects using Docker, without the need for custom
+`Dockerfile`s.
 
 ```console
 cargo install -f cross
 ```
 
-In order to build a binary for `ARM64` architecture run:
+To build a binary for an `ARM64` architecture, run:
 
 ```console
 cd examples/firmware_device
 cross build [--release] --target=aarch64-unknown-linux-musl
 ```
 
-where `firmware_device` is the name of the example to build, while `--release`
-is an optional argument which enables all time and memory optimizations.
-
-# Copy the cross-compiled binary to a board
-
-To copy a cross-compiled binary to a board through `SSH`,
-use the following command:
-
-```console
-scp -O target/aarch64-unknown-linux-musl/release/binary-name root@IPV4:~
-```
-
-where `IPV$` represents the address of the LAN interface which allows to connect
-to board to a PC, while `~` represents the home directory on which the binary
-will be copied.
-
-Since `scp` is deprecated, and the version on a PC might use SFTP by default,
-the `-O` flag reverts to the deprecated protocol.
+where `firmware_device` is the name of the example to build, and `--release`
+is an optional argument that enables all time and memory optimizations.
 
 <!-- Links -->
 [license]: https://github.com/ToscaLabs/tosca?tab=readme-ov-file#license
