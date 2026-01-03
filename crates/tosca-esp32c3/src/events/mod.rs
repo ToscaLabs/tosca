@@ -127,7 +127,7 @@ where
             broker,
             topic: match device.description.kind {
                 DeviceKind::Light => TopicBuilder::new().prefix("light"),
-                _ => TopicBuilder::new().prefix("unknown"),
+                DeviceKind::Unknown => TopicBuilder::new().prefix("unknown"),
             }
             .suffix("events")
             .mac(device.wifi_mac)
