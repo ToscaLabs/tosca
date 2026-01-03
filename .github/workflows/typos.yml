@@ -1,0 +1,27 @@
+name: Typos
+
+permissions:
+  contents: read
+
+on:
+  push:
+    branches: [master]
+    tags:
+      - 'v*.*.*' # Run when a new version is being published
+  pull_request:
+    branches: [master]
+    types: [opened, synchronize]
+
+env:
+  CLICOLOR: 1
+
+jobs:
+
+  typos:
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v6
+
+      - name: Find spells in repo
+        uses: crate-ci/typos@v1.41.0
