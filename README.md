@@ -46,8 +46,9 @@ devices.
 
 ### `tosca`
 
-`tosca` is the main crate of the framework. It serves as an interface
-between a device and a controller.
+[tosca](https://github.com/ToscaLabs/tosca/tree/master/crates/tosca) is the main
+crate of the framework. It serves as an interface between a device and
+a controller.
 All other `tosca` crates must integrate this crate into their API definitions.
 
 It can:
@@ -82,42 +83,42 @@ to the `core` crate instead of the `std` crate.
 
 ### Firmware side
 
-The [tosca-os](./crates/tosca-os) and [tosca-esp32c3](./crates/tosca-esp32c3)
+The [tosca-os](https://github.com/ToscaLabs/tosca/tree/master/crates/tosca-os)
+and
+[tosca-esp32c3](https://github.com/ToscaLabs/tosca/tree/master/crates/tosca-esp32c3)
 crates are two libraries used for building firmware. As previously stated, they
 integrate the `tosca` library as a dependency in their APIs to maintain a
 common interface.
 
 The `tosca-os` library crate is designed for firmware running on operating
 systems.
-In the [tosca-os/examples](./crates/tosca-os/examples) directory, you will find
-simple examples of [light](./crates/tosca-os/examples/light) and
-[ip-camera](./crates/tosca-os/examples/ip-camera) firmware.
+In the [tosca-os/examples](https://github.com/ToscaLabs/tosca/tree/master/crates/tosca-os/examples) directory, you will find a simple example of both light and IP-camera firmware.
 
 The `tosca-esp32c3` library crate is designed for firmware running on
 `ESP32-C3` microcontrollers.
-In the [tosca-esp32c3/examples](./crates/tosca-esp32c3/examples) directory,
-you will find several **light** firmware examples demonstrating various
-features of this library.
+In the [tosca-esp32c3/examples](https://github.com/ToscaLabs/tosca/tree/master/crates/tosca-esp32c3/examples) directory, you will find several **light** firmware examples
+demonstrating various features of this library.
 
-The [tosca-drivers](./crates/tosca-drivers) library crate provides
-architecture-agnostic drivers for a range of sensors and devices.
-All drivers are built on top of [`embedded-hal`] and [`embedded-hal-async`],
-ensuring compatibility across all supported hardware platforms.
+The [tosca-drivers](https://github.com/ToscaLabs/tosca/tree/master/crates/tosca-drivers)
+library crate provides architecture-agnostic drivers for a range of sensors
+and devices. All drivers are built on top of [`embedded-hal`] and
+[`embedded-hal-async`], ensuring compatibility across all supported
+hardware platforms.
 
 ### Controller side
 
-The [tosca-controller](./crates/tosca-controller) library crate defines
-a set of APIs for managing, orchestrating, and interacting with firmware built
-using the crates mentioned above. In the
-[tosca-controller/examples](./crates/tosca-controller/examples) directory,
-you will find some examples demonstrating various methods for receiving events
-from devices.
+The [tosca-controller](https://github.com/ToscaLabs/tosca/tree/master/crates/tosca-controller)
+library crate defines a set of APIs for managing, orchestrating, and interacting
+with firmware built using the crates mentioned above. In the
+[tosca-controller/examples](https://github.com/ToscaLabs/tosca/tree/master/crates/tosca-controller/examples) directory, you will find some examples demonstrating various methods
+for receiving events from devices.
 
 ## Building
 
-This repository is a Cargo workspace composed of several crates. Dependencies
-common to all crates are defined in the root `Cargo.toml`, ensuring they are
-compiled once and their resulting binaries shared across all crates.
+The framework [repository](https://github.com/ToscaLabs/tosca) is a Cargo
+workspace composed of several crates. Dependencies common to all crates are
+defined in the root `Cargo.toml`, ensuring they are compiled once and their
+resulting binaries shared across all crates.
 The same approach is applied to the `tosca` metadata.
 
 To build the entire workspace with the `debug` profile from the root of the
@@ -136,8 +137,8 @@ cargo build --release
 ```
 
 To build a specific crate, navigate to its corresponding subdirectory
-within the [crates](./crates) directory and run the same build commands as
-described above.
+within the [crates](https://github.com/ToscaLabs/tosca/tree/master/crates)
+directory and run the same build commands as described above.
 
 If a crate provides features that you want to disable, add the
 `--no-default-features` option to the commands above.
@@ -169,8 +170,8 @@ If a crate provides features that you want to disable, add the
 
 Licensed under either of
 
-- [Apache License, Version 2.0](LICENSE-APACHE)
-- [MIT License](LICENSE-MIT)
+- [Apache License, Version 2.0](https://github.com/ToscaLabs/tosca/blob/master/LICENSE-APACHE)
+- [MIT License](https://github.com/ToscaLabs/tosca/blob/master/LICENSE-MIT)
 
 at your option.
 
