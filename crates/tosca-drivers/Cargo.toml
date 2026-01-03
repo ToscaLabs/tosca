@@ -6,9 +6,9 @@ authors = ["Alex Leonte <m.alex.leonte@gmail.com>"]
 description = "A library providing architecture-agnostic drivers for various sensors and devices."
 keywords = ["iot", "iot-library", "devices", "sensors", "data"]
 documentation = "https://docs.rs/tosca-drivers"
-readme.workspace = true
+readme = "README.md"
 license.workspace = true
-repository.workspace = true
+repository = "https://github.com/ToscaLabs/tosca/tree/master/crates/tosca-drivers"
 rust-version.workspace = true
 
 [features]
