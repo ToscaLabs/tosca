@@ -81,7 +81,7 @@ where
         self
     }
 
-    /// Sets the server port.
+    /// Sets the port for the server to listen on.
     #[must_use]
     pub const fn port(mut self, port: u16) -> Self {
         self.data.port = port;

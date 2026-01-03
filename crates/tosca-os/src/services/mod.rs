@@ -85,7 +85,7 @@ impl<'a> ServiceConfig<'a> {
 
     /// Sets a discovery service property.
     ///
-    /// For example, a property might be the server scheme.
+    /// An example of property could be the server scheme.
     /// i.e. ("scheme", "http")
     #[must_use]
     pub fn property(mut self, property: (impl Into<String>, impl Into<String>)) -> Self {

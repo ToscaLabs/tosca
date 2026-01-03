@@ -14,8 +14,7 @@ use axum::{
 pub struct ErrorResponse(Response);
 
 impl ErrorResponse {
-    /// Generates an [`ErrorResponse`] containing an
-    /// [`tosca::response::ErrorResponse`].
+    /// Generates an [`ErrorResponse`].
     ///
     /// Requires specifying an [`ErrorKind`] and a general description.
     #[must_use]
@@ -25,8 +24,7 @@ impl ErrorResponse {
         Self((StatusCode::INTERNAL_SERVER_ERROR, Json(value)).into_response())
     }
 
-    /// Generates an [`ErrorResponse`] containing an
-    /// [`tosca::response::ErrorResponse`].
+    /// Generates an [`ErrorResponse`].
     ///
     /// Requires specifying an [`ErrorKind`], a general error
     /// description, and optional information about the encountered error.
