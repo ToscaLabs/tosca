@@ -8,7 +8,7 @@ keywords = ["iot", "iot-library", "firmware", "device", "esp32-c3"]
 documentation = "https://docs.rs/tosca-esp32c3"
 readme = "README.md"
 license = "Apache-2.0 OR MIT"
-repository = "https://github.com/ToscaLabs/tosca"
+repository = "https://github.com/ToscaLabs/tosca/tree/master/crates/tosca-esp32c3"
 rust-version = "1.90"
 
 [dependencies]
