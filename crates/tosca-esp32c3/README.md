@@ -21,8 +21,7 @@ The device APIs are designed to guide developers in defining their own
 devices, aiming to minimize the ambiguities that could arise during
 firmware development.
 
-Currently, only the [light](./src/devices/light.rs) device and its associated
-APIs are implemented within the [src/devices](./src/devices) directory.
+Currently, only a light device is implemented as a device.
 However, this does not prevent the addition of other devices without altering
 the overall crate structure.
 
