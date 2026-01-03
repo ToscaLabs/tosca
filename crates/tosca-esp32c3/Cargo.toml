@@ -26,7 +26,7 @@ edge-http.version = "0.6.1"
 edge-mdns.version = "0.6.1"
 
 # Networking traits
-edge-nal.version = "0.5.0"
+edge-nal.version = "0.6.0"
 edge-nal-embassy.version = "0.7.0"
 
 # Embassy framework
