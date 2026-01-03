@@ -1,4 +1,4 @@
-//! The `tosca-controller` library provides a set of APIs for managing,
+//! The `tosca-controller` library crate provides a set of APIs for managing,
 //! orchestrating, and interacting with all `tosca` devices within a
 //! network.
 //!
