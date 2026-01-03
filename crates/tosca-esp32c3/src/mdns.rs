@@ -44,7 +44,7 @@ const PACKET_METADATA_LENGTH: usize = 2;
 
 static RNG: CriticalSectionMutex<OnceCell<Rng>> = CriticalSectionMutex::new(OnceCell::new());
 
-/// The `mDNS-SD` service.
+/// The `mDNS-SD` discovery service.
 pub struct Mdns {
     hostname: &'static str,
     service: &'static str,
@@ -55,7 +55,7 @@ pub struct Mdns {
 }
 
 impl Mdns {
-    /// Creates the [`Mdns`] service.
+    /// Creates the [`Mdns`] discovery service.
     #[must_use]
     pub const fn new(rng: Rng) -> Self {
         Self {
@@ -68,35 +68,46 @@ impl Mdns {
         }
     }
 
-    /// Sets the `mDNS-SD` hostname.
+    /// Sets the service hostname.
+    ///
+    /// An example might be `tosca`.
     #[must_use]
     pub const fn hostname(mut self, hostname: &'static str) -> Self {
         self.hostname = hostname;
         self
     }
 
-    /// Sets the `mDNS-SD` service.
+    /// Sets the service.
+    ///
+    ///
+    /// The service is typically the name of the device to be discovered.
+    /// i.e. device
     #[must_use]
     pub const fn service(mut self, service: &'static str) -> Self {
         self.service = service;
         self
     }
 
-    /// Sets the `mDNS-SD` service type.
+    /// Sets the service type.
+    ///
+    /// The service type searched by the client. i.e. _tosca
     #[must_use]
     pub const fn service_type(mut self, service_type: &'static str) -> Self {
         self.service_type = service_type;
         self
     }
 
-    /// Seconds for the time-to-live for the `mDNS-SD` answers.
+    /// Time-to-live (TTL) in seconds for the discovery service responses.
     #[must_use]
     pub const fn time_to_live(mut self, seconds: u32) -> Self {
         self.time_to_live = if seconds == 0 { 1 } else { seconds };
         self
     }
 
-    /// Sets the `mDNS-SD` properties.
+    /// Sets the service properties.
+    ///
+    /// An example of property could be the server scheme.
+    /// i.e. [("scheme", "http")]
     #[must_use]
     pub const fn properties(mut self, properties: &'static [(&'static str, &'static str)]) -> Self {
         self.properties = properties;

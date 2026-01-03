@@ -45,7 +45,7 @@ async fn task(mut runner: Runner<'static, WifiDevice<'static>>) {
 pub struct NetworkStack;
 
 impl NetworkStack {
-    /// Builds a [`NetworkStack`] .
+    /// Builds the [`NetworkStack`] .
     ///
     /// # Errors
     ///

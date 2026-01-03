@@ -156,33 +156,33 @@ fn with_timeout<T>(timeout_ms: u32, io: T) -> WithTimeout<T> {
     WithTimeout::new(timeout_ms, io)
 }
 
-/// The `tosca` server.
+/// A server running indefinitely on the firmware.
 ///
 /// ## Parameters
 ///
 /// - **`port`**
-///   The TCP port on which the server listens for incoming connections.
-///   Defaults to `80`.
-///   See [`Server::port()`] to configure this.
+///   The TCP port on which the server listens for incoming connections,
+///   defaulting to `80`.
+///   See [`Server::port()`] for configuration options.
 ///
 /// - **`keepalive_timeout_ms`**
-///   Optional timeout (in milliseconds) for detecting an idle persistent
-///   HTTP keep-alive connection, where multiple requests can be sent over
-///   the same TCP connection without reopening it.
-///   The default value is `None`, meaning that idle connections are never
-///   closed due to inactivity; if no other timeouts are set, they remain
-///   open indefinitely.
-///   See [`Server::keepalive_timeout()`] to configure this.
+///   Optional timeout (in milliseconds) for detecting idle persistent
+///   HTTP keep-alive connections, allowing multiple requests over the
+///   same TCP connection without reopening it.
+///   The default value is `None`, meaning idle connections are never
+///   closed due to inactivity and remain open indefinitely if no other timeouts
+///   are set.
+///   See [`Server::keepalive_timeout()`] for configuration options.
 ///
 /// - **`io_timeout_ms`**
 ///   Optional timeout (in milliseconds) for socket I/O operations.
-///   The default value is `None`, meaning that read and write operations
+///   The default value is `None`, meaning read and write operations
 ///   never time out.
 ///   See [`Server::io_timeout()`].
 ///
 /// - **`handler_timeout_ms`**
 ///   Optional timeout (in milliseconds) for handler execution.
-///   The default value is `None`, meaning that request handlers are not
+///   The default value is `None`, meaning request handlers are not
 ///   interrupted by timeouts.
 ///   See [`Server::handler_timeout()`].
 ///
@@ -190,10 +190,10 @@ fn with_timeout<T>(timeout_ms: u32, io: T) -> WithTimeout<T> {
 ///
 /// In `edge-net`
 /// ([issue #62](https://github.com/sysgrok/edge-net/issues/62)),
-/// connection reuse may cause some clients — notably `curl` —
+/// connection reuse may cause some clients, notably `curl`,
 /// to fail when sending multiple requests over a single
-/// keep-alive session using `keepalive_timeout_ms`.
-/// To ensure correct sequential request handling with `curl`,
+/// keep-alive session with `keepalive_timeout_ms`.
+/// To ensure proper handling of sequential requests with `curl`,
 /// include `Connection: close` in the request headers
 /// until the issue is resolved.
 pub struct Server<const TX_SIZE: usize, const RX_SIZE: usize, const MAXIMUM_HEADERS_COUNT: usize, S>
@@ -221,7 +221,7 @@ impl<const TX_SIZE: usize, const RX_SIZE: usize, const MAXIMUM_HEADERS_COUNT: us
 where
     S: ValueFromRef + Send + Sync + 'static,
 {
-    /// Creates a [`Server`].
+    /// Creates a [`Server`] from the given [`Device`].
     #[inline]
     pub fn new(device: Device<S>, mdns: Mdns) -> Self {
         Self {
@@ -235,14 +235,15 @@ where
         }
     }
 
-    /// Sets the port number for the server to listen on.
+    /// Sets the port for the server to listen on.
     #[must_use]
     pub const fn port(mut self, port: u16) -> Self {
         self.port = port;
         self
     }
 
-    /// Sets the timeout (in milliseconds) for persistent HTTP keep-alive connections.
+    /// Sets the timeout (in milliseconds) for persistent HTTP keep-alive
+    /// connections.
     #[must_use]
     pub const fn keepalive_timeout(mut self, timeout_ms: u32) -> Self {
         self.keepalive_timeout_ms = Some(timeout_ms);
@@ -270,13 +271,13 @@ where
         self
     }
 
-    /// Runs the [`Server`] and the [`Mdns`] task.
+    /// Runs the server and the [`Mdns`] task.
     ///
     /// # Errors
     ///
-    /// - Failure to bind TCP protocol buffers to the underlying socket
-    /// - Failure to spawn the `mDNS` task
-    /// - Failure to run the server
+    /// - Failed to bind `TCP` protocol buffers to the underlying socket
+    /// - Failed to spawn the [`Mdns`] task
+    /// - Failed to run the server
     pub async fn run(self, stack: Stack<'static>, spawner: Spawner) -> Result<(), Error> {
         let Server {
             port,

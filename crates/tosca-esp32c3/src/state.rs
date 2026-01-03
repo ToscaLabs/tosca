@@ -1,10 +1,11 @@
-/// A device state accessible through a route handler.
+/// The device state.
+///
+/// The state can **only** be accessed and modified within a route handler.
 pub struct State<S>(pub S);
 
-/// A trait used in conjunction with the [`State`] extractor to retrieve
-/// specific parts of the firmware state.
+/// A trait for retrieving the substates of the device [`State`].
 pub trait ValueFromRef {
-    /// Converts a self reference into a value.
+    /// Retrieves the internal value from its reference.
     #[must_use]
     fn value_from_ref(&self) -> Self;
 }

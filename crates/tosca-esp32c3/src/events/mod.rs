@@ -96,7 +96,7 @@ static WRITE_ON_NETWORK: Signal<CriticalSectionRawMutex, u8> = Signal::new();
 
 /// Events configuration.
 ///
-/// It defines all the data necessary to execute the events.
+/// Defines all the data required to execute event tasks.
 pub struct EventsConfig<S>
 where
     S: ValueFromRef + Send + Sync + 'static,
@@ -112,7 +112,7 @@ impl<S> EventsConfig<S>
 where
     S: ValueFromRef + Send + Sync + 'static,
 {
-    /// Creates a new [`EventsConfig`].
+    /// Creates an [`EventsConfig`].
     #[inline]
     #[must_use]
     pub fn new(
@@ -248,9 +248,9 @@ async fn write_on_network(stack: Stack<'static>, remote_endpoint: (IpAddress, u1
     }
 }
 
-/// An events manager.
+/// An event manager.
 ///
-/// It checks whether events are correct and runs them.
+/// Validates the events data and executes the corresponding tasks.
 pub struct EventsManager<S>
 where
     S: ValueFromRef + Send + Sync + 'static,
@@ -265,7 +265,7 @@ where
 {
     /// Configures the [`EventsManager`].
     ///
-    /// It allocates its internal structures with a fixed amount of memory.
+    /// Allocates internal structures with a fixed amount of memory.
     #[inline]
     #[must_use]
     pub fn config(config: EventsConfig<S>) -> Self {
@@ -277,7 +277,7 @@ where
 
     /// Monitors a pin with an [`Event<bool>`] notifier.
     ///
-    /// Discard the event if it matches another.
+    /// Discards the event if it matches an existing one.
     #[inline]
     #[must_use]
     pub fn bool_event<F, Fut>(
@@ -313,9 +313,9 @@ where
         self.spawn(name, task, |events| events.add_bool_event(event))
     }
 
-    /// Monitors an [`Event<bool>`] notifier without requiring a pin.
+    /// Monitors an [`Event<bool>`] notifier not tied to a pin.
     ///
-    /// Discard the event if it matches another.
+    /// Discards the event if it matches an existing one.
     #[inline]
     #[must_use]
     pub fn bool_event_pinless<F, Fut>(
@@ -352,7 +352,7 @@ where
 
     /// Monitors a pin with a [`PeriodicEvent<bool>`] notifier.
     ///
-    /// Discard the event if it matches another.
+    /// Discards the event if it matches an existing one.
     #[inline]
     #[must_use]
     pub fn periodic_bool<F, Fut>(
@@ -389,9 +389,9 @@ where
         self.spawn(name, task, |events| events.add_periodic_bool_event(event))
     }
 
-    /// Monitors a [`PeriodicEvent<bool>`] notifier without requiring a pin.
+    /// Monitors a [`PeriodicEvent<bool>`] notifier not tied to a pin.
     ///
-    /// Discard the event if it matches another.
+    /// Discards the event if it matches an existing one.
     #[inline]
     #[must_use]
     pub fn periodic_bool_pinless<F, Fut>(
@@ -429,7 +429,7 @@ where
 
     /// Monitors a pin with an [`Event<u8>`] notifier.
     ///
-    /// Discard the event if it matches another.
+    /// Discards the event if it matches an existing one.
     #[inline]
     #[must_use]
     pub fn u8_event<F, Fut>(
@@ -465,9 +465,9 @@ where
         self.spawn(name, task, |events| events.add_u8_event(event))
     }
 
-    /// Monitors an [`Event<u8>`] notifier without requiring a pin.
+    /// Monitors an [`Event<u8>`] notifier not tied to a pin.
     ///
-    /// Discard the event if it matches another.
+    /// Discards the event if it matches an existing one.
     #[inline]
     #[must_use]
     pub fn u8_event_pinless<F, Fut>(
@@ -504,7 +504,7 @@ where
 
     /// Monitors a pin with a [`PeriodicEvent<u8>`] notifier.
     ///
-    /// Discard the event if it matches another.
+    /// Discards the event if it matches an existing one.
     #[inline]
     #[must_use]
     pub fn periodic_u8<F, Fut>(
@@ -541,9 +541,9 @@ where
         self.spawn(name, task, |events| events.add_periodic_u8_event(event))
     }
 
-    /// Monitors a [`PeriodicEvent<u8>`] notifier without requiring a pin.
+    /// Monitors a [`PeriodicEvent<u8>`] notifier not tied to a pin.
     ///
-    /// Discard the event if it matches another.
+    /// Discards the event if it matches an existing one.
     #[inline]
     #[must_use]
     pub fn periodic_u8_pinless<F, Fut>(
@@ -581,7 +581,7 @@ where
 
     /// Monitors a pin with an [`Event<i32>`] notifier.
     ///
-    /// Discard the event if it matches another.
+    /// Discards the event if it matches an existing one.
     #[inline]
     #[must_use]
     pub fn i32_event<F, Fut>(
@@ -617,9 +617,9 @@ where
         self.spawn(name, task, |events| events.add_i32_event(event))
     }
 
-    /// Monitors an [`Event<i32>`] notifier without requiring a pin.
+    /// Monitors an [`Event<i32>`] notifier not tied to a pin.
     ///
-    /// Discard the event if it matches another.
+    /// Discards the event if it matches an existing one.
     #[inline]
     #[must_use]
     pub fn i32_event_pinless<F, Fut>(
@@ -656,7 +656,7 @@ where
 
     /// Monitors a pin with a [`PeriodicEvent<i32>`] notifier.
     ///
-    /// Discard the event if it matches another.
+    /// Discards the event if it matches an existing one.
     #[inline]
     #[must_use]
     pub fn periodic_i32<F, Fut>(
@@ -694,9 +694,9 @@ where
         self.spawn(name, task, |events| events.add_periodic_i32_event(event))
     }
 
-    /// Monitors a [`PeriodicEvent<i32>`] notifier without requiring a pin.
+    /// Monitors a [`PeriodicEvent<i32>`] notifier not tied to a pin.
     ///
-    /// Discard the event if it matches another.
+    /// Discards the event if it matches an existing one.
     #[inline]
     #[must_use]
     pub fn periodic_i32_pinless<F, Fut>(
@@ -734,7 +734,7 @@ where
 
     /// Monitors a pin with an [`Event<f32>`] notifier.
     ///
-    /// Discard the event if it matches another.
+    /// Discards the event if it matches an existing one.
     #[inline]
     #[must_use]
     pub fn f32_event<F, Fut>(
@@ -770,9 +770,9 @@ where
         self.spawn(name, task, |events| events.add_f32_event(event))
     }
 
-    /// Monitors an [`Event<f32>`] notifier without requiring a pin.
+    /// Monitors an [`Event<f32>`] notifier not tied to a pin.
     ///
-    /// Discard the event if it matches another.
+    /// Discards the event if it matches an existing one.
     #[inline]
     #[must_use]
     pub fn f32_event_pinless<F, Fut>(
@@ -809,7 +809,7 @@ where
 
     /// Monitors a pin with a [`PeriodicEvent<f32>`] notifier.
     ///
-    /// Discard the event if it matches another.
+    /// Discards the event if it matches an existing one.
     #[inline]
     #[must_use]
     pub fn periodic_f32<F, Fut>(
@@ -847,9 +847,9 @@ where
         self.spawn(name, task, |events| events.add_periodic_f32_event(event))
     }
 
-    /// Monitors a [`PeriodicEvent<f32>`] notifier without requiring a pin.
+    /// Monitors a [`PeriodicEvent<f32>`] notifier not tied to a pin.
     ///
-    /// Discard the event if it matches another.
+    /// Discards the event if it matches an existing one.
     #[inline]
     #[must_use]
     pub fn periodic_f32_pinless<F, Fut>(
@@ -887,7 +887,7 @@ where
 
     /// Monitors a pin with an [`Event<f64>`] notifier.
     ///
-    /// Discard the event if it matches another.
+    /// Discards the event if it matches an existing one.
     #[inline]
     #[must_use]
     pub fn f64_event<F, Fut>(
@@ -923,9 +923,9 @@ where
         self.spawn(name, task, |events| events.add_f64_event(event))
     }
 
-    /// Monitors an [`Event<f64>`] notifier without requiring a pin.
+    /// Monitors an [`Event<f64>`] notifier not tied to a pin.
     ///
-    /// Discard the event if it matches another.
+    /// Discards the event if it matches an existing one.
     #[inline]
     #[must_use]
     pub fn f64_event_pinless<F, Fut>(
@@ -962,7 +962,7 @@ where
 
     /// Monitors a pin with a [`PeriodicEvent<f64>`] notifier.
     ///
-    /// Discard the event if it matches another.
+    /// Discards the event if it matches an existing one.
     #[inline]
     #[must_use]
     pub fn periodic_f64<F, Fut>(
@@ -1000,9 +1000,9 @@ where
         self.spawn(name, task, |events| events.add_periodic_f64_event(event))
     }
 
-    /// Monitors a [`PeriodicEvent<f64>`] notifier without requiring a pin.
+    /// Monitors a [`PeriodicEvent<f64>`] notifier not tied to a pin.
     ///
-    /// Discard the event if it matches another.
+    /// Discards the event if it matches an existing one.
     #[inline]
     #[must_use]
     pub fn periodic_f64_pinless<F, Fut>(
@@ -1044,11 +1044,11 @@ where
     ///
     /// # Errors
     ///
-    /// It fails when:
-    /// - The events manager is empty, meaning no events have been inserted.
-    /// - The broker domain cannot be resolved through a `DNS` query.
-    /// - The task responsible for network transmission cannot interact with its
-    ///   scheduler or the network.
+    /// Fails when:
+    /// - The events manager is empty (no events have been inserted).
+    /// - The broker domain cannot be resolved via a `DNS` query.
+    /// - The task responsible for network transmission cannot interact with
+    ///   the scheduler or the network.
     pub async fn run_network_task(self) -> Result<Device<S>, Error> {
         if self.events.is_empty() {
             return Err(Error::new(

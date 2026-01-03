@@ -10,13 +10,13 @@ pub enum BrokerData {
 }
 
 impl BrokerData {
-    /// Creates a [`BrokerData`] from `URL` and `port`.
+    /// Creates a [`BrokerData`] from the `URL` and `port`.
     #[must_use]
     pub const fn url(url: &'static str, port: u16) -> Self {
         Self::Url(url, port)
     }
 
-    /// Creates a [`BrokerData`] from [`IpAddress`] and `port`.
+    /// Creates a [`BrokerData`] from the [`IpAddress`] and `port`.
     #[must_use]
     pub const fn ip(ip: IpAddress, port: u16) -> Self {
         Self::Ip(ip, port)

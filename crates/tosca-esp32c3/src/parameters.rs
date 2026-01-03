@@ -22,7 +22,7 @@ impl BoolPayload {
     }
 }
 
-/// A [`u8`] payload.
+/// An [`u8`] payload.
 pub struct U8Payload {
     /// Value.
     pub value: u8,
@@ -45,7 +45,7 @@ impl U8Payload {
     }
 }
 
-/// A [`u16`] payload.
+/// An [`u16`] payload.
 pub struct U16Payload {
     /// Value.
     pub value: u16,
@@ -68,7 +68,7 @@ impl U16Payload {
     }
 }
 
-/// A [`u32`] payload.
+/// An [`u32`] payload.
 pub struct U32Payload {
     /// Value.
     pub value: u32,
@@ -91,7 +91,7 @@ impl U32Payload {
     }
 }
 
-/// A [`u64`] payload.
+/// An [`u64`] payload.
 pub struct U64Payload {
     /// Value.
     pub value: u64,
@@ -166,7 +166,7 @@ impl F64Payload {
     }
 }
 
-/// A characters sequence payload.
+/// A payload consisting of a sequence of characters.
 pub struct CharsSequencePayload<'a> {
     /// Value.
     pub value: Cow<'a, str>,
@@ -180,7 +180,7 @@ impl<'a> CharsSequencePayload<'a> {
     }
 }
 
-/// A container that stores route parameters payloads.
+/// A container for storing route parameter payloads.
 pub struct ParametersPayloads(pub(crate) ToscaParametersPayloads<'static>);
 
 impl ParametersPayloads {

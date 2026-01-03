@@ -11,7 +11,7 @@ use embassy_time::Timer;
 
 use crate::events::{WAIT_FOR_MILLISECONDS, WRITE_ON_NETWORK};
 
-/// A notifier to signal a [`tosca::events::PeriodicEvent`].
+/// A notifier for signaling a [`tosca::events::PeriodicEvent`].
 pub struct PeriodicNotifier<T: Clone + Copy> {
     index: usize,
     time_interval: Duration,

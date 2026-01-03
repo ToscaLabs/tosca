@@ -16,6 +16,8 @@ use crate::mk_static;
 pub(crate) const WIFI_RECONNECT_DELAY: u64 = 2;
 
 /// The `Wi-Fi` controller.
+///
+/// Configures and establishes a conncection to a `Wi-Fi` access point.
 pub struct Wifi {
     _esp_radio_controller: &'static Controller<'static>,
     controller: WifiController<'static>,
@@ -28,8 +30,8 @@ impl Wifi {
     ///
     /// # Errors
     ///
-    /// Unable to initialize the `Wi-Fi` controller and retrieve the
-    /// corresponding network interfaces.
+    /// Failed to initialize the `Wi-Fi` controller and retrieve the
+    /// network interfaces.
     pub fn configure(peripherals_wifi: WIFI<'static>, spawner: Spawner) -> Result<Self> {
         let esp_radio_controller = &*mk_static!(Controller<'static>, esp_radio::init()?);
         let (controller, interfaces) =
@@ -49,9 +51,9 @@ impl Wifi {
     ///
     /// - Missing `Wi-Fi` SSID
     /// - Missing `Wi-Fi` password
-    /// - Failure to set up the `Wi-Fi` configuration
-    /// - Failure to spawn the task to connect the device to the access point
-    ///   via `Wi-Fi`.
+    /// - Failed to configure the `Wi-Fi` settings
+    /// - Failed to spawn the task for connecting the device to the access
+    ///   point via `Wi-Fi`.
     pub async fn connect(mut self, ssid: &str, password: &str) -> Result<Interfaces<'static>> {
         if ssid.is_empty() {
             return Err(Error::new(ErrorKind::WiFi, "Missing Wi-Fi SSID"));

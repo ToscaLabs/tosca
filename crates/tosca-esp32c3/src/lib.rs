@@ -1,64 +1,72 @@
-//! A Rust library crate designed to develop `Tosca` firmware on `ESP32-C3`
-//! boards.
+//! `tosca-esp32c3` is a library crate for building firmware for `tosca` devices
+//! using an `ESP32-C3` microcontroller.
 //!
-//! It offers APIs to:
+//! It provides APIs to:
 //!
 //! - Connect a device to a `Wi-Fi` access point
 //! - Build the network stack
 //! - Configure the `mDNS-SD` discovery service
+//! - Define events for specific route tasks
 //! - Initialize and run an `HTTP` server
 //!
-//! The device APIs have been conceived to assist developers in defining their
-//! own devices, minimizing as much as possible the ambiguities that may arise
-//! during firmware development.
+//! The device APIs are designed to guide developers in defining their own
+//! devices, aiming to minimize the ambiguities that could arise during
+//! firmware development.
 //!
-//! Some of the most common errors include:
+//! Device firmware consists of a description and a set of tasks, both exposed
+//! through a client-server architecture in which the firmware operates as the
+//! server and its controller as the client.
 //!
-//! - Absence of the fundamental methods that define a device
-//! - Missing or incorrect hazard information associated with a server route
+//! A device description is defined as a sequence of fields, such as the
+//! device name, the device kind, and other data used to establish a
+//! connection with a controller.
 //!
-//! To ensure device customization, there are also APIs to add routes
-//! associated with specific device operations.
+//! When a controller makes a request to the firmware through a route, the
+//! firmware executes the corresponding task and sends a response! back to the
+//! controller.
+//! Routes may also accept parameters to configure tasks
 //!
-//! Each device route should be associated with one or more hazards, serving
-//! as informative indicators of the potential risks involved in invoking an
-//! operation.
-//! It is then the controller's responsibility to evaluate these hazards and
-//! decide whether to block or allow the invocation of the operation.
+//! An event can be associated with a route to monitor data produced by a
+//! sensor. Both integer and floating-point values are supported, as well as
+//! events triggered by changes in the device state configuration.
 //!
-//! This crate cannot verify at compile time all potential effects that
-//! may occur while an operation is running.
-//! Actually, hazards are purely informational data for a controller, that
-//! determines whether to block or permit the invocation of an operation
-//! based on established privacy policies.
+//! Each route can define zero or more associated hazards, representing
+//! potential risks during task execution. Even if no hazards are declared,
+//! a route may still pose unknown risks to the device.
+//! In such cases, the controller must decide whether to allow or block the
+//! request based on its privacy policy.
+//!
+//! This crate **cannot** determine the outcome of device tasks at compile
+//! time, as they depend on the runtime environment. Therefore, hazards
+//! only informs a controller of the **possible** risks that might arise.
 
 #![no_std]
 #![deny(missing_docs)]
 
 extern crate alloc;
 
-/// All device types implementable within firmware.
+/// All supported device types.
 pub mod devices;
 
-/// A general and immutable device.
+/// General device definition along with its methods.
 pub mod device;
-/// The error manager.
+/// Error management.
 pub mod error;
-/// The events manager and its configuration setter.
+/// Events and their data.
 pub mod events;
-/// All methods to configure the `mDNS-SD` service.
+/// The `mDNS-SD` discovery service.
 pub mod mdns;
-/// All methods associated with the network stack.
+/// The network stack builder.
 pub mod net;
 /// All route parameters.
 pub mod parameters;
-/// All supported response types.
+/// All responses kinds along with their payloads.
 pub mod response;
-/// All methods to initialize and run the firmware server.
+/// The firmware server.
 pub mod server;
-/// A device state.
+/// The device state.
 pub mod state;
-/// All methods to configure and connect to a `Wi-Fi` access point.
+/// The `Wi-Fi` controller.
 pub mod wifi;
 
 macro_rules! mk_static {

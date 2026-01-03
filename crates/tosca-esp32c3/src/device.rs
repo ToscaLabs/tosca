@@ -8,7 +8,9 @@ use crate::response::Response;
 use crate::server::{FuncIndex, Functions};
 use crate::state::{State, ValueFromRef};
 
-/// A general device.
+/// A generic `tosca` device.
+///
+/// A [`Device`] can only be passed to a [`crate::server::Server`].
 pub struct Device<S>
 where
     S: ValueFromRef + Send + Sync + 'static,

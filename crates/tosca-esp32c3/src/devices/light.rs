@@ -27,7 +27,9 @@ const ALLOWED_HAZARDS: &[Hazard] = &[Hazard::FireHazard, Hazard::ElectricEnergyC
 
 /// A `light` device.
 ///
-/// The first placeholder to construct a [`CompleteLight`].
+/// Its methods guide in the definition of a correct light.
+///
+/// The initial placeholder for constructing a [`CompleteLight`].
 pub struct Light<S = ()>(CompleteLight<S>)
 where
     S: ValueFromRef + Send + Sync + 'static;
@@ -52,7 +54,7 @@ where
     }
 
     /// Turns on a light using a stateless handler, returning an [`OkResponse`]
-    /// upon success and an [`ErrorResponse`] in case of failure.
+    /// on success and an [`ErrorResponse`] on failure.
     #[must_use]
     #[inline]
     pub fn turn_light_on_stateless_ok<F, Fut>(
@@ -68,7 +70,7 @@ where
     }
 
     /// Turns on a light using a stateful handler, returning an [`OkResponse`]
-    /// upon success and an [`ErrorResponse`] in case of failure.
+    /// on success and an [`ErrorResponse`] on failure.
     #[must_use]
     #[inline]
     pub fn turn_light_on_stateful_ok<F, Fut>(
@@ -84,8 +86,7 @@ where
     }
 
     /// Turns on a light using a stateless handler, returning a
-    /// [`SerialResponse`] upon success and
-    /// an [`ErrorResponse`] in case of failure.
+    /// [`SerialResponse`] on success and an [`ErrorResponse`] on failure.
     #[must_use]
     #[inline]
     pub fn turn_light_on_stateless_serial<F, Fut>(
@@ -101,8 +102,7 @@ where
     }
 
     /// Turns on a light using a stateful handler, returning a
-    /// [`SerialResponse`] upon success and
-    /// an [`ErrorResponse`] in case of failure.
+    /// [`SerialResponse`] on success and an [`ErrorResponse`] on failure.
     #[must_use]
     #[inline]
     pub fn turn_light_on_stateful_serial<F, Fut>(
@@ -118,9 +118,9 @@ where
     }
 }
 
-/// A `light` placeholder that includes only the route to turn the light on.
+/// A `light` placeholder that includes only the route for turning the light on.
 ///
-/// All of its methods return a [`CompleteLight`].
+/// All methods return a [`CompleteLight`].
 pub struct LightOnRoute<S = ()>(CompleteLight<S>)
 where
     S: ValueFromRef + Send + Sync + 'static;
@@ -130,7 +130,7 @@ where
     S: ValueFromRef + Send + Sync + 'static,
 {
     /// Turns off a light using a stateless handler, returning an [`OkResponse`]
-    /// upon success and an [`ErrorResponse`] in case of failure.
+    /// on success and an [`ErrorResponse`] on failure.
     #[must_use]
     #[inline]
     pub fn turn_light_off_stateless_ok<F, Fut>(
@@ -146,7 +146,7 @@ where
     }
 
     /// Turns off a light using a stateful handler, returning an [`OkResponse`]
-    /// upon success and an [`ErrorResponse`] in case of failure.
+    /// on success and an [`ErrorResponse`] on failure.
     #[must_use]
     #[inline]
     pub fn turn_light_off_stateful_ok<F, Fut>(
@@ -162,8 +162,7 @@ where
     }
 
     /// Turns off a light using a stateless handler, returning a
-    /// [`SerialResponse`] upon success and
-    /// an [`ErrorResponse`] in case of failure.
+    /// [`SerialResponse`] on success and an [`ErrorResponse`] on failure.
     #[must_use]
     #[inline]
     pub fn turn_light_off_stateless_serial<F, Fut>(
@@ -179,8 +178,7 @@ where
     }
 
     /// Turns off a light using a stateful handler, returning a
-    /// [`SerialResponse`] upon success and
-    /// an [`ErrorResponse`] in case of failure.
+    /// [`SerialResponse`] on success and an [`ErrorResponse`] on failure.
     #[must_use]
     #[inline]
     pub fn turn_light_off_stateful_serial<F, Fut>(
@@ -196,7 +194,7 @@ where
     }
 }
 
-/// A `light` device that provides methods to turn a light on and off.
+/// A `light` device with methods to turn the light on and off.
 pub struct CompleteLight<S = ()>
 where
     S: ValueFromRef + Send + Sync + 'static,
@@ -213,7 +211,7 @@ impl<S> CompleteLight<S>
 where
     S: ValueFromRef + Send + Sync + 'static,
 {
-    /// Changes the main route.
+    /// Sets the main route.
     #[must_use]
     #[inline]
     pub fn main_route(mut self, main_route: &'static str) -> Self {
@@ -223,7 +221,7 @@ where
     }
 
     /// Adds a [`Route`] with a stateless handler that returns an [`OkResponse`]
-    /// on success, and an [`ErrorResponse`] on failure.
+    /// on success and an [`ErrorResponse`] on failure.
     #[must_use]
     pub fn stateless_ok_route<F, Fut>(self, route: Route, func: F) -> Self
     where
@@ -242,7 +240,7 @@ where
     }
 
     /// Adds a [`Route`] with a stateful handler that returns an [`OkResponse`]
-    /// on success, and an [`ErrorResponse`] on failure.
+    /// on success and an [`ErrorResponse`] on failure.
     #[must_use]
     pub fn stateful_ok_route<F, Fut>(self, route: Route, func: F) -> Self
     where
@@ -262,7 +260,7 @@ where
     }
 
     /// Adds a [`Route`] with a stateless handler that returns a
-    /// [`SerialResponse`] on success, and an [`ErrorResponse`] on failure.
+    /// [`SerialResponse`] on success and an [`ErrorResponse`] on failure.
     #[must_use]
     pub fn stateless_serial_route<F, Fut>(self, route: Route, func: F) -> Self
     where
@@ -282,7 +280,7 @@ where
     }
 
     /// Adds a [`Route`] with a stateful handler that returns a
-    /// [`SerialResponse`] on success, and an [`ErrorResponse`] on failure.
+    /// [`SerialResponse`] on success and an [`ErrorResponse`] on failure.
     #[must_use]
     pub fn stateful_serial_route<F, Fut>(self, route: Route, func: F) -> Self
     where
@@ -302,7 +300,7 @@ where
     }
 
     /// Adds a [`Route`] with a stateless handler that returns an
-    /// [`InfoResponse`] on success, and an [`ErrorResponse`] on failure.
+    /// [`InfoResponse`] on success and an [`ErrorResponse`] on failure.
     #[must_use]
     pub fn stateless_info_route<F, Fut>(self, route: Route, func: F) -> Self
     where
@@ -321,7 +319,7 @@ where
     }
 
     /// Adds a [`Route`] with a stateful handler that returns an
-    /// [`InfoResponse`] on success, and an [`ErrorResponse`] on failure.
+    /// [`InfoResponse`] on success and an [`ErrorResponse`] on failure.
     #[must_use]
     pub fn stateful_info_route<F, Fut>(self, route: Route, func: F) -> Self
     where
@@ -341,6 +339,8 @@ where
     }
 
     /// Builds a [`Device`].
+    ///
+    /// **This method consumes the light.**
     #[must_use]
     #[inline]
     pub fn build(self) -> Device<S> {

@@ -20,7 +20,7 @@ async fn notify_network_task() {
     Timer::after_millis(WAIT_FOR_MILLISECONDS).await;
 }
 
-/// A notifier to signal an [`tosca::events::Event`].
+/// A notifier for signaling an [`tosca::events::Event`].
 pub struct Notifier<T: Clone + Copy> {
     index: usize,
     phantom: PhantomData<T>,

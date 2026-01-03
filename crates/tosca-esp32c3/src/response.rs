@@ -26,8 +26,7 @@ impl Default for OkResponse {
 }
 
 impl OkResponse {
-    /// Creates an [`OkResponse`] containing
-    /// an [`tosca::response::OkResponse`].
+    /// Creates an [`OkResponse`].
     #[must_use]
     #[inline]
     pub fn new() -> Self {
@@ -40,8 +39,7 @@ impl OkResponse {
 pub struct SerialResponse(Response);
 
 impl SerialResponse {
-    /// Creates a [`SerialResponse`] containing
-    /// a [`tosca::response::SerialResponse`].
+    /// Creates a [`SerialResponse`] from a serializable value.
     #[must_use]
     #[inline]
     pub fn new<T: Serialize>(value: T) -> Self {
@@ -51,8 +49,7 @@ impl SerialResponse {
         ))
     }
 
-    /// Creates a [`SerialResponse`] containing a
-    /// [`tosca::response::SerialResponse`] derived from a given text.
+    /// Creates a [`SerialResponse`] from a given text.
     #[must_use]
     #[inline]
     pub fn text(value: &str) -> Self {
@@ -65,12 +62,11 @@ impl SerialResponse {
 }
 
 /// A response which transmits a JSON message over the network containing
-/// a device's energy and economy information.
+/// a device energy and economy information.
 pub struct InfoResponse(Response);
 
 impl InfoResponse {
-    /// Creates a [`InfoResponse`] containing
-    /// a [`tosca::response::InfoResponse`].
+    /// Creates a [`InfoResponse`].
     #[must_use]
     #[inline]
     pub fn new(device_info: DeviceInfo) -> Self {
@@ -89,8 +85,7 @@ impl InfoResponse {
 pub struct ErrorResponse(pub(crate) Response);
 
 impl ErrorResponse {
-    /// Generates an [`ErrorResponse`] containing an
-    /// [`tosca::response::ErrorResponse`].
+    /// Generates an [`ErrorResponse`].
     ///
     /// Requires specifying the [`ErrorKind`] kind and a general
     /// description.
@@ -103,8 +98,7 @@ impl ErrorResponse {
         ))
     }
 
-    /// Generates an [`ErrorResponse`] containing an
-    /// [`tosca::response::ErrorResponse`].
+    /// Generates an [`ErrorResponse`].
     ///
     /// Requires specifying the [`ErrorKind`] kind, a general error
     /// description, and optional information about the encountered error.
