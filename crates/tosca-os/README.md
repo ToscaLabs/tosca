@@ -3,6 +3,7 @@
 # `tosca-os`
 
 [![LICENSE][license badge]][license]
+[![Crates.io Version [crates.io badge]][crates.io]
 
 </div>
 
@@ -89,6 +90,8 @@ is an optional argument that enables all time and memory optimizations.
 
 <!-- Links -->
 [license]: https://github.com/ToscaLabs/tosca?tab=readme-ov-file#license
+[crates.io]: https://crates.io/crates/tosca-os
 
 <!-- Badges -->
 [license badge]: https://img.shields.io/badge/license-Apache--2.0_OR_MIT-blue.svg
+[crates.io badge]: https://img.shields.io/crates/v/tosca-os.svg

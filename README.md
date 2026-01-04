@@ -3,6 +3,7 @@
 # `tosca`
 
 [![Actions][actions badge]][actions]
+[![Crates.io Version [crates.io badge]][crates.io]
 [![Codecov][codecov badge]][codecov]
 [![LICENSE][license badge]][license]
 
@@ -185,6 +186,7 @@ the project defined licenses, without any additional terms or conditions.
 
 <!-- Links -->
 [actions]: https://github.com/ToscaLabs/tosca/actions
+[crates.io]: https://crates.io/crates/tosca
 [codecov]: https://codecov.io/gh/ToscaLabs/tosca
 [license]: https://github.com/ToscaLabs/tosca?tab=readme-ov-file#license
 [`embedded-hal`]: https://crates.io/crates/embedded-hal
@@ -192,5 +194,6 @@ the project defined licenses, without any additional terms or conditions.
 
 <!-- Badges -->
 [actions badge]: https://github.com/ToscaLabs/tosca/workflows/ci/badge.svg
+[crates.io badge]: https://img.shields.io/crates/v/tosca.svg
 [codecov badge]: https://codecov.io/gh/ToscaLabs/tosca/branch/master/graph/badge.svg
 [license badge]: https://img.shields.io/badge/license-Apache--2.0_OR_MIT-blue.svg

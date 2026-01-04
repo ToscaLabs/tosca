@@ -3,6 +3,7 @@
 # `tosca-drivers`
 
 [![LICENSE][license badge]][license]
+[![Crates.io Version [crates.io badge]][crates.io]
 
 </div>
 
@@ -39,9 +40,11 @@ tosca-drivers.features = ["bh1750", "dht22"] # only include needed drivers
 
 <!-- Links -->
 [license]: https://github.com/ToscaLabs/tosca?tab=readme-ov-file#license
+[crates.io]: https://crates.io/crates/tosca-drivers
 [`embedded-hal`]: https://crates.io/crates/embedded-hal
 [`embedded-hal-async`]: https://crates.io/crates/embedded-hal-async
 [`Fritzing`]: https://fritzing.org/download/
 
 <!-- Badges -->
 [license badge]: https://img.shields.io/badge/license-Apache--2.0_OR_MIT-blue.svg
+[crates.io badge]: https://img.shields.io/crates/v/tosca-drivers.svg
