@@ -4,9 +4,9 @@
 
 [![Actions][actions badge]][actions]
 [![Crates.io Version [crates.io badge]][crates.io]
+[![Minimum Supported Rust Version][msrv badge]][msrv]
 [![Codecov][codecov badge]][codecov]
 [![LICENSE][license badge]][license]
-[![Minimum Supported Rust Version][msrv badge]][msrv]
 
 </div>
 
@@ -188,15 +188,15 @@ the project defined licenses, without any additional terms or conditions.
 <!-- Links -->
 [actions]: https://github.com/ToscaLabs/tosca/actions
 [crates.io]: https://crates.io/crates/tosca
+[msrv]: https://crates.io/crates/tosca
 [codecov]: https://codecov.io/gh/ToscaLabs/tosca
 [license]: https://github.com/ToscaLabs/tosca?tab=readme-ov-file#license
-[msrv]: https://crates.io/crates/tosca
 [`embedded-hal`]: https://crates.io/crates/embedded-hal
 [`embedded-hal-async`]: https://crates.io/crates/embedded-hal-async
 
 <!-- Badges -->
 [actions badge]: https://github.com/ToscaLabs/tosca/workflows/ci/badge.svg
 [crates.io badge]: https://img.shields.io/crates/v/tosca.svg
+[msrv badge]: https://img.shields.io/crates/msrv/tosca
 [codecov badge]: https://codecov.io/gh/ToscaLabs/tosca/branch/master/graph/badge.svg
 [license badge]: https://img.shields.io/badge/license-Apache--2.0_OR_MIT-blue.svg
-[msrv badge]: https://img.shields.io/crates/msrv/tosca
