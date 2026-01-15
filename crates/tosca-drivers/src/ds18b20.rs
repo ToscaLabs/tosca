@@ -116,6 +116,15 @@ where
     /// 3. Reads and CRC-verifies the scratchpad data
     /// 4. Returns the measured temperature in degrees Celsius (°C)
     ///
+    /// # Notes
+    ///
+    /// After a power-on reset, the DS18B20’s temperature register is initialized
+    /// to **85.0 °C**. This happens when the sensor is first powered on (power-up)
+    /// or if a reset of its internal registers occurs while powered.
+    /// This value has a valid CRC and is not treated as an error by the driver.
+    /// Discard the first reading after a power-on reset, as it returns 85.0 °C
+    /// which does not reflect the current temperature.
+    ///
     /// # Errors
     ///
     /// Returns an error if:
