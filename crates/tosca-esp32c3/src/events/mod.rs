@@ -22,7 +22,7 @@ use embassy_time::Timer;
 
 use esp_hal::gpio::AnyPin;
 
-use log::{error, info};
+use log::{debug, error, info};
 
 use tosca::device::DeviceKind;
 use tosca::events::{
@@ -233,7 +233,7 @@ async fn write_on_network(stack: Stack<'static>, remote_endpoint: (IpAddress, u1
             }
         };
 
-        info!("Data capacity: {} bytes", data.capacity());
+        debug!("Data capacity: {} bytes", data.capacity());
 
         // Transmit the data over the network.
         //
