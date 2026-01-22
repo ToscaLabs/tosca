@@ -1,0 +1,39 @@
+name: publish
+
+on:
+  workflow_dispatch:
+    inputs:
+      no-dry-run:
+        description: "Publish on crates.io"
+        type: boolean
+        required: false
+        default: false
+
+jobs:
+  publish-tosca:
+
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v6
+
+      - name: Install Rust toolchain
+        uses: dtolnay/rust-toolchain@stable
+
+      - name: Publish tosca workspace dry run
+        run: cargo publish --workspace --dry-run
+
+      - name: Publish tosca-esp32c3 dry run
+        run: cd crates/tosca-esp32c3; cargo publish --dry-run
+
+      - name: Login
+        if: ${{ github.event_name == 'workflow_dispatch' && inputs.no-dry-run }}
+        run: cargo login ${{ secrets.CRATES_IO_TOKEN }}
+
+      - name: Publish tosca workspace
+        if: ${{ github.event_name == 'workflow_dispatch' && inputs.no-dry-run }}
+        run: cargo publish --workspace
+
+      - name: Publish tosca-esp32c3
+        if: ${{ github.event_name == 'workflow_dispatch' && inputs.no-dry-run }}
+        run: cd crates/tosca-esp32c3; cargo publish
