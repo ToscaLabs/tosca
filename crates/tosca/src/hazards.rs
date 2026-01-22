@@ -354,10 +354,8 @@ pub struct HazardData {
     /// Description.
     pub description: &'static str,
     /// Category name.
-    #[serde(rename = "category name")]
     pub category_name: &'static str,
     /// Category description.
-    #[serde(rename = "category description")]
     pub category_description: &'static str,
 }
 
@@ -467,8 +465,8 @@ mod tests {
                         "id": hazard.id(),
                         "name": hazard.name(),
                         "description": hazard.description(),
-                        "category name": hazard.category().name(),
-                        "category description": hazard.category().description(),
+                        "category_name": hazard.category().name(),
+                        "category_description": hazard.category().description(),
                     }
 
 
