@@ -36,7 +36,7 @@ hashbrown.features = ["default-hasher"]
 indexmap.version = "2.12"
 indexmap.default-features = false
 
-mdns-sd.version = "0.17.0"
+mdns-sd.version = "0.18.0"
 mdns-sd.default-features = false
 
 serde.version = "1.0"
