@@ -6,7 +6,7 @@ use serde::Serialize;
 use tokio::sync::broadcast::{self, Receiver};
 use tokio::task::JoinHandle;
 
-use tosca::device::{DeviceEnvironment, DeviceKind};
+use tosca::device::{DeviceEnvironment, DeviceKindId};
 use tosca::events::{Events as ToscaEvents, EventsDescription};
 use tosca::route::RouteConfigs;
 
@@ -90,7 +90,7 @@ impl NetworkInformation {
 #[derive(Debug, PartialEq, Serialize)]
 pub struct Description {
     /// Device kind.
-    pub kind: DeviceKind,
+    pub kind: DeviceKindId,
     /// Device environment.
     pub environment: DeviceEnvironment,
     /// Device main route.
@@ -100,7 +100,11 @@ pub struct Description {
 impl Description {
     /// Creates a [`Description`].
     #[must_use]
-    pub const fn new(kind: DeviceKind, environment: DeviceEnvironment, main_route: String) -> Self {
+    pub const fn new(
+        kind: DeviceKindId,
+        environment: DeviceEnvironment,
+        main_route: String,
+    ) -> Self {
         Self {
             kind,
             environment,
