@@ -44,8 +44,8 @@ pub enum DeviceKind {
     Light,
 }
 
-impl DeviceKind {
-    const fn description(self) -> &'static str {
+impl DeviceKindTrait for DeviceKind {
+    fn name(&self) -> &'static str {
         match self {
             Self::Unknown => "Unknown",
             Self::Light => "Light",
@@ -55,7 +55,7 @@ impl DeviceKind {
 
 impl core::fmt::Display for DeviceKind {
     fn fmt(&self, f: &mut core::fmt::Formatter<'_>) -> core::fmt::Result {
-        write!(f, "{}", self.description())
+        write!(f, "{}", self.name())
     }
 }
 
