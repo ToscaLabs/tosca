@@ -59,6 +59,51 @@ impl core::fmt::Display for DeviceKind {
     }
 }
 
+/// A string-backed device kind identifier.
+///
+/// Used in [`DeviceData`] for serialization over the wire. The controller
+/// deserializes into this type, so it can handle any device kind including
+/// ones it has never seen before.
+///
+/// On the firmware side, this is constructed automatically from any type
+/// that implements [`DeviceKind`] via the [`From`] impl.
+#[derive(Debug, Clone, PartialEq, Serialize)]
+#[cfg_attr(feature = "deserialize", derive(serde::Deserialize))]
+#[serde(transparent)]
+pub struct DeviceKindId(alloc::borrow::Cow<'static, str>);
+
+impl DeviceKindId {
+    /// Creates a new [`DeviceKindId`] from a static string.
+    #[must_use]
+    pub const fn new(name: &'static str) -> Self {
+        Self(alloc::borrow::Cow::Borrowed(name))
+    }
+
+    /// Returns the device kind name.
+    #[must_use]
+    pub fn name(&self) -> &str {
+        &self.0
+    }
+
+    /// Checks if this ID matches a known [`DeviceKind`] value.
+    #[must_use]
+    pub fn matches<K: DeviceKindTrait>(&self, kind: &K) -> bool {
+        self.0 == kind.name()
+    }
+}
+
+impl core::fmt::Display for DeviceKindId {
+    fn fmt(&self, f: &mut core::fmt::Formatter<'_>) -> core::fmt::Result {
+        write!(f, "{}", self.0)
+    }
+}
+
+impl<K: DeviceKindTrait> From<&K> for DeviceKindId {
+    fn from(kind: &K) -> Self {
+        Self::new(kind.name())
+    }
+}
+
 /// Device environment.
 ///
 /// Specifies the underlying hardware architecture of a device,
