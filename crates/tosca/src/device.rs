@@ -5,6 +5,35 @@ use crate::energy::Energy;
 use crate::events::EventsDescription;
 use crate::route::RouteConfigs;
 
+/// Trait for device kind types.
+///
+/// Firmware authors implement this on their own enum.
+///
+/// # Example
+///
+/// ```rust
+/// use tosca::device::DeviceKindTrait;
+///
+/// #[derive(Debug, Clone, Copy, PartialEq)]
+/// enum MyDeviceKind {
+///     Relay,
+///     MotorController,
+/// }
+///
+/// impl DeviceKindTrait for MyDeviceKind {
+///     fn name(&self) -> &'static str {
+///         match self {
+///             Self::Relay => "Relay",
+///             Self::MotorController => "MotorController",
+///         }
+///     }
+/// }
+/// ```
+pub trait DeviceKindTrait {
+    /// Returns the display name of this device kind.
+    fn name(&self) -> &'static str;
+}
+
 /// A device kind.
 #[derive(Debug, Clone, Copy, PartialEq, Serialize)]
 #[cfg_attr(feature = "deserialize", derive(serde::Deserialize))]
