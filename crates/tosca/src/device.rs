@@ -162,7 +162,7 @@ impl DeviceInfo {
 #[cfg_attr(feature = "deserialize", derive(serde::Deserialize))]
 pub struct DeviceData {
     /// Device kind.
-    pub kind: DeviceKind,
+    pub kind: DeviceKindId,
     /// Device environment.
     pub environment: DeviceEnvironment,
     /// Device description.
@@ -189,7 +189,7 @@ impl DeviceData {
     /// Creates [`DeviceData`].
     #[must_use]
     pub fn new(
-        kind: DeviceKind,
+        kind: DeviceKindId,
         environment: DeviceEnvironment,
         wifi_mac: Option<[u8; 6]>,
         ethernet_mac: Option<[u8; 6]>,
