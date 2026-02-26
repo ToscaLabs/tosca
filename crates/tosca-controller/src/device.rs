@@ -393,7 +393,7 @@ impl Devices {
 pub(crate) mod tests {
     use std::collections::{HashMap, HashSet};
 
-    use tosca::device::{DeviceEnvironment, DeviceKind};
+    use tosca::device::{DeviceEnvironment, DeviceKindId};
     use tosca::hazards::{Hazard, Hazards};
     use tosca::parameters::Parameters;
     use tosca::route::{Route, RouteConfigs};
@@ -423,13 +423,13 @@ pub(crate) mod tests {
         .ethernet_mac([0x06, 0xAA, 0xBB, 0xCC, 0xDD, 0xEE])
     }
 
-    fn create_description(device_kind: DeviceKind, main_route: &str) -> Description {
+    fn create_description(device_kind: DeviceKindId, main_route: &str) -> Description {
         Description::new(device_kind, DeviceEnvironment::Os, main_route.into())
     }
 
     pub(crate) fn create_light() -> Device {
         let network_info = create_network_info("192.168.1.174", 5000);
-        let description = create_description(DeviceKind::Light, "light/");
+        let description = create_description(DeviceKindId::new("Light"), "light/");
 
         let light_on_route = Route::put("On", "/on")
             .description("Turn light on.")
@@ -458,7 +458,7 @@ pub(crate) mod tests {
 
     pub(crate) fn create_unknown() -> Device {
         let network_info = create_network_info("192.168.1.176", 5500);
-        let description = create_description(DeviceKind::Unknown, "ip-camera/");
+        let description = create_description(DeviceKindId::new("Unknown"), "ip-camera/");
 
         let camera_stream_route = Route::get("Stream", "/stream")
             .description("View camera stream.")
