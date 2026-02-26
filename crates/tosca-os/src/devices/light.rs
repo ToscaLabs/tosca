@@ -57,7 +57,7 @@ where
     /// Creates a [`Light`] with a state.
     #[inline]
     pub fn with_state(state: S) -> Self {
-        let device = Device::init(DeviceKind::Light, state).main_route(MAIN_ROUTE);
+        let device = Device::init(&DeviceKind::Light, state).main_route(MAIN_ROUTE);
 
         Self {
             device,
