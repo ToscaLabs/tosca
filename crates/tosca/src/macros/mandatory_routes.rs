@@ -151,3 +151,49 @@ macro_rules! mandatory_route {
         }
     };
 }
+
+#[cfg(test)]
+mod tests {
+    use crate::hazards::Hazard;
+    use crate::parameters::Parameters;
+    use crate::route::RestKind;
+
+    mandatory_route!(TestRoute, "/test", methods: [get, put, post, delete]);
+
+    #[test]
+    fn test_mandatory_route_constructors() {
+        let get = TestRoute::get("Get");
+        assert_eq!(get.route(), "/test");
+        assert_eq!(get.kind(), RestKind::Get);
+
+        let put = TestRoute::put("Put");
+        assert_eq!(put.kind(), RestKind::Put);
+
+        let post = TestRoute::post("Post");
+        assert_eq!(post.kind(), RestKind::Post);
+
+        let delete = TestRoute::delete("Delete");
+        assert_eq!(delete.kind(), RestKind::Delete);
+    }
+
+    #[test]
+    fn test_mandatory_route_builder_chain() {
+        let route = TestRoute::put("On")
+            .description("Turn on.")
+            .with_hazard(Hazard::FireHazard)
+            .with_parameters(Parameters::new().bool("enabled", false));
+
+        assert_eq!(route.route(), "/test");
+        assert_eq!(route.kind(), RestKind::Put);
+        assert!(!route.hazards().is_empty());
+        assert!(!route.parameters().is_empty());
+    }
+
+    #[test]
+    fn test_mandatory_route_into_route() {
+        let route = TestRoute::get("Toggle").description("Toggle.").into_route();
+
+        assert_eq!(route.route(), "/test");
+        assert_eq!(route.kind(), RestKind::Get);
+    }
+}
