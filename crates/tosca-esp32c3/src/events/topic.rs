@@ -2,13 +2,13 @@ use alloc::format;
 
 use tosca::events::Topic;
 
-pub(crate) struct TopicBuilder {
-    prefix: &'static str,
+pub(crate) struct TopicBuilder<'a> {
+    prefix: &'a str,
     mac: [u8; 6],
-    suffix: &'static str,
+    suffix: &'a str,
 }
 
-impl TopicBuilder {
+impl<'a> TopicBuilder<'a> {
     pub(crate) const fn new() -> Self {
         Self {
             prefix: "",
@@ -17,7 +17,7 @@ impl TopicBuilder {
         }
     }
 
-    pub(crate) const fn prefix(mut self, prefix: &'static str) -> Self {
+    pub(crate) const fn prefix(mut self, prefix: &'a str) -> Self {
         self.prefix = prefix;
         self
     }
@@ -27,7 +27,7 @@ impl TopicBuilder {
         self
     }
 
-    pub(crate) const fn suffix(mut self, suffix: &'static str) -> Self {
+    pub(crate) const fn suffix(mut self, suffix: &'a str) -> Self {
         self.suffix = suffix;
         self
     }
