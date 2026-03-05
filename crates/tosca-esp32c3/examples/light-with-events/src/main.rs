@@ -302,6 +302,7 @@ async fn main(spawner: Spawner) {
                 .unwrap_or(Ipv4Address::LOCALHOST.into()),
             device_config.broker_port,
         ),
+        "light",
         device,
     );
 
