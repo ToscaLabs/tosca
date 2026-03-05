@@ -2,7 +2,7 @@ use alloc::borrow::Cow;
 use alloc::boxed::Box;
 use alloc::vec::Vec;
 
-use tosca::device::{DeviceData, DeviceEnvironment, DeviceKind};
+use tosca::device::{DeviceData, DeviceEnvironment, DeviceKind, DeviceKindId};
 use tosca::hazards::Hazard;
 use tosca::response::ResponseKind;
 use tosca::route::{Route, RouteConfigs};
@@ -386,7 +386,7 @@ where
         let wifi_mac = wifi_interface.mac_address();
 
         let device_data = DeviceData::new(
-            DeviceKind::Light,
+            DeviceKindId::from(&DeviceKind::Light),
             DeviceEnvironment::Esp32,
             None,
             None,

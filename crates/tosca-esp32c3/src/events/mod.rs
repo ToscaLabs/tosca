@@ -24,7 +24,6 @@ use esp_hal::gpio::AnyPin;
 
 use log::{debug, error, info};
 
-use tosca::device::DeviceKind;
 use tosca::events::{
     BrokerData as ToscaBrokerData, Event, Events, EventsDescription, PeriodicEvent, Topic,
 };
@@ -119,19 +118,18 @@ where
         spawner: Spawner,
         stack: Stack<'static>,
         broker: BrokerData,
+        topic_prefix: &str,
         device: Device<S>,
     ) -> Self {
         Self {
             spawner,
             stack,
             broker,
-            topic: match device.description.kind {
-                DeviceKind::Light => TopicBuilder::new().prefix("light"),
-                DeviceKind::Unknown => TopicBuilder::new().prefix("unknown"),
-            }
-            .suffix("events")
-            .mac(device.wifi_mac)
-            .build(),
+            topic: TopicBuilder::new()
+                .prefix(topic_prefix)
+                .suffix("events")
+                .mac(device.wifi_mac)
+                .build(),
             device,
         }
     }

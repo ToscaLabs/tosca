@@ -1,7 +1,7 @@
 use std::net::Ipv4Addr;
 use std::time::Duration;
 
-use tosca::device::{DeviceEnvironment, DeviceKind};
+use tosca::device::{DeviceEnvironment, DeviceKindId};
 use tosca::hazards::{Hazard, Hazards};
 use tosca::parameters::{ParameterKind, Parameters, ParametersData};
 use tosca::response::ResponseKind;
@@ -177,7 +177,7 @@ pub(crate) fn compare_device_data(device: &Device) {
     );
 
     // Check device information.
-    assert_eq!(device.description().kind, DeviceKind::Light);
+    assert_eq!(device.description().kind, DeviceKindId::new("Light"));
     assert_eq!(device.description().environment, DeviceEnvironment::Os);
 
     // Check requests number.

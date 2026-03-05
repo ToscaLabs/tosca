@@ -1,4 +1,4 @@
-use tosca::device::{DeviceData, DeviceEnvironment, DeviceKind};
+use tosca::device::{DeviceData, DeviceEnvironment, DeviceKind, DeviceKindId, DeviceKindTrait};
 use tosca::route::{RouteConfig, RouteConfigs};
 
 use axum::Router;
@@ -26,7 +26,7 @@ where
     // Device state.
     pub(crate) state: S,
     // Device kind.
-    kind: DeviceKind,
+    kind: DeviceKindId,
     // All device routes along with their associated hazards.
     route_configs: RouteConfigs,
     // Number of mandatory routes.
@@ -56,7 +56,7 @@ where
     #[must_use]
     #[inline]
     pub fn with_state(state: S) -> Self {
-        Self::init(DeviceKind::Unknown, state)
+        Self::init(&DeviceKind::Unknown, state)
     }
 
     /// Sets the main route.
@@ -81,11 +81,11 @@ where
         self.response_data(base_response.finalize())
     }
 
-    pub(crate) fn init(kind: DeviceKind, state: S) -> Self {
+    pub(crate) fn init<K: DeviceKindTrait>(kind: &K, state: S) -> Self {
         Self {
             main_route: MAIN_ROUTE,
             router: Router::new(),
-            kind,
+            kind: DeviceKindId::from(kind),
             route_configs: RouteConfigs::new(),
             state,
             num_mandatory_routes: 0,
