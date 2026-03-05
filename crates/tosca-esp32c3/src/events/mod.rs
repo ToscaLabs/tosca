@@ -118,20 +118,18 @@ where
         spawner: Spawner,
         stack: Stack<'static>,
         broker: BrokerData,
+        topic_prefix: &str,
         device: Device<S>,
     ) -> Self {
         Self {
             spawner,
             stack,
             broker,
-            topic: match device.description.kind.name() {
-                "Light" => TopicBuilder::new().prefix("light"),
-                "Unknown" => TopicBuilder::new().prefix("unknown"),
-                _ => todo!(),
-            }
-            .suffix("events")
-            .mac(device.wifi_mac)
-            .build(),
+            topic: TopicBuilder::new()
+                .prefix(topic_prefix)
+                .suffix("events")
+                .mac(device.wifi_mac)
+                .build(),
             device,
         }
     }
