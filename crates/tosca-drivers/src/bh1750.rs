@@ -356,7 +356,7 @@ mod tests {
     async fn test_set_mtreg_clamping_high() {
         // MTreg equal to 255 should be clamped to 254 (max).
         let high = 0x40 | (254 >> 5);
-        let low = 0x60 | (254 & 0x1F);
+        let low = 0x60 | (0xFE & 0x1F);
         let expectations = [
             I2cTransaction::write(0x23, vec![high]),
             I2cTransaction::write(0x23, vec![low]),
