@@ -1,5 +1,8 @@
 #![no_std]
 #![no_main]
+// FIXME: Work around Rust 1.94 query-depth regression with deeply nested async futures.
+// Remove once the upstream issue is fixed: https://github.com/rust-lang/rust/issues/152942
+#![recursion_limit = "256"]
 #![deny(
     clippy::mem_forget,
     reason = "mem::forget is generally not safe to do with esp_hal types, especially those \
