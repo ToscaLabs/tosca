@@ -11,10 +11,13 @@
 
 extern crate alloc;
 
+mod light;
+
 use core::sync::atomic::{AtomicBool, Ordering};
 
+use tosca::device::DeviceKindTrait;
 use tosca::parameters::Parameters;
-use tosca::route::{LightOffRoute, LightOnRoute, Route};
+use tosca::route::Route;
 
 use esp_hal::Config;
 use esp_hal::clock::CpuClock;
@@ -30,8 +33,8 @@ use embassy_net::Ipv4Address;
 use embassy_sync::{blocking_mutex::raw::CriticalSectionRawMutex, signal::Signal};
 use embassy_time::Timer;
 
+use light::{Light, LightOffRoute, LightOnRoute};
 use tosca_esp32c3::{
-    devices::light::Light,
     events::{EventsConfig, EventsManager, broker::BrokerData, interrupt::Notifier},
     mdns::Mdns,
     net::NetworkStack,
@@ -40,6 +43,19 @@ use tosca_esp32c3::{
     server::Server,
     wifi::Wifi,
 };
+
+#[derive(Debug, Clone, Copy, PartialEq)]
+enum MyDeviceKind {
+    Light,
+}
+
+impl DeviceKindTrait for MyDeviceKind {
+    fn name(&self) -> &'static str {
+        match self {
+            Self::Light => "Light",
+        }
+    }
+}
 
 const MAX_HEAP_SIZE: usize = 64 * 1024;
 const MILLISECONDS_TO_WAIT: u64 = 100;
@@ -278,7 +294,7 @@ async fn main(spawner: Spawner) {
         .spawn(press_button(button))
         .expect("Impossible to spawn the task to press the button task");
 
-    let device = Light::new(&interfaces.ap)
+    let device = Light::new(&interfaces.ap, &MyDeviceKind::Light)
         .turn_light_on_stateless_serial(
             LightOnRoute::put("On").description("Turn light on."),
             turn_light_on,
