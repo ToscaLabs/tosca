@@ -1,2 +1,2 @@
-/// A `light` device.
-pub mod light;
+/// A generic device builder.
+pub mod builder;
