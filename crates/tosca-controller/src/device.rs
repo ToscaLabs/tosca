@@ -95,6 +95,8 @@ pub struct Description {
     pub environment: DeviceEnvironment,
     /// Device main route.
     pub main_route: String,
+    /// Device description.
+    pub description: Option<String>,
 }
 
 impl Description {
@@ -109,7 +111,16 @@ impl Description {
             kind,
             environment,
             main_route,
+            description: None,
         }
+    }
+
+    /// Sets a device description.
+    #[inline]
+    #[must_use]
+    pub fn description(mut self, description: Option<String>) -> Self {
+        self.description = description;
+        self
     }
 }
 
@@ -423,13 +434,19 @@ pub(crate) mod tests {
         .ethernet_mac([0x06, 0xAA, 0xBB, 0xCC, 0xDD, 0xEE])
     }
 
-    fn create_description(device_kind: DeviceKindId, main_route: &str) -> Description {
+    fn create_description(
+        device_kind: DeviceKindId,
+        main_route: &str,
+        description: Option<&str>,
+    ) -> Description {
         Description::new(device_kind, DeviceEnvironment::Os, main_route.into())
+            .description(description.map(std::convert::Into::into))
     }
 
     pub(crate) fn create_light() -> Device {
         let network_info = create_network_info("192.168.1.174", 5000);
-        let description = create_description(DeviceKindId::new("Light"), "light/");
+        let description =
+            create_description(DeviceKindId::new("Light"), "light/", Some("A smart light"));
 
         let light_on_route = Route::put("On", "/on")
             .description("Turn light on.")
@@ -458,7 +475,7 @@ pub(crate) mod tests {
 
     pub(crate) fn create_unknown() -> Device {
         let network_info = create_network_info("192.168.1.176", 5500);
-        let description = create_description(DeviceKindId::new("Unknown"), "ip-camera/");
+        let description = create_description(DeviceKindId::new("Unknown"), "ip-camera/", None);
 
         let camera_stream_route = Route::get("Stream", "/stream")
             .description("View camera stream.")
