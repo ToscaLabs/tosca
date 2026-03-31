@@ -36,7 +36,7 @@ fn slash_start_end(s: &str) -> &str {
 }
 
 fn compare_values_with_params_data(
-    parameter_values: &ParametersValues,
+    parameter_values: &ParametersValues<'_>,
     parameters_data: &ParametersData,
 ) -> Result<(), Error> {
     for (name, parameter_value) in parameter_values {
@@ -308,7 +308,7 @@ impl Request {
         RequestData::new(request, parameters)
     }
 
-    fn create_request(&self, parameters: &ParametersValues) -> Result<RequestData, Error> {
+    fn create_request(&self, parameters: &ParametersValues<'_>) -> Result<RequestData, Error> {
         // Compare parameters values with parameters data.
         compare_values_with_params_data(parameters, &self.parameters_data)?;
 
@@ -337,7 +337,7 @@ impl Request {
     fn create_params_plain(&self) -> HashMap<String, String> {
         let mut params = HashMap::new();
         for (name, parameter_kind) in &self.parameters_data {
-            params.insert(
+            let _ = params.insert(
                 name.clone(),
                 format!("{}", ParameterValue::from_parameter_kind(parameter_kind)),
             );
@@ -347,7 +347,7 @@ impl Request {
 
     // Axum parameters: hello/{{1}}/{{2}}
     //                  hello/0.5/1
-    fn axum_get(&self, parameters: &ParametersValues) -> String {
+    fn axum_get(&self, parameters: &ParametersValues<'_>) -> String {
         let mut route = String::from(&self.route);
         for (name, parameter_kind) in &self.parameters_data {
             let value = if let Some(value) = parameters.get(name) {
@@ -376,7 +376,7 @@ impl Request {
                     format!("{}", ParameterValue::from_parameter_kind(parameter_kind)),
                 )
             };
-            params.insert(name.clone(), value);
+            let _ = params.insert(name.clone(), value);
         }
         params
     }

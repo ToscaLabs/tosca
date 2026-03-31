@@ -40,7 +40,7 @@ impl Policy {
     #[must_use]
     #[inline]
     pub fn block_device_on_hazards(mut self, id: usize, hazards: Hazards) -> Self {
-        self.block_device_on_hazards.insert(id, hazards);
+        let _ = self.block_device_on_hazards.insert(id, hazards);
         self
     }
 

@@ -201,7 +201,7 @@ impl EventsRunner {
         let topic = events.description.topic.as_str();
 
         let mut mqttoptions = MqttOptions::new(id.to_string(), address.to_string(), port);
-        mqttoptions.set_keep_alive(KEEP_ALIVE_TIME);
+        let _ = mqttoptions.set_keep_alive(KEEP_ALIVE_TIME);
 
         let (client, eventloop) = AsyncClient::new(mqttoptions, ASYNC_CHANNEL_CAPACITY);
         client
