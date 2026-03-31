@@ -154,7 +154,7 @@ macro_rules! mandatory_route {
 
 #[cfg(test)]
 mod tests {
-    use crate::hazards::Hazard;
+    use crate::hazards::{Hazard, Hazards};
     use crate::parameters::Parameters;
     use crate::route::RestKind;
 
@@ -195,5 +195,19 @@ mod tests {
 
         assert_eq!(route.route(), "/test");
         assert_eq!(route.kind(), RestKind::Get);
+    }
+
+    // FIXME: This test should be deleted or improved. Only used to remove a
+    // warning for now.
+    #[test]
+    fn test_mandatory_route_unused_methods() {
+        let route = TestRoute::get("On")
+            .change_name("OnGet")
+            .with_hazards(Hazards::new().insert(Hazard::FireHazard))
+            .with_array_of_hazards([Hazard::FireHazard; 1]);
+
+        assert_eq!(route.route(), "/test");
+        assert!(!route.hazards().is_empty());
+        assert!(route.parameters().is_empty());
     }
 }
