@@ -100,6 +100,7 @@ pub struct RequestInfo<'device> {
     /// Route name.
     pub route: &'device str,
     /// Route description.
+    #[cfg(feature = "metadata")]
     pub description: Option<&'device str>,
     /// Rest kind.
     pub rest_kind: RestKind,
@@ -117,6 +118,7 @@ impl<'device> RequestInfo<'device> {
     pub(crate) fn new(route: &'device str, request: &'device Request) -> Self {
         Self {
             route,
+            #[cfg(feature = "metadata")]
             description: request.description.as_deref(),
             rest_kind: request.kind,
             hazards: &request.hazards,
@@ -135,6 +137,7 @@ pub struct Request {
     pub(crate) kind: RestKind,
     pub(crate) hazards: Hazards,
     pub(crate) route: String,
+    #[cfg(feature = "metadata")]
     pub(crate) description: Option<String>,
     pub(crate) parameters_data: ParametersData,
     pub(crate) response_kind: ResponseKind,
@@ -186,6 +189,7 @@ impl Request {
             kind,
             hazards,
             route,
+            #[cfg(feature = "metadata")]
             description: route_config.data.description.map(|s| s.to_string()),
             parameters_data,
             response_kind,
@@ -399,6 +403,7 @@ mod tests {
 
     fn plain_request(route: Route, kind: RestKind, hazards: Hazards) {
         let route = route.serialize_data();
+        #[cfg(feature = "metadata")]
         let description = route
             .data
             .description
@@ -413,6 +418,7 @@ mod tests {
                 kind,
                 hazards,
                 route: COMPLETE_ROUTE.into(),
+                #[cfg(feature = "metadata")]
                 description,
                 parameters_data: ParametersData::new(),
                 response_kind: ResponseKind::Ok,
@@ -429,6 +435,7 @@ mod tests {
                     .rangef64("rangef64", (0., 20., 0.1)),
             )
             .serialize_data();
+        #[cfg(feature = "metadata")]
         let description = route
             .data
             .description
@@ -463,6 +470,7 @@ mod tests {
                 kind,
                 hazards: hazards.clone(),
                 route: COMPLETE_ROUTE.into(),
+                #[cfg(feature = "metadata")]
                 description,
                 parameters_data,
                 response_kind: ResponseKind::Ok,
@@ -513,6 +521,7 @@ mod tests {
                 kind: RestKind::Put,
                 hazards: Hazards::new(),
                 route: COMPLETE_ROUTE.into(),
+                #[cfg(feature = "metadata")]
                 description: None,
                 parameters_data: ParametersData::new(),
                 response_kind: ResponseKind::Ok,
