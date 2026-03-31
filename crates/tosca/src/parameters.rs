@@ -638,7 +638,7 @@ impl Parameters {
     }
 
     fn create_parameter(mut self, name: &'static str, parameter_kind: ParameterKind) -> Self {
-        self.0.insert(name, parameter_kind);
+        let _ = self.0.insert(name, parameter_kind);
         self
     }
 }
@@ -789,7 +789,7 @@ impl<'a> ParametersValues<'a> {
         name: impl Into<Cow<'a, str>>,
         parameter_value: ParameterValue,
     ) -> &mut Self {
-        self.0.insert(name.into(), parameter_value);
+        let _ = self.0.insert(name.into(), parameter_value);
         self
     }
 

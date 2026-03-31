@@ -53,7 +53,7 @@ impl EnergyClass {
 }
 
 impl core::fmt::Display for EnergyClass {
-    fn fmt(&self, f: &mut core::fmt::Formatter) -> core::fmt::Result {
+    fn fmt(&self, f: &mut core::fmt::Formatter<'_>) -> core::fmt::Result {
         self.name().fmt(f)
     }
 }
@@ -76,7 +76,7 @@ pub struct EnergyEfficiency {
 }
 
 impl core::fmt::Display for EnergyEfficiency {
-    fn fmt(&self, f: &mut core::fmt::Formatter) -> core::fmt::Result {
+    fn fmt(&self, f: &mut core::fmt::Formatter<'_>) -> core::fmt::Result {
         write!(
             f,
             "The device {} a {}% of energy for the \"{}\" efficiency class",
@@ -138,7 +138,7 @@ pub struct CarbonFootprint {
 }
 
 impl core::fmt::Display for CarbonFootprint {
-    fn fmt(&self, f: &mut core::fmt::Formatter) -> core::fmt::Result {
+    fn fmt(&self, f: &mut core::fmt::Formatter<'_>) -> core::fmt::Result {
         write!(
             f,
             "The device {} the atmosphere a {}% of greenhouse gases for the \"{}\" efficiency class",
