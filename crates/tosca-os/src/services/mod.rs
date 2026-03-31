@@ -27,7 +27,7 @@ pub enum TransportProtocol {
 }
 
 impl std::fmt::Display for TransportProtocol {
-    fn fmt(&self, f: &mut std::fmt::Formatter) -> std::fmt::Result {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
         self.name().fmt(f)
     }
 }
@@ -89,7 +89,7 @@ impl<'a> ServiceConfig<'a> {
     /// i.e. ("scheme", "http")
     #[must_use]
     pub fn property(mut self, property: (impl Into<String>, impl Into<String>)) -> Self {
-        self.properties.insert(property.0.into(), property.1.into());
+        let _ = self.properties.insert(property.0.into(), property.1.into());
         self
     }
 
@@ -158,7 +158,7 @@ impl Service {
     // Runs a service.
     #[inline]
     pub(crate) fn run(
-        service_config: ServiceConfig,
+        service_config: ServiceConfig<'_>,
         server_address: Ipv4Addr,
         port: u16,
     ) -> Result<()> {
