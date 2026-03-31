@@ -214,7 +214,7 @@ mod os_mac {
 
     use tracing::warn;
 
-    use windows_sys::Win32::Foundation::ERROR_SUCCESS;
+    use windows_sys::Win32::Foundation::{ERROR_BUFFER_OVERFLOW, ERROR_SUCCESS};
     use windows_sys::Win32::NetworkManagement::IpHelper::{
         GetAdaptersAddresses, GetIfEntry2, IF_TYPE_ETHERNET_CSMACD, IF_TYPE_IEEE80211,
         IP_ADAPTER_ADDRESSES_LH, MIB_IF_ROW2,
@@ -291,14 +291,21 @@ mod os_mac {
 
         // SAFETY: First call only fills `size` to determine required
         // buffer size.
-        unsafe {
+        let error_code = unsafe {
             GetAdaptersAddresses(
                 AF_UNSPEC as u32,
                 0,
                 ptr::null_mut(),
                 ptr::null_mut(),
                 &mut size,
-            );
+            )
+        };
+
+        // The first call always returns ERROR_BUFFER_OVERFLOW
+        // because it’s used only to determine the required buffer size.
+        if error_code != ERROR_BUFFER_OVERFLOW {
+            warn!("`GetAdaptersAddresses` returned an error with code: {error_code}.");
+            return (None, None);
         }
 
         if size == 0 {
