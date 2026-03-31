@@ -11,6 +11,9 @@ license.workspace = true
 repository = "https://github.com/ToscaLabs/tosca/tree/master/crates/tosca-drivers"
 rust-version.workspace = true
 
+[lints]
+workspace = true
+
 [features]
 default = ["dht22", "bh1750", "am312", "ds18b20"]
 dht22 = []

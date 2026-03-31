@@ -22,6 +22,13 @@ keywords = ["iot", "framework", "library", "controller", "devices"]
 rust-version = "1.90"
 readme = "README.md"
 
+[workspace.lints.rust]
+rust_2018_idioms = { level = "deny", priority = -1 }
+missing_docs = "deny"
+warnings = "deny"
+unsafe_code = "deny"
+unused_results = "deny"
+
 [workspace.lints.clippy]
 
 [workspace.lints.rustdoc]

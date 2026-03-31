@@ -22,8 +22,6 @@
 //!
 //! This crate can be compiled for both `std` and `no_std` environments.
 
-#![forbid(unsafe_code)]
-#![deny(missing_docs)]
 #![no_std]
 
 extern crate alloc;

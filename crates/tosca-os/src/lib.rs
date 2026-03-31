@@ -33,9 +33,6 @@
 //!
 //! An `std` environment is required to obtain full crate functionality.
 
-#![deny(unsafe_code)]
-#![deny(missing_docs)]
-
 /// All supported device types.
 pub mod devices;
 
