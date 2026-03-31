@@ -194,7 +194,7 @@ async fn run_mdns_task(stack: Stack<'static>, host: Host<'static>, service: Serv
         recv_buf,
         send_buf,
         |buf| {
-            RNG.lock(|c| c.get().map(|r| r.clone().read(buf)));
+            let _ = RNG.lock(|c| c.get().map(|r| r.clone().read(buf)));
         },
         &signal,
     );
