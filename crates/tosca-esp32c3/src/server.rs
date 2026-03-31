@@ -485,7 +485,7 @@ where
             info!("Route path: {route_path}");
 
             for _ in 0..route_path.split_terminator('/').count() {
-                route_iter.nth(0).ok_or_else(Response::not_found)?;
+                let _ = route_iter.nth(0).ok_or_else(Response::not_found)?;
             }
 
             // If the route has no parameters, return its index.
@@ -588,17 +588,19 @@ where
         }
 
         let mut bytes = [0; MAXIMUM_REQUEST_SIZE];
-        body.read(&mut bytes).await.map_err(|e| {
+        let _ = body.read(&mut bytes).await.map_err(|e| {
             error_response_with_error("Error reading the request bytes", &format!("{e:?}"))
         })?;
 
-        let route_parameters =
-            serde_json::from_slice::<ParametersValues>(&bytes[0..content_length]).map_err(|e| {
-                error_response_with_error(
-                    "Failed to convert bytes into a sequence of parameters",
-                    &format!("{e}"),
-                )
-            })?;
+        let route_parameters = serde_json::from_slice::<ParametersValues<'_>>(
+            &bytes[0..content_length],
+        )
+        .map_err(|e| {
+            error_response_with_error(
+                "Failed to convert bytes into a sequence of parameters",
+                &format!("{e}"),
+            )
+        })?;
 
         info!("Route parameters: {route_parameters:?}");
 
