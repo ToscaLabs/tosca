@@ -22,9 +22,6 @@
 //! multi-threaded systems, where tasks are distributed across
 //! multiple threads for additional efficiency.
 
-#![forbid(unsafe_code)]
-#![deny(missing_docs)]
-
 /// A controller for interacting with `tosca` devices.
 pub mod controller;
 /// Device data along with its associated methods.

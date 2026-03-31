@@ -11,6 +11,9 @@ license.workspace = true
 repository = "https://github.com/ToscaLabs/tosca/tree/master/crates/tosca-controller"
 rust-version.workspace = true
 
+[lints]
+workspace = true
+
 [features]
 stream = ["dep:futures-util", "tosca/stream"]
 default = ["stream"]
