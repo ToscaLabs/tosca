@@ -254,7 +254,7 @@ impl Controller {
                 continue;
             };
 
-            EventsRunner::run_global_subscriber(events, id, tx.clone()).await?;
+            let _handle = EventsRunner::run_global_subscriber(events, id, tx.clone()).await?;
 
             started_count += 1;
         }
