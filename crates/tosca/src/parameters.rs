@@ -1040,9 +1040,9 @@ mod tests {
     #[test]
     fn test_deserialize_parameters_values() {
         let mut parameters = ParametersValues::new();
-        parameters.bool("one", true);
-        parameters.u8("two", 8);
-        parameters.f32("three", 3.0);
+        let _ = parameters.bool("one", true);
+        let _ = parameters.u8("two", 8);
+        let _ = parameters.f32("three", 3.0);
 
         let json_value = serde_json::json!({
             "one": true,
@@ -1050,6 +1050,6 @@ mod tests {
             "three": 3.0,
         });
 
-        assert_eq!(deserialize::<ParametersValues>(json_value), parameters);
+        assert_eq!(deserialize::<ParametersValues<'_>>(json_value), parameters);
     }
 }
