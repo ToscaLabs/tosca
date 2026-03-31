@@ -485,8 +485,8 @@ mod tests {
         );
 
         let mut parameters = HashMap::with_capacity(2);
-        parameters.insert("rangeu64".into(), "3".into());
-        parameters.insert("rangef64".into(), "0".into());
+        let _ = parameters.insert("rangeu64".into(), "3".into());
+        let _ = parameters.insert("rangef64".into(), "0".into());
 
         assert_eq!(
             request.create_request(ParametersValues::new().u64("rangeu64", 3)),
