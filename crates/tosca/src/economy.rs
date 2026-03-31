@@ -30,7 +30,7 @@ impl CostTimespan {
 }
 
 impl core::fmt::Display for CostTimespan {
-    fn fmt(&self, f: &mut core::fmt::Formatter) -> core::fmt::Result {
+    fn fmt(&self, f: &mut core::fmt::Formatter<'_>) -> core::fmt::Result {
         self.name().fmt(f)
     }
 }
@@ -50,7 +50,7 @@ pub struct Cost {
 }
 
 impl core::fmt::Display for Cost {
-    fn fmt(&self, f: &mut core::fmt::Formatter) -> core::fmt::Result {
+    fn fmt(&self, f: &mut core::fmt::Formatter<'_>) -> core::fmt::Result {
         write!(
             f,
             "The device {} {} USD in a {} timespan",
@@ -95,7 +95,7 @@ pub struct Roi {
 }
 
 impl core::fmt::Display for Roi {
-    fn fmt(&self, f: &mut core::fmt::Formatter) -> core::fmt::Result {
+    fn fmt(&self, f: &mut core::fmt::Formatter<'_>) -> core::fmt::Result {
         write!(
             f,
             "The device has a Return on Investments (Roi) for the `{}` \

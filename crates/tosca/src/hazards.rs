@@ -106,13 +106,13 @@ impl core::convert::AsRef<Self> for Hazard {
 }
 
 impl core::fmt::Debug for Hazard {
-    fn fmt(&self, f: &mut core::fmt::Formatter) -> core::fmt::Result {
+    fn fmt(&self, f: &mut core::fmt::Formatter<'_>) -> core::fmt::Result {
         self.name().fmt(f)
     }
 }
 
 impl core::fmt::Display for Hazard {
-    fn fmt(&self, f: &mut core::fmt::Formatter) -> core::fmt::Result {
+    fn fmt(&self, f: &mut core::fmt::Formatter<'_>) -> core::fmt::Result {
         self.name().fmt(f)
     }
 }
@@ -374,13 +374,13 @@ pub enum Category {
 }
 
 impl core::fmt::Debug for Category {
-    fn fmt(&self, f: &mut core::fmt::Formatter) -> core::fmt::Result {
+    fn fmt(&self, f: &mut core::fmt::Formatter<'_>) -> core::fmt::Result {
         self.name().fmt(f)
     }
 }
 
 impl core::fmt::Display for Category {
-    fn fmt(&self, f: &mut core::fmt::Formatter) -> core::fmt::Result {
+    fn fmt(&self, f: &mut core::fmt::Formatter<'_>) -> core::fmt::Result {
         self.name().fmt(f)
     }
 }

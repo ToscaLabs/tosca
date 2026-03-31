@@ -51,7 +51,7 @@ macro_rules! set {
             #[must_use]
             #[inline]
             pub fn insert(mut self, element: $element) -> Self {
-                self.0.insert(element);
+                let _ = self.0.insert(element);
                 self
             }
 
@@ -60,7 +60,7 @@ macro_rules! set {
             #[doc = concat!("Unlike [`Self::insert`], this method does not return a modified [`", stringify!($name), "`].")]
             #[inline]
             pub fn add(&mut self, element: $element) {
-                self.0.insert(element);
+                let _ = self.0.insert(element);
             }
 
             #[doc = concat!("Checks if [`", stringify!($name), "`] contains the given [`", stringify!($element), "`].")]

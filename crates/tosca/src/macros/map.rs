@@ -42,7 +42,7 @@ macro_rules! map {
             #[must_use]
             #[inline]
             pub fn insert(mut self, key: $key, value: $value) -> Self {
-                self.0.insert(key, value);
+                let _ = self.0.insert(key, value);
                 self
             }
 
@@ -51,7 +51,7 @@ macro_rules! map {
             #[doc = concat!("Unlike [`Self::insert`], this method does not return a modified [`", stringify!($name), "`].")]
             #[inline]
             pub fn add(&mut self, key: $key, value: $value) {
-                self.0.insert(key, value);
+                let _ = self.0.insert(key, value);
             }
 
             #[doc = concat!("Checks if [`", stringify!($name), "`] is empty.")]

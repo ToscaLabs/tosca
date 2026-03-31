@@ -31,7 +31,7 @@ pub enum ResponseKind {
 }
 
 impl core::fmt::Display for ResponseKind {
-    fn fmt(&self, f: &mut core::fmt::Formatter) -> core::fmt::Result {
+    fn fmt(&self, f: &mut core::fmt::Formatter<'_>) -> core::fmt::Result {
         match self {
             Self::Ok => "Ok",
             Self::Serial => "Serial",
@@ -227,7 +227,7 @@ mod tests {
         }
 
         assert_eq!(
-            deserialize::<SerialCow>(serialize(SerialResponse::new(SerialCow {
+            deserialize::<SerialCow<'_>>(serialize(SerialResponse::new(SerialCow {
                 value: Cow::Borrowed("hi")
             }))),
             SerialCow {
@@ -269,7 +269,7 @@ mod tests {
         );
 
         assert_eq!(
-            deserialize::<ErrorResponse>(serialize(error)),
+            deserialize::<ErrorResponse<'_>>(serialize(error)),
             ErrorResponse {
                 error: ErrorKind::InvalidData,
                 description: Cow::Borrowed("Invalid data error description"),
