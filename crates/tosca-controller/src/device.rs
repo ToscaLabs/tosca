@@ -406,11 +406,11 @@ pub(crate) mod tests {
         let complete_address = build_device_address("http", &ip_address, port);
 
         let mut addresses = HashSet::new();
-        addresses.insert(ip_address);
-        addresses.insert("172.0.0.1".parse().unwrap());
+        let _ = addresses.insert(ip_address);
+        let _ = addresses.insert("172.0.0.1".parse().unwrap());
 
         let mut properties = HashMap::new();
-        properties.insert("scheme".into(), "http".into());
+        let _ = properties.insert("scheme".into(), "http".into());
 
         NetworkInformation::new(
             "device-name1._tosca._tcp.local.".into(),

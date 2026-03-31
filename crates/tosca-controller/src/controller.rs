@@ -521,7 +521,7 @@ mod tests {
 
         // With parameters
         let mut parameters = ParametersValues::new();
-        parameters.u64("brightness", 5);
+        let _ = parameters.u64("brightness", 5);
 
         // Run "/on" request and get an "Ok" response with parameters.
         check_ok_response_with_parameters(&device_sender, "/on", &parameters).await;

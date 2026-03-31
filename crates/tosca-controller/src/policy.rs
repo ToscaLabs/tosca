@@ -94,8 +94,8 @@ mod tests {
 
     fn check_device_policies(policy: &Policy, block_on_hazards: Hazards, local_hazards: &Hazards) {
         let mut devices_hazards = HashMap::new();
-        devices_hazards.insert(1, local_hazards.clone());
-        devices_hazards.insert(2, local_hazards.clone());
+        let _ = devices_hazards.insert(1, local_hazards.clone());
+        let _ = devices_hazards.insert(2, local_hazards.clone());
 
         assert_eq!(
             policy,
