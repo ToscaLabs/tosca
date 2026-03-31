@@ -41,7 +41,6 @@
 //! only informs a controller of the **possible** risks that might arise.
 
 #![no_std]
-#![deny(missing_docs)]
 
 extern crate alloc;
 
