@@ -275,7 +275,7 @@ mod tests {
     fn complete_with_state() {
         let routes = create_routes();
 
-        Light::with_state(LightState {})
+        let _ = Light::with_state(LightState {})
             .turn_light_on(routes.light_on, mandatory_serial_stateful(turn_light_on))
             .turn_light_off(routes.light_off, mandatory_ok_stateful(turn_light_off))
             .route(serial_stateful(routes.light_on_post, turn_light_on))
@@ -289,7 +289,7 @@ mod tests {
     fn without_response_with_state() {
         let routes = create_routes();
 
-        Light::with_state(LightState {})
+        let _ = Light::with_state(LightState {})
             .turn_light_on(routes.light_on, mandatory_serial_stateful(turn_light_on))
             .turn_light_off(routes.light_off, mandatory_ok_stateful(turn_light_off))
             .build();
@@ -299,7 +299,7 @@ mod tests {
     fn stateless_response_with_state() {
         let routes = create_routes();
 
-        Light::with_state(LightState {})
+        let _ = Light::with_state(LightState {})
             .turn_light_on(routes.light_on, mandatory_serial_stateful(turn_light_on))
             .turn_light_off(routes.light_off, mandatory_ok_stateful(turn_light_off))
             .route(serial_stateful(routes.light_on_post, turn_light_on))
@@ -313,7 +313,7 @@ mod tests {
     fn complete_without_state() {
         let routes = create_routes();
 
-        Light::new()
+        let _ = Light::new()
             .turn_light_on(
                 routes.light_on,
                 mandatory_serial_stateless(turn_light_on_stateless),
@@ -336,7 +336,7 @@ mod tests {
     fn without_response_and_state() {
         let routes = create_routes();
 
-        Light::new()
+        let _ = Light::new()
             .turn_light_on(
                 routes.light_on,
                 mandatory_serial_stateless(turn_light_on_stateless),
