@@ -96,6 +96,7 @@ pub struct Description {
     /// Device main route.
     pub main_route: String,
     /// Device description.
+    #[cfg(feature = "metadata")]
     pub description: Option<String>,
 }
 
@@ -111,11 +112,13 @@ impl Description {
             kind,
             environment,
             main_route,
+            #[cfg(feature = "metadata")]
             description: None,
         }
     }
 
     /// Sets a device description.
+    #[cfg(feature = "metadata")]
     #[inline]
     #[must_use]
     pub fn description(mut self, description: Option<String>) -> Self {
@@ -437,16 +440,22 @@ pub(crate) mod tests {
     fn create_description(
         device_kind: DeviceKindId,
         main_route: &str,
-        description: Option<&str>,
+        #[cfg(feature = "metadata")] description: Option<&str>,
     ) -> Description {
-        Description::new(device_kind, DeviceEnvironment::Os, main_route.into())
-            .description(description.map(std::convert::Into::into))
+        let desc = Description::new(device_kind, DeviceEnvironment::Os, main_route.into());
+        #[cfg(feature = "metadata")]
+        let desc = desc.description(description.map(std::convert::Into::into));
+        desc
     }
 
     pub(crate) fn create_light() -> Device {
         let network_info = create_network_info("192.168.1.174", 5000);
-        let description =
-            create_description(DeviceKindId::new("Light"), "light/", Some("A smart light"));
+        let description = create_description(
+            DeviceKindId::new("Light"),
+            "light/",
+            #[cfg(feature = "metadata")]
+            Some("A smart light"),
+        );
 
         let light_on_route = Route::put("On", "/on")
             .description("Turn light on.")
@@ -475,7 +484,12 @@ pub(crate) mod tests {
 
     pub(crate) fn create_unknown() -> Device {
         let network_info = create_network_info("192.168.1.176", 5500);
-        let description = create_description(DeviceKindId::new("Unknown"), "ip-camera/", None);
+        let description = create_description(
+            DeviceKindId::new("Unknown"),
+            "ip-camera/",
+            #[cfg(feature = "metadata")]
+            None,
+        );
 
         let camera_stream_route = Route::get("Stream", "/stream")
             .description("View camera stream.")

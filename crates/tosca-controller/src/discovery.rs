@@ -272,8 +272,10 @@ impl Discovery {
                             device_data.kind,
                             device_data.environment,
                             device_data.main_route.into_owned(),
-                        )
-                        .description(device_data.description.map(std::convert::Into::into));
+                        );
+                        #[cfg(feature = "metadata")]
+                        let description = description
+                            .description(device_data.description.map(std::convert::Into::into));
 
                         let mut network_info = NetworkInformation::new(
                             service.fullname,

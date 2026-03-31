@@ -131,7 +131,7 @@ fn build_route(device: &Device, route: &str) -> String {
 fn check_request(
     device: &Device,
     route: &str,
-    description: &str,
+    #[cfg(feature = "metadata")] description: &str,
     kind: RestKind,
     hazards: Hazards,
     parameters_data: ParametersData,
@@ -145,6 +145,7 @@ fn check_request(
             kind,
             hazards,
             route: build_route(device, route),
+            #[cfg(feature = "metadata")]
             description: Some(description.to_string()),
             parameters_data,
             response_kind,
@@ -201,6 +202,7 @@ pub(crate) fn compare_device_data(device: &Device) {
         check_request(
             device,
             "/toggle",
+            #[cfg(feature = "metadata")]
             "Toggle a light.",
             RestKind::Get,
             Hazards::new()
@@ -215,6 +217,7 @@ pub(crate) fn compare_device_data(device: &Device) {
     check_request(
         device,
         "/on",
+        #[cfg(feature = "metadata")]
         "Turn light on.",
         RestKind::Put,
         Hazards::init(Hazard::ElectricEnergyConsumption),
@@ -226,6 +229,7 @@ pub(crate) fn compare_device_data(device: &Device) {
     check_request(
         device,
         "/off",
+        #[cfg(feature = "metadata")]
         "Turn light off.",
         RestKind::Put,
         Hazards::init(Hazard::LogEnergyConsumption),
