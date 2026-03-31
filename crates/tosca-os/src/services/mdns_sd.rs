@@ -21,7 +21,7 @@ impl From<std::io::Error> for Error {
 }
 
 pub(crate) fn run(
-    service_config: ServiceConfig,
+    service_config: ServiceConfig<'_>,
     server_address: Ipv4Addr,
     server_port: u16,
 ) -> std::result::Result<(), Error> {
