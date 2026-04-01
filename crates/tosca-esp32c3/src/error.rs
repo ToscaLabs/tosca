@@ -147,9 +147,58 @@ impl<E: edge_nal::io::Error> From<edge_mdns::io::MdnsIoError<E>> for Error {
     }
 }
 
-impl From<rust_mqtt::packet::v5::reason_codes::ReasonCode> for Error {
-    fn from(e: rust_mqtt::packet::v5::reason_codes::ReasonCode) -> Self {
-        use rust_mqtt::packet::v5::reason_codes::ReasonCode;
+impl<'e> From<rust_mqtt::client::MqttError<'e>> for Error {
+    fn from(e: rust_mqtt::client::MqttError<'e>) -> Self {
+        use rust_mqtt::client::MqttError;
+        let err = match e {
+            MqttError::Network(_) => "An underlying Read/Write method returned an error",
+            MqttError::Server => {
+                "The remote server did something the client does not understand / does not match the specification"
+            }
+            MqttError::Alloc => "A buffer provision failed",
+            MqttError::AuthPacketReceived => {
+                "An AUTH packet header has been received by the client"
+            }
+            MqttError::Disconnect { .. } => {
+                "The client could not connect to the broker or the broker has sent a DISCONNECT packet"
+            }
+            MqttError::RecoveryRequired => "Another unrecoverable error has been returned earlier",
+            MqttError::PacketIdentifierNotInFlight => {
+                "A republish of a packet without an in flight entry was attempted"
+            }
+            MqttError::RepublishQoSNotMatching => {
+                "A republish of a packet with a quality of service that does not match the quality of service of the original publication was attempted"
+            }
+            MqttError::PacketIdentifierAwaitingPubcomp => {
+                "A republish of a packet whose corresponding PUBREL packet has already been sent was attempted"
+            }
+            MqttError::PacketMaximumLengthExceeded => {
+                "A packet was too long to encode its length with the variable byte integer"
+            }
+            MqttError::ServerMaximumPacketSizeExceeded => {
+                "A packet is too long and would exceed the servers maximum packet size"
+            }
+            MqttError::InvalidTopicAlias => {
+                "The value of a topic alias in an outgoing PUBLISH packet was 0 or greater than the server’s maximum allowed value"
+            }
+            MqttError::SessionBuffer => {
+                "An action was rejected because an internal buffer used for tracking session state is full"
+            }
+            MqttError::SendQuotaExceeded => {
+                "A publish now would exceed the server’s receive maximum and ultimately cause a protocol error"
+            }
+            MqttError::IllegalDisconnectSessionExpiryInterval => {
+                "A disconnect now with the given session expiry interval would cause a protocol error"
+            }
+        };
+
+        Self::new(ErrorKind::Mqtt, err)
+    }
+}
+
+impl From<rust_mqtt::types::ReasonCode> for Error {
+    fn from(e: rust_mqtt::types::ReasonCode) -> Self {
+        use rust_mqtt::types::ReasonCode;
         let err = match e {
             ReasonCode::Success => "Success",
             ReasonCode::GrantedQoS1 => "Granted Qo S1",
@@ -157,23 +206,23 @@ impl From<rust_mqtt::packet::v5::reason_codes::ReasonCode> for Error {
             ReasonCode::DisconnectWithWillMessage => "Disconnect with will message",
             ReasonCode::NoMatchingSubscribers => "No matching subscribers",
             ReasonCode::NoSubscriptionExisted => "No subscription existed",
-            ReasonCode::ContinueAuth => "Continue authentication",
+            ReasonCode::ContinueAuthentication => "Continue authentication",
             ReasonCode::ReAuthenticate => "Reauthenticate",
             ReasonCode::UnspecifiedError => "Unspecified error",
             ReasonCode::MalformedPacket => "Malformed packet",
             ReasonCode::ProtocolError => "Protocol error",
             ReasonCode::ImplementationSpecificError => "Implementation specific error",
             ReasonCode::UnsupportedProtocolVersion => "Unsupported protocol version",
-            ReasonCode::ClientIdNotValid => "Client ID not valid",
+            ReasonCode::ClientIdentifierNotValid => "Client ID not valid",
             ReasonCode::BadUserNameOrPassword => "Bad username or password",
             ReasonCode::NotAuthorized => "Not authorized",
             ReasonCode::ServerUnavailable => "Server unavailable",
             ReasonCode::ServerBusy => "Server busy",
             ReasonCode::Banned => "Banned",
             ReasonCode::ServerShuttingDown => "Server shutting down",
-            ReasonCode::BadAuthMethod => "Bad authentication method",
+            ReasonCode::BadAuthenticationMethod => "Bad authentication method",
             ReasonCode::KeepAliveTimeout => "Keep alive timeout",
-            ReasonCode::SessionTakeOver => "Sessions take over",
+            ReasonCode::SessionTakenOver => "Sessions take over",
             ReasonCode::TopicFilterInvalid => "Topic filter invalid",
             ReasonCode::TopicNameInvalid => "Topic name invalid",
             ReasonCode::PacketIdentifierInUse => "Packet identifier in use",
@@ -189,16 +238,13 @@ impl From<rust_mqtt::packet::v5::reason_codes::ReasonCode> for Error {
             ReasonCode::QoSNotSupported => "QoS not supported",
             ReasonCode::UseAnotherServer => "Use another server",
             ReasonCode::ServerMoved => "Server moved",
-            ReasonCode::SharedSubscriptionNotSupported => "Shared subscription not supported",
+            ReasonCode::SharedSubscriptionsNotSupported => "Shared subscription not supported",
             ReasonCode::ConnectionRateExceeded => "Connection rate exceeded",
             ReasonCode::MaximumConnectTime => "Maximum connect time",
             ReasonCode::SubscriptionIdentifiersNotSupported => {
                 "Subscription identifiers not supported"
             }
-            ReasonCode::WildcardSubscriptionNotSupported => "Wildcard subscription not supported",
-            ReasonCode::TimerNotSupported => "Timer not supported",
-            ReasonCode::BuffError => "Buffering error",
-            ReasonCode::NetworkError => "Network error",
+            ReasonCode::WildcardSubscriptionsNotSupported => "Wildcard subscription not supported",
         };
 
         Self::new(ErrorKind::Mqtt, err)

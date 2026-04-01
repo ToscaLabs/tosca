@@ -1,3 +1,5 @@
+use core::num::NonZero;
+
 use alloc::boxed::Box;
 
 use embassy_net::{IpAddress, Stack, tcp::TcpSocket};
@@ -7,14 +9,15 @@ use embassy_sync::mutex::Mutex;
 
 use embassy_time::{Duration, with_timeout};
 
-use rust_mqtt::client::client::MqttClient;
-use rust_mqtt::client::client_config::{ClientConfig, MqttVersion};
-use rust_mqtt::packet::v5::{publish_packet::QualityOfService, reason_codes::ReasonCode};
-use rust_mqtt::utils::rng_generator::CountingRng;
+use rust_mqtt::client::Client;
+use rust_mqtt::config::SessionExpiryInterval;
+use rust_mqtt::buffer::AllocBuffer;
+use rust_mqtt::client::options::ConnectOptions;
 
 use log::{info, warn};
 
 use crate::error::{Error, ErrorKind};
+use crate::mk_static;
 
 // Timeout duration for the socket connection, in seconds.
 const SOCKET_TIMEOUT: u64 = 2;
@@ -22,23 +25,30 @@ const SOCKET_TIMEOUT: u64 = 2;
 const MAX_PACKET_SIZE: u32 = 100;
 // Size of the socket and MQTT client transmission and reception buffers.
 const BUFFER_SIZE: usize = 1024;
-// Maximum numbers of properties for MQTT client.
-const MAXIMUM_MQTT_PROPERTIES: usize = 5;
 
 pub(crate) struct Mqtt {
     pub(crate) client:
-        Mutex<CriticalSectionRawMutex, MqttClient<'static, TcpSocket<'static>, 5, CountingRng>>,
+        Mutex<CriticalSectionRawMutex, Client<'static, TcpSocket<'static>, AllocBuffer, 1, 1, 1, 1>>,
 }
 
 impl Mqtt {
-    pub(crate) async fn new(
-        stack: Stack<'static>,
-        remote_endpoint: (IpAddress, u16),
-    ) -> Result<Self, Error> {
-        let rx_buffer = Box::leak(Box::new([0u8; BUFFER_SIZE]));
+    #[inline]
+    pub(crate) fn new() -> Result<Self, Error> {
+        let buffer = mk_static!(AllocBuffer, AllocBuffer);
+        let client = Client::<_, _, _, 1, 1, 1>::new(
+            buffer,
+        );
+
+        Ok(Self {
+            client: Mutex::new(client),
+        })
+    }
+
+    #[inline]
+    pub(crate) async fn connect(&mut self,  stack: Stack<'static>,
+        remote_endpoint: (IpAddress, u16)) -> Result<(), Error> {
+         let rx_buffer = Box::leak(Box::new([0u8; BUFFER_SIZE]));
         let tx_buffer = Box::leak(Box::new([0u8; BUFFER_SIZE]));
-        let recv_buffer = Box::leak(Box::new([0u8; BUFFER_SIZE]));
-        let write_buffer = Box::leak(Box::new([0u8; BUFFER_SIZE]));
 
         let mut socket = TcpSocket::new(stack, &mut rx_buffer[..], &mut tx_buffer[..]);
 
@@ -56,37 +66,37 @@ impl Mqtt {
 
         info!("Connected to socket!");
 
-        let mut config = ClientConfig::new(MqttVersion::MQTTv5, CountingRng(20000));
-        config.add_max_subscribe_qos(QualityOfService::QoS1);
-        config.max_packet_size = MAX_PACKET_SIZE;
+        let connect_options = ConnectOptions::new()
+                .clean_start()
+                .session_expiry_interval(SessionExpiryInterval::Seconds(5))
+                .maximum_packet_size(NonZero::new(MAX_PACKET_SIZE).unwrap_or(NonZero::<u32>::MAX));
 
-        let client = MqttClient::<_, MAXIMUM_MQTT_PROPERTIES, _>::new(
-            socket,
-            &mut write_buffer[..],
-            BUFFER_SIZE,
-            &mut recv_buffer[..],
-            BUFFER_SIZE,
-            config,
-        );
+        {
 
-        Ok(Self {
-            client: Mutex::new(client),
-        })
-    }
+        let client = self.client.lock().await;
 
-    #[inline]
-    pub(crate) async fn connect(&mut self) -> Result<(), Error> {
-        self.client
-            .lock()
+        let connect_info = client
+            .connect(
+                socket,
+                &connect_options,
+                None
+            )
             .await
-            .connect_to_broker()
-            .await
-            .map_err(core::convert::Into::into)
+            .map_err(|e| e.into())?;
+
+            info!("Connected to server: {connect_info:?}");
+            info!("{:?}", client.client_config());
+            info!("{:?}", client.server_config());
+            info!("{:?}", client.shared_config());
+            info!("{:?}", client.session());
+        }
+
+            Ok(())
     }
 
     #[inline]
     pub(crate) async fn publish(&mut self, topic: &str, payload: &[u8]) -> Result<(), Error> {
-        let Err(e) = self
+        /*let Err(e) = self
             .client
             .lock()
             .await
@@ -104,7 +114,8 @@ impl Mqtt {
                 Ok(())
             }
             _ => Err(e.into()),
-        }
+        }*/
+        Ok(())
     }
 
     #[inline]
@@ -112,7 +123,7 @@ impl Mqtt {
         self.client
             .lock()
             .await
-            .send_ping()
+            .ping()
             .await
             .map_err(core::convert::Into::into)
     }
