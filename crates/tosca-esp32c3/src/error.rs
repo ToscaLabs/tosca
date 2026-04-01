@@ -151,6 +151,7 @@ impl<'e> From<rust_mqtt::client::MqttError<'e>> for Error {
     fn from(e: rust_mqtt::client::MqttError<'e>) -> Self {
         use rust_mqtt::client::MqttError;
         let err = match e {
+            // FIXME: Add network error.
             MqttError::Network(_) => "An underlying Read/Write method returned an error",
             MqttError::Server => {
                 "The remote server did something the client does not understand / does not match the specification"

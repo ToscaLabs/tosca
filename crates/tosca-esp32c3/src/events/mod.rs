@@ -140,79 +140,13 @@ async fn write_on_network(stack: Stack<'static>, remote_endpoint: (IpAddress, u1
     // This task is scheduled to run last, so it is assigned a lower priority.
     Timer::after_secs(LOWER_PRIORITY).await;
 
-    let mut mqtt_publisher = loop {
-        // Create a `MQTT` publisher.
-        //
-        // If an error occurs, retry creation after a specified time interval.
-        match Mqtt::new(stack, remote_endpoint).await {
-            Ok(mqtt_publisher) => {
-                info!("Created the `MQTT` publisher");
-                break mqtt_publisher;
-            }
-            Err(e) => {
-                error!("Error while creating the `MQTT` publisher: {e}");
-            }
-        }
-        Timer::after_secs(RETRY_INTERVAL).await;
-    };
+    let mut mqtt = Mqtt::new();
 
-    loop {
-        // Connect to the broker.
-        //
-        // If an error occurs, retry the connection after
-        // a specified time interval.
-        match mqtt_publisher.connect().await {
-            Ok(()) => {
-                info!("`MQTT` publisher connected to the broker");
-                break;
-            }
-            Err(e) => {
-                error!("Error while connecting the `MQTT` publisher to the broker: {e}");
-            }
-        }
-        Timer::after_secs(RETRY_INTERVAL).await;
-    }
+    mqtt.connect_and_subscribe(stack, remote_endpoint, topic.as_str())
+        .await
+        .unwrap();
 
-    // Count the number of ping failures
-    let mut ping_failure_counter: u8 = 0;
-    loop {
-        // Ping the broker to check if it is still alive
-        if let Err(e) = mqtt_publisher.send_ping().await {
-            error!("Error while pinging the `MQTT` broker: {e}");
-
-            // After five consecutive ping failures, reinitialize the `MQTT`
-            // publisher, as the socket may have been closed.
-            if ping_failure_counter == 5 {
-                mqtt_publisher = match Mqtt::new(stack, remote_endpoint).await {
-                    Ok(mqtt_publisher) => {
-                        info!("Reinitialize the `MQTT` publisher");
-                        mqtt_publisher
-                    }
-                    Err(e) => {
-                        error!("Error while reinitializing the `MQTT` publisher: {e}");
-                        Timer::after_secs(RETRY_INTERVAL).await;
-                        continue;
-                    }
-                };
-
-                match mqtt_publisher.connect().await {
-                    Ok(()) => {
-                        info!("`MQTT` publisher reconnected to the broker");
-                    }
-                    Err(e) => {
-                        error!("Error while reconnecting the `MQTT` publisher to broker: {e}");
-                        Timer::after_secs(PING_BROKER_AGAIN).await;
-                        continue;
-                    }
-                }
-                ping_failure_counter = 0;
-                continue;
-            }
-            ping_failure_counter += 1;
-            Timer::after_secs(PING_BROKER_AGAIN).await;
-            continue;
-        }
-
+    /*
         // The lock will be released at the end of this scope.
         {
             // Wait until a signal is received.
@@ -232,18 +166,7 @@ async fn write_on_network(stack: Stack<'static>, remote_endpoint: (IpAddress, u1
         };
 
         debug!("Data capacity: {} bytes", data.capacity());
-
-        // Transmit the data over the network.
-        //
-        // Skip the operation if any subscriber errors are detected, and issue
-        // a warning
-        if let Err(e) = mqtt_publisher.publish(topic.as_str(), &data).await {
-            error!("Error while publishing data over the network: {e}");
-        }
-
-        // Wait briefly after transmitting data over the network
-        Timer::after_millis(WAIT_FOR_MILLISECONDS).await;
-    }
+    */
 }
 
 /// An event manager.
