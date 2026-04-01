@@ -32,25 +32,32 @@ tosca.default-features = false
 critical-section.version = "1.2.0"
 
 # HTTP server
-edge-http.version = "0.6.1"
+edge-http.version = "0.7.0"
+edge-http.git = "https://github.com/sysgrok/edge-net"
 
 # mDNS service
-edge-mdns.version = "0.6.1"
+edge-mdns.version = "0.7.0"
+edge-mdns.git = "https://github.com/sysgrok/edge-net"
 
 # Networking traits
-edge-nal.version = "0.5.0"
-edge-nal-embassy.version = "0.7.0"
+edge-nal.version = "0.6.0"
+edge-nal.git = "https://github.com/sysgrok/edge-net"
+edge-nal-embassy.version = "0.8.1"
+edge-nal-embassy.git = "https://github.com/sysgrok/edge-net"
 
 # Embassy framework
 embassy-executor.version = "0.9.1"
 embassy-executor.features = ["log"]
 
 embassy-net.version = "0.9.0"
+embassy-net.default-features = false
 embassy-net.features = ["dhcpv4", "dns", "log", "medium-ethernet", "tcp", "udp"]
 
 embassy-sync.version = "0.8.0"
+embassy-sync.default-features = false
 
 embassy-time.version = "0.5.1"
+embassy-time.default-features = false
 embassy-time.features = ["log"]
 
 # Asynchronous read and write traits
