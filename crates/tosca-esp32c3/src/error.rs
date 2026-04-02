@@ -92,27 +92,17 @@ impl From<embassy_net::dns::Error> for Error {
     }
 }
 
-impl<E: edge_nal::io::Error> From<edge_mdns::io::MdnsIoError<E>> for Error {
-    fn from(e: edge_mdns::io::MdnsIoError<E>) -> Self {
-        use edge_mdns::MdnsError;
-        use edge_mdns::io::MdnsIoError;
-        use edge_nal::io::ErrorKind;
-        let err = match e {
-            MdnsIoError::MdnsError(mdns_error) => match mdns_error {
-                MdnsError::ShortBuf => "Internal: Short buffer",
-                MdnsError::InvalidMessage => "Internal: Invalid message",
-            },
-            MdnsIoError::NoRecvBufError => "No receiving buffer error",
-            MdnsIoError::NoSendBufError => "No sending buffer error",
-            MdnsIoError::IoError(io_error) => match io_error.kind() {
+macro_rules! io_error {
+    ($func_name:ident, $t:ty) => {
+        const fn $func_name(e: $t) -> &'static str {
+            use $t;
+            match e {
                 ErrorKind::Other => "I/O: Unspecified error kind",
                 ErrorKind::NotFound => "I/O: An entity was not found, often a file",
                 ErrorKind::PermissionDenied => {
                     "I/O: The operation lacked the necessary privileges to complete"
                 }
-                ErrorKind::ConnectionRefused => {
-                    "I/O: The connection was refused by the remote server"
-                }
+                ErrorKind::ConnectionRefused => "I/O: The connection was refused by the remote server",
                 ErrorKind::ConnectionReset => "I/O: The connection was reset by the remote server",
                 ErrorKind::ConnectionAborted => {
                     "I/O: The connection was aborted (terminated) by the remote server"
@@ -140,7 +130,26 @@ impl<E: edge_nal::io::Error> From<edge_mdns::io::MdnsIoError<E>> for Error {
                 }
                 ErrorKind::WriteZero => "I/O: An attempted write could not write any data",
                 _ => "I/O: Unknown or still non-existent error",
+            }
+        }
+    };
+}
+
+io_error!(from_io_error, edge_nal::io::ErrorKind);
+io_error!(from_embedded_async_error, embedded_io_async::ErrorKind);
+
+impl<E: edge_nal::io::Error> From<edge_mdns::io::MdnsIoError<E>> for Error {
+    fn from(e: edge_mdns::io::MdnsIoError<E>) -> Self {
+        use edge_mdns::MdnsError;
+        use edge_mdns::io::MdnsIoError;
+        let err = match e {
+            MdnsIoError::MdnsError(mdns_error) => match mdns_error {
+                MdnsError::ShortBuf => "Internal: Short buffer",
+                MdnsError::InvalidMessage => "Internal: Invalid message",
             },
+            MdnsIoError::NoRecvBufError => "No receiving buffer error",
+            MdnsIoError::NoSendBufError => "No sending buffer error",
+            MdnsIoError::IoError(io_error) => from_io_error(io_error.kind()),
         };
 
         Self::new(self::ErrorKind::MDns, err)
@@ -151,8 +160,7 @@ impl<'e> From<rust_mqtt::client::MqttError<'e>> for Error {
     fn from(e: rust_mqtt::client::MqttError<'e>) -> Self {
         use rust_mqtt::client::MqttError;
         let err = match e {
-            // FIXME: Add network error.
-            MqttError::Network(_) => "An underlying Read/Write method returned an error",
+            MqttError::Network(e) => from_embedded_async_error(e),
             MqttError::Server => {
                 "The remote server did something the client does not understand / does not match the specification"
             }
