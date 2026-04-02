@@ -148,8 +148,7 @@ impl Mdns {
             txt_kvs: self.properties,
         };
 
-        spawner
-            .spawn(run_mdns_task(stack, host, service, self.rng)?);
+        spawner.spawn(run_mdns_task(stack, host, service, self.rng)?);
 
         Ok(())
     }
@@ -175,8 +174,8 @@ impl rand_core::TryRng for EspRng {
     }
 
     fn try_next_u64(&mut self) -> core::result::Result<u64, Self::Error> {
-        let hi = self.try_next_u32()? as u64;
-        let lo = self.try_next_u32()? as u64;
+        let hi = u64::from(self.try_next_u32()?);
+        let lo = u64::from(self.try_next_u32()?);
         Ok((hi << 32) | lo)
     }
 

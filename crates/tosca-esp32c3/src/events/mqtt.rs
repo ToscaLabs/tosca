@@ -81,7 +81,7 @@ impl Mqtt {
             let connect_info = client
                 .connect(socket, &connect_options, None)
                 .await
-                .map_err(|e| <MqttError<'_> as Into<Error>>::into(e))?;
+                .map_err(<MqttError<'_> as Into<Error>>::into)?;
 
             info!("Connected to server: {connect_info:?}");
             info!("{:?}", client.client_config());

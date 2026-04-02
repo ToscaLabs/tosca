@@ -13,7 +13,7 @@ use core::time::Duration;
 
 use alloc::boxed::Box;
 
-use embassy_executor::{SpawnToken, Spawner, SpawnError};
+use embassy_executor::{SpawnError, SpawnToken, Spawner};
 use embassy_net::{IpAddress, Stack, dns::DnsQueryType};
 use embassy_sync::blocking_mutex::raw::CriticalSectionRawMutex;
 use embassy_sync::mutex::Mutex;
@@ -1001,7 +1001,12 @@ where
             )))
     }
 
-    fn spawn<F>(mut self, name: &'static str, task: Result<SpawnToken<impl Sized>, SpawnError>, add_event: F) -> Self
+    fn spawn<F>(
+        mut self,
+        name: &'static str,
+        task: Result<SpawnToken<impl Sized>, SpawnError>,
+        add_event: F,
+    ) -> Self
     where
         F: FnOnce(&mut Events),
     {
