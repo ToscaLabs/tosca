@@ -1,11 +1,9 @@
-use core::cell::OnceCell;
 use core::net::{Ipv4Addr, Ipv6Addr};
 
 use esp_hal::rng::Rng;
 
 use embassy_executor::Spawner;
 
-use embassy_sync::blocking_mutex::CriticalSectionMutex;
 use embassy_sync::blocking_mutex::raw::NoopRawMutex;
 use embassy_sync::signal::Signal;
 
@@ -41,8 +39,6 @@ const MDNS_BUFFER_POOL_SIZE: usize = 2;
 const BUFFER_LENGTH: usize = 1500;
 // Packet metadata length
 const PACKET_METADATA_LENGTH: usize = 2;
-
-static RNG: CriticalSectionMutex<OnceCell<Rng>> = CriticalSectionMutex::new(OnceCell::new());
 
 /// The `mDNS-SD` discovery service.
 pub struct Mdns {
@@ -121,8 +117,6 @@ impl Mdns {
         port: u16,
         spawner: Spawner,
     ) -> Result<()> {
-        RNG.lock(|c| _ = c.set(self.rng));
-
         info!(
             "About to run an mDNS responder on IPV4 address `{}`. \
              It will be accessible via `{}.local`, \
@@ -155,13 +149,53 @@ impl Mdns {
         };
 
         spawner
-            .spawn(run_mdns_task(stack, host, service))
+            .spawn(run_mdns_task(stack, host, service, self.rng))
             .map_err(core::convert::Into::into)
     }
 }
 
+// FIXME: Hack introduced to fix the unreleased version of esp-hal which does
+// not use rand 0.10.0 as edge-mdns
+// https://github.com/esp-rs/esp-hal/blob/c96f07bcd2f5a2c617a2ac538471731a76ab3e02/esp-hal/CHANGELOG.md?plain=1#L58
+
+struct EspRng(Rng);
+
+impl EspRng {
+    fn new(rng: Rng) -> Self {
+        Self(rng)
+    }
+}
+
+impl rand_core::TryRng for EspRng {
+    type Error = core::convert::Infallible;
+
+    fn try_next_u32(&mut self) -> core::result::Result<u32, Self::Error> {
+        Ok(self.0.random())
+    }
+
+    fn try_next_u64(&mut self) -> core::result::Result<u64, Self::Error> {
+        let hi = self.try_next_u32()? as u64;
+        let lo = self.try_next_u32()? as u64;
+        Ok((hi << 32) | lo)
+    }
+
+    fn try_fill_bytes(&mut self, dest: &mut [u8]) -> core::result::Result<(), Self::Error> {
+        for chunk in dest.chunks_mut(4) {
+            let r = self.0.random().to_le_bytes();
+            let len = chunk.len();
+            chunk.copy_from_slice(&r[..len]);
+        }
+        Ok(())
+    }
+}
+
 #[embassy_executor::task]
-async fn run_mdns_task(stack: Stack<'static>, host: Host<'static>, service: Service<'static>) {
+async fn run_mdns_task(
+    stack: Stack<'static>,
+    host: Host<'static>,
+    service: Service<'static>,
+    rng: Rng,
+) {
     let (recv_buf, send_buf) = (
         VecBufAccess::<NoopRawMutex, BUFFER_LENGTH>::new(),
         VecBufAccess::<NoopRawMutex, BUFFER_LENGTH>::new(),
@@ -183,9 +217,11 @@ async fn run_mdns_task(stack: Stack<'static>, host: Host<'static>, service: Serv
 
     // A way to notify the mDNS responder that the data in `Host` has changed.
     // Not needed for this example, as the data is hard-coded.
-    let signal = Signal::new();
+    let signal = Signal::<NoopRawMutex, _>::new();
 
-    let mdns = io::Mdns::<NoopRawMutex, _, _, _, _>::new(
+    let rng = EspRng::new(rng);
+
+    let mdns = io::Mdns::new(
         Some(Ipv4Addr::UNSPECIFIED),
         // No IPv6 network is up and running
         None,
@@ -193,9 +229,7 @@ async fn run_mdns_task(stack: Stack<'static>, host: Host<'static>, service: Serv
         send,
         recv_buf,
         send_buf,
-        |buf| {
-            let _ = RNG.lock(|c| c.get().map(|r| r.clone().read(buf)));
-        },
+        rng,
         &signal,
     );
 

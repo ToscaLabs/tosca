@@ -75,18 +75,11 @@ const CAPACITY: usize = 4;
 // Time to wait, in milliseconds, after completing a task operation
 const WAIT_FOR_MILLISECONDS: u64 = 200;
 
-// Time to wait, in seconds, before reconnecting to the broker
-const RETRY_INTERVAL: u64 = 120;
-
 // Time, in seconds, to wait before starting the network write task.
 //
 // To be on the safe side, this value should be twice the WiFi reconnection
 // interval (in seconds), plus an additional two
 const LOWER_PRIORITY: u64 = (WIFI_RECONNECT_DELAY * 2) + 2;
-
-// Time, in seconds, to wait before pinging the broker again to check if the
-// connection is still active
-const PING_BROKER_AGAIN: u64 = 10;
 
 // All events to be transmitted over the network
 static EVENTS: Mutex<CriticalSectionRawMutex, Events> = Mutex::new(Events::empty());

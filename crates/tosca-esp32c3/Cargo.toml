@@ -9,7 +9,7 @@ documentation = "https://docs.rs/tosca-esp32c3"
 readme = "README.md"
 license = "Apache-2.0 OR MIT"
 repository = "https://github.com/ToscaLabs/tosca/tree/master/crates/tosca-esp32c3"
-rust-version = "1.90"
+rust-version = "1.91"
 
 [lints.rust]
 rust_2018_idioms = { level = "deny", priority = -1 }
@@ -81,6 +81,10 @@ esp-radio.features = ["esp-alloc", "esp32c3", "log-04", "wifi"]
 
 # Logging utilities
 log.version = "0.4.29"
+
+# Hack: remove when esp-hal > 1.0 version is released.
+# Random traits
+rand_core.version = "0.10.0"
 
 # Mqtt protocol
 rust-mqtt.version = "0.5.0"
