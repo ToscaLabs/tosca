@@ -71,7 +71,7 @@ impl Wifi {
 
         self.controller.set_config(&client_config)?;
 
-        self.spawner.spawn(connect(self.controller))?;
+        self.spawner.spawn(connect(self.controller)?);
 
         // Wait until Wi-Fi is connected.
         while sta_state() != WifiStaState::Connected {

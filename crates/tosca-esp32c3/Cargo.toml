@@ -34,19 +34,25 @@ critical-section.version = "1.2.0"
 # HTTP server
 edge-http.version = "0.7.0"
 edge-http.git = "https://github.com/sysgrok/edge-net"
+edge-http.default-features = false
+edge-http.features = ["io"]
 
 # mDNS service
 edge-mdns.version = "0.7.0"
 edge-mdns.git = "https://github.com/sysgrok/edge-net"
+edge-mdns.default-features = false
+edge-mdns.features = ["io"]
 
 # Networking traits
 edge-nal.version = "0.6.0"
 edge-nal.git = "https://github.com/sysgrok/edge-net"
+
 edge-nal-embassy.version = "0.8.1"
 edge-nal-embassy.git = "https://github.com/sysgrok/edge-net"
 
 # Embassy framework
-embassy-executor.version = "0.9.1"
+embassy-executor.version = "0.10.0"
+embassy-executor.default-features = false
 embassy-executor.features = ["log"]
 
 embassy-net.version = "0.9.0"

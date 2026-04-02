@@ -13,7 +13,7 @@ use core::time::Duration;
 
 use alloc::boxed::Box;
 
-use embassy_executor::{SpawnToken, Spawner};
+use embassy_executor::{SpawnToken, Spawner, SpawnError};
 use embassy_net::{IpAddress, Stack, dns::DnsQueryType};
 use embassy_sync::blocking_mutex::raw::CriticalSectionRawMutex;
 use embassy_sync::mutex::Mutex;
@@ -989,7 +989,7 @@ where
             self.config.stack,
             remote_endpoint,
             self.config.topic.clone(),
-        ))?;
+        )?);
 
         Ok(self
             .config
@@ -1001,14 +1001,18 @@ where
             )))
     }
 
-    fn spawn<F, T>(mut self, name: &'static str, task: SpawnToken<T>, add_event: F) -> Self
+    fn spawn<F>(mut self, name: &'static str, task: Result<SpawnToken<impl Sized>, SpawnError>, add_event: F) -> Self
     where
         F: FnOnce(&mut Events),
     {
-        if let Err(e) = self.config.spawner.spawn(task) {
-            error!("Impossible to spawn the event `{name}`: {e}");
-            return self;
-        }
+        let task = match task {
+            Ok(task) => task,
+            Err(e) => {
+                error!("Failed to define spawn token for event `{name}`: {e}");
+                return self;
+            }
+        };
+        self.config.spawner.spawn(task);
         add_event(&mut self.events);
         info!("Spawned the task for event `{name}`");
         self

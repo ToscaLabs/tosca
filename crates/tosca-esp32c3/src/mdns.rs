@@ -149,8 +149,9 @@ impl Mdns {
         };
 
         spawner
-            .spawn(run_mdns_task(stack, host, service, self.rng))
-            .map_err(core::convert::Into::into)
+            .spawn(run_mdns_task(stack, host, service, self.rng)?);
+
+        Ok(())
     }
 }
 

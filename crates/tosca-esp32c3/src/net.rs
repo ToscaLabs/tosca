@@ -65,7 +65,7 @@ impl NetworkStack {
 
         let (stack, runner) = embassy_net::new(wifi_interface, config, resources, seed);
 
-        spawner.spawn(task(runner))?;
+        spawner.spawn(task(runner)?);
 
         // Wait until the stack has a valid IP configuration.
         while !stack.is_config_up() {
