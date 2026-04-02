@@ -92,51 +92,44 @@ impl From<embassy_net::dns::Error> for Error {
     }
 }
 
-macro_rules! io_error {
-    ($func_name:ident, $t:ty) => {
-        const fn $func_name(e: $t) -> &'static str {
-            use $t;
-            match e {
-                ErrorKind::Other => "I/O: Unspecified error kind",
-                ErrorKind::NotFound => "I/O: An entity was not found, often a file",
-                ErrorKind::PermissionDenied => {
-                    "I/O: The operation lacked the necessary privileges to complete"
-                }
-                ErrorKind::ConnectionRefused => "I/O: The connection was refused by the remote server",
-                ErrorKind::ConnectionReset => "I/O: The connection was reset by the remote server",
-                ErrorKind::ConnectionAborted => {
-                    "I/O: The connection was aborted (terminated) by the remote server"
-                }
-                ErrorKind::NotConnected => {
-                    "I/O: The network operation failed because it was not connected yet"
-                }
-                ErrorKind::AddrInUse => {
-                    "I/O: A socket address could not be bound because the address is already in use elsewhere"
-                }
-                ErrorKind::AddrNotAvailable => {
-                    "I/O: A nonexistent interface was requested or the requested address was not local"
-                }
-                ErrorKind::BrokenPipe => "I/O: The operation failed because a pipe was closed",
-                ErrorKind::AlreadyExists => "I/O: An entity already exists, often a file",
-                ErrorKind::InvalidInput => "I/O: A parameter was incorrect",
-                ErrorKind::InvalidData => "I/O: Data not valid for the operation were encountered",
-                ErrorKind::TimedOut => {
-                    "I/O: The I/O operation’s timeout expired, causing it to be canceled"
-                }
-                ErrorKind::Interrupted => "I/O: This operation was interrupted",
-                ErrorKind::Unsupported => "I/O: This operation is unsupported on this platform",
-                ErrorKind::OutOfMemory => {
-                    "I/O: An operation could not be completed, because it failed to allocate enough memory"
-                }
-                ErrorKind::WriteZero => "I/O: An attempted write could not write any data",
-                _ => "I/O: Unknown or still non-existent error",
-            }
+const fn from_io_error(e: embedded_io_async::ErrorKind) -> &'static str {
+    use embedded_io_async::ErrorKind;
+    match e {
+        ErrorKind::Other => "I/O: Unspecified error kind",
+        ErrorKind::NotFound => "I/O: An entity was not found, often a file",
+        ErrorKind::PermissionDenied => {
+            "I/O: The operation lacked the necessary privileges to complete"
         }
-    };
+        ErrorKind::ConnectionRefused => "I/O: The connection was refused by the remote server",
+        ErrorKind::ConnectionReset => "I/O: The connection was reset by the remote server",
+        ErrorKind::ConnectionAborted => {
+            "I/O: The connection was aborted (terminated) by the remote server"
+        }
+        ErrorKind::NotConnected => {
+            "I/O: The network operation failed because it was not connected yet"
+        }
+        ErrorKind::AddrInUse => {
+            "I/O: A socket address could not be bound because the address is already in use elsewhere"
+        }
+        ErrorKind::AddrNotAvailable => {
+            "I/O: A nonexistent interface was requested or the requested address was not local"
+        }
+        ErrorKind::BrokenPipe => "I/O: The operation failed because a pipe was closed",
+        ErrorKind::AlreadyExists => "I/O: An entity already exists, often a file",
+        ErrorKind::InvalidInput => "I/O: A parameter was incorrect",
+        ErrorKind::InvalidData => "I/O: Data not valid for the operation were encountered",
+        ErrorKind::TimedOut => {
+            "I/O: The I/O operation’s timeout expired, causing it to be canceled"
+        }
+        ErrorKind::Interrupted => "I/O: This operation was interrupted",
+        ErrorKind::Unsupported => "I/O: This operation is unsupported on this platform",
+        ErrorKind::OutOfMemory => {
+            "I/O: An operation could not be completed, because it failed to allocate enough memory"
+        }
+        ErrorKind::WriteZero => "I/O: An attempted write could not write any data",
+        _ => "I/O: Unknown or still non-existent error",
+    }
 }
-
-io_error!(from_io_error, edge_nal::io::ErrorKind);
-io_error!(from_embedded_async_error, embedded_io_async::ErrorKind);
 
 impl<E: edge_nal::io::Error> From<edge_mdns::io::MdnsIoError<E>> for Error {
     fn from(e: edge_mdns::io::MdnsIoError<E>) -> Self {
@@ -160,7 +153,7 @@ impl<'e> From<rust_mqtt::client::MqttError<'e>> for Error {
     fn from(e: rust_mqtt::client::MqttError<'e>) -> Self {
         use rust_mqtt::client::MqttError;
         let err = match e {
-            MqttError::Network(e) => from_embedded_async_error(e),
+            MqttError::Network(e) => from_io_error(e),
             MqttError::Server => {
                 "The remote server did something the client does not understand / does not match the specification"
             }
