@@ -170,10 +170,10 @@ impl DeviceMetrics {
     }
 }
 
-/// Device description.
+/// Device data.
 #[derive(Debug, PartialEq, Serialize)]
 #[cfg_attr(feature = "deserialize", derive(serde::Deserialize))]
-pub struct DeviceDescription {
+pub struct DeviceData {
     /// Device kind.
     pub kind: DeviceKindId,
     /// Device environment.
@@ -186,6 +186,28 @@ pub struct DeviceDescription {
     /// Ethernet MAC address.
     #[serde(skip_serializing_if = "Option::is_none")]
     pub ethernet_mac: Option<[u8; 6]>,
+}
+
+impl DeviceData {
+    #[inline]
+    fn new(kind: DeviceKindId) -> Self {
+        Self {
+            kind,
+            environment: DeviceEnvironment::Embedded,
+            description: None,
+            wifi_mac: None,
+            ethernet_mac: None,
+        }
+    }
+}
+
+/// Device description.
+#[derive(Debug, PartialEq, Serialize)]
+#[cfg_attr(feature = "deserialize", derive(serde::Deserialize))]
+pub struct DeviceDescription {
+    /// Device data.
+    #[serde(flatten)]
+    pub data: DeviceData,
     /// Device main route.
     pub main_route: alloc::borrow::Cow<'static, str>,
     /// All device route configurations.
@@ -199,22 +221,16 @@ pub struct DeviceDescription {
 
 impl DeviceDescription {
     /// Creates [`DeviceDescription`].
+    #[inline]
     #[must_use]
     pub fn new(
         kind: DeviceKindId,
-        environment: DeviceEnvironment,
-        wifi_mac: Option<[u8; 6]>,
-        ethernet_mac: Option<[u8; 6]>,
         main_route: impl Into<alloc::borrow::Cow<'static, str>>,
         route_configs: RouteConfigs,
         mandatory_routes: u8,
     ) -> Self {
         Self {
-            kind,
-            environment,
-            description: None,
-            wifi_mac,
-            ethernet_mac,
+            data: DeviceData::new(kind),
             main_route: main_route.into(),
             route_configs,
             mandatory_routes,
@@ -222,10 +238,32 @@ impl DeviceDescription {
         }
     }
 
+    /// Sets the device environment.
+    #[must_use]
+    pub const fn environment(mut self, environment: DeviceEnvironment) -> Self {
+        self.data.environment = environment;
+        self
+    }
+
+    /// Sets the Wi-Fi MAC address.
+    #[must_use]
+    pub const fn wifi_mac(mut self, wifi_mac: Option<[u8; 6]>) -> Self {
+        self.data.wifi_mac = wifi_mac;
+        self
+    }
+
+    /// Sets the Ethernet MAC address.
+    #[must_use]
+    pub const fn ethernet_mac(mut self, ethernet_mac: Option<[u8; 6]>) -> Self {
+        self.data.ethernet_mac = ethernet_mac;
+        self
+    }
+
     /// Sets a device description.
+    #[inline]
     #[must_use]
     pub fn description(mut self, description: impl Into<alloc::borrow::Cow<'static, str>>) -> Self {
-        self.description = Some(description.into());
+        self.data.description = Some(description.into());
         self
     }
 
@@ -324,9 +362,6 @@ mod tests {
     fn test_device_description() {
         let device_description = DeviceDescription::new(
             DeviceKindId::from(&DeviceKind::Light),
-            DeviceEnvironment::Os,
-            None,
-            None,
             "/light",
             routes(),
             2,
