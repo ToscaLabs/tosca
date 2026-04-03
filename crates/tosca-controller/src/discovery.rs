@@ -252,9 +252,11 @@ impl Discovery {
                     .await
                 {
                     Ok(response) => {
-                        let device_data: DeviceDescription = response.json().await?;
+                        let device_desc: DeviceDescription = response.json().await?;
 
-                        if device_data.wifi_mac.is_none() && device_data.ethernet_mac.is_none() {
+                        if device_desc.data.wifi_mac.is_none()
+                            && device_desc.data.ethernet_mac.is_none()
+                        {
                             warn!(
                                 "Ignoring device {complete_address} because no valid MAC addresses have been found"
                             );
@@ -262,20 +264,21 @@ impl Discovery {
                         }
 
                         let requests = create_requests(
-                            device_data.route_configs,
+                            device_desc.route_configs,
                             &complete_address,
-                            &device_data.main_route,
-                            device_data.environment,
+                            &device_desc.main_route,
+                            device_desc.data.environment,
                         );
 
                         let description = Description::new(
-                            device_data.kind,
-                            device_data.environment,
-                            device_data.main_route.into_owned(),
+                            device_desc.data.kind,
+                            device_desc.data.environment,
+                            device_desc.main_route.into_owned(),
                         );
                         #[cfg(feature = "metadata")]
-                        let description = description
-                            .description(device_data.description.map(std::convert::Into::into));
+                        let description = description.description(
+                            device_desc.data.description.map(std::convert::Into::into),
+                        );
 
                         let mut network_info = NetworkInformation::new(
                             service.fullname,
@@ -289,15 +292,15 @@ impl Discovery {
                             complete_address,
                         );
 
-                        if let Some(mac) = device_data.wifi_mac {
+                        if let Some(mac) = device_desc.data.wifi_mac {
                             network_info = network_info.wifi_mac(mac);
                         }
 
-                        if let Some(mac) = device_data.ethernet_mac {
+                        if let Some(mac) = device_desc.data.ethernet_mac {
                             network_info = network_info.ethernet_mac(mac);
                         }
 
-                        let events = device_data.events_description.map(Events::new);
+                        let events = device_desc.events_description.map(Events::new);
 
                         devices.add(Device::init(network_info, description, requests, events));
 
