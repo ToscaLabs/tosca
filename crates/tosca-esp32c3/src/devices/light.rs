@@ -2,7 +2,7 @@ use alloc::borrow::Cow;
 use alloc::boxed::Box;
 use alloc::vec::Vec;
 
-use tosca::device::{DeviceData, DeviceEnvironment, DeviceKind, DeviceKindId};
+use tosca::device::{DeviceDescription, DeviceEnvironment, DeviceKind, DeviceKindId};
 use tosca::hazards::Hazard;
 use tosca::response::ResponseKind;
 use tosca::route::{Route, RouteConfigs};
@@ -203,7 +203,7 @@ where
     main_route: &'static str,
     state: State<S>,
     routes_functions: Functions<S>,
-    device_data: DeviceData,
+    device_data: DeviceDescription,
     index_array: Vec<FuncIndex>,
 }
 
@@ -385,7 +385,7 @@ where
     fn with_state(wifi_interface: &WifiDevice<'_>, state: S) -> Self {
         let wifi_mac = wifi_interface.mac_address();
 
-        let device_data = DeviceData::new(
+        let device_data = DeviceDescription::new(
             DeviceKindId::from(&DeviceKind::Light),
             DeviceEnvironment::Embedded,
             None,

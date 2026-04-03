@@ -1,6 +1,6 @@
 use alloc::vec::Vec;
 
-use tosca::device::DeviceData;
+use tosca::device::DeviceDescription;
 use tosca::events::EventsDescription;
 use tosca::route::RouteConfigs;
 
@@ -17,7 +17,7 @@ where
 {
     pub(crate) wifi_mac: [u8; 6],
     pub(crate) state: State<S>,
-    pub(crate) description: DeviceData,
+    pub(crate) description: DeviceDescription,
     pub(crate) main_route: &'static str,
     pub(crate) routes_functions: Functions<S>,
     pub(crate) index_array: Vec<FuncIndex>,
@@ -31,7 +31,7 @@ where
     pub(crate) fn new(
         wifi_mac: [u8; 6],
         state: State<S>,
-        description: DeviceData,
+        description: DeviceDescription,
         main_route: &'static str,
         routes_functions: Functions<S>,
         index_array: Vec<FuncIndex>,
