@@ -2,7 +2,7 @@ use std::borrow::Cow;
 use std::net::IpAddr;
 use std::time::Duration;
 
-use tosca::device::DeviceData;
+use tosca::device::DeviceDescription;
 
 use flume::RecvTimeoutError;
 
@@ -252,7 +252,7 @@ impl Discovery {
                     .await
                 {
                     Ok(response) => {
-                        let device_data: DeviceData = response.json().await?;
+                        let device_data: DeviceDescription = response.json().await?;
 
                         if device_data.wifi_mac.is_none() && device_data.ethernet_mac.is_none() {
                             warn!(
