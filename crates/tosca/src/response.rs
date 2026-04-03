@@ -2,7 +2,7 @@ use alloc::borrow::Cow;
 
 use serde::Serialize;
 
-use crate::device::DeviceInfo;
+use crate::device::DeviceMetrics;
 
 /// The header value associated with a response sent by a device which had
 /// failed to serialize its values.
@@ -75,17 +75,17 @@ impl<T: Serialize> SerialResponse<T> {
     }
 }
 
-/// A response which transmits a JSON message over the network containing
-/// a device's energy and economy information.
+/// A response which transmits runtime device information as a JSON message
+/// over the network.
 #[derive(Debug, PartialEq, Serialize)]
 #[cfg_attr(feature = "deserialize", derive(serde::Deserialize))]
-pub struct InfoResponse(DeviceInfo);
+pub struct InfoResponse(DeviceMetrics);
 
 impl InfoResponse {
     /// Generates an [`InfoResponse`].
     #[must_use]
-    pub const fn new(info: DeviceInfo) -> Self {
-        Self(info)
+    pub const fn new(metrics: DeviceMetrics) -> Self {
+        Self(metrics)
     }
 }
 
@@ -194,7 +194,7 @@ mod tests {
 
     use super::{OkResponse, SerialResponse, Serialize};
 
-    use super::{Cow, DeviceInfo, ErrorKind, ErrorResponse, InfoResponse};
+    use super::{Cow, DeviceMetrics, ErrorKind, ErrorResponse, InfoResponse};
 
     #[test]
     fn test_ok_response() {
@@ -243,10 +243,10 @@ mod tests {
         );
 
         assert_eq!(
-            deserialize::<DeviceInfo>(serialize(InfoResponse::new(
-                DeviceInfo::empty().add_energy(energy)
-            ))),
-            DeviceInfo {
+            deserialize::<DeviceMetrics>(serialize(InfoResponse::new(DeviceMetrics::with_energy(
+                energy
+            )))),
+            DeviceMetrics {
                 energy: crate::energy::Energy {
                     energy_efficiencies: None,
                     carbon_footprints: None,
