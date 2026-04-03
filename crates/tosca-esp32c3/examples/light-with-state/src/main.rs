@@ -13,7 +13,8 @@ extern crate alloc;
 
 use core::sync::atomic::{AtomicBool, AtomicU32, Ordering};
 
-use tosca::device::DeviceInfo;
+use tosca::device::DeviceMetrics;
+use tosca::energy::Energy;
 use tosca::parameters::Parameters;
 use tosca::route::{LightOffRoute, LightOnRoute, Route};
 
@@ -333,7 +334,11 @@ async fn main(spawner: Spawner) {
         )
         .stateless_info_route(
             Route::get("Info", "/info").description("Provide device information."),
-            |_| async move { Ok(InfoResponse::new(DeviceInfo::empty())) },
+            |_| async move {
+                Ok(InfoResponse::new(DeviceMetrics::with_energy(
+                    Energy::empty(),
+                )))
+            },
         )
         .build();
 
