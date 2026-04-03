@@ -2,7 +2,7 @@ use alloc::borrow::Cow;
 use alloc::string::ToString;
 use alloc::vec::Vec;
 
-use tosca::device::DeviceInfo;
+use tosca::device::DeviceMetrics;
 use tosca::response::{
     ErrorKind, ErrorResponse as ToscaErrorResponse, InfoResponse as ToscaInfoResponse,
     OkResponse as ToscaOkResponse, SERIALIZATION_ERROR, SerialResponse as ToscaSerialResponse,
@@ -69,10 +69,10 @@ impl InfoResponse {
     /// Creates a [`InfoResponse`].
     #[must_use]
     #[inline]
-    pub fn new(device_info: DeviceInfo) -> Self {
+    pub fn new(device_metrics: DeviceMetrics) -> Self {
         Self(json_to_response(
             Headers::json(),
-            ToscaInfoResponse::new(device_info),
+            ToscaInfoResponse::new(device_metrics),
         ))
     }
 }
