@@ -106,16 +106,16 @@ impl<K: DeviceKindTrait> From<&K> for DeviceKindId {
 
 /// Device environment.
 ///
-/// Specifies the underlying hardware architecture of a device,
-/// allowing the controller to perform different operations based on
-/// the device environment.
+/// Indicates the type of underlying hardware architecture,
+/// operating or embedded system, allowing the controller to adjust its
+/// operations accordingly.
 #[derive(Debug, Clone, Copy, PartialEq, Serialize)]
 #[cfg_attr(feature = "deserialize", derive(serde::Deserialize))]
 pub enum DeviceEnvironment {
+    /// Embedded system.
+    Embedded,
     /// Operating system.
     Os,
-    /// Esp32.
-    Esp32,
 }
 
 /// Device metrics.
@@ -295,7 +295,7 @@ mod tests {
 
     #[test]
     fn test_device_environment() {
-        for device_environment in &[DeviceEnvironment::Os, DeviceEnvironment::Esp32] {
+        for device_environment in &[DeviceEnvironment::Os, DeviceEnvironment::Embedded] {
             assert_eq!(
                 deserialize::<DeviceEnvironment>(serialize(device_environment)),
                 *device_environment
