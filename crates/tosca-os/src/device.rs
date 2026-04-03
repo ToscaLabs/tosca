@@ -272,35 +272,7 @@ mod tests {
         }))
     }
 
-    #[derive(Serialize)]
-    struct DeviceInfoResponse {
-        parameter: f64,
-        device_metrics: DeviceMetrics,
-    }
-
-    // This method demonstrates the library flexibility, but its use is
-    // not recommended.
-    // A controller may ignore a DeviceInfo structure if it is contained
-    // within a SerialResponse.
-    async fn serial_response_with_substate2(
-        State(state): State<DeviceInfoState>,
-        Json(inputs): Json<Inputs>,
-    ) -> Result<SerialResponse<DeviceInfoResponse>, ErrorResponse> {
-        // Retrieve the internal state.
-        let mut device_metrics = state.lock().map_err(|e| {
-            ErrorResponse::internal_with_error("Failed to obtain state lock", &e.to_string())
-        })?;
-
-        // Change the state.
-        device_metrics.energy = Energy::empty();
-
-        Ok(SerialResponse::new(DeviceInfoResponse {
-            parameter: inputs.parameter,
-            device_metrics: device_metrics.clone(),
-        }))
-    }
-
-    async fn info_response_with_substate3(
+    async fn info_response_with_substate2(
         State(state): State<DeviceInfoState>,
     ) -> Result<InfoResponse, ErrorResponse> {
         // Retrieve the internal state.
@@ -367,15 +339,10 @@ mod tests {
                 routes.with_state_route,
                 serial_response_with_substate1,
             ))
-            .route(serial_stateful(
-                Route::put("Substate response", "/substate-response")
-                    .description("Run a serial response with a substate."),
-                serial_response_with_substate2,
-            ))
             .info_route(info_stateful(
                 Route::put("Substate info", "/substate-info")
                     .description("Run an informative response with a substate."),
-                info_response_with_substate3,
+                info_response_with_substate2,
             ))
             .route(serial_stateless(
                 routes.without_state_route,
