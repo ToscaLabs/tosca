@@ -1,4 +1,4 @@
-use tosca::device::{DeviceData, DeviceEnvironment, DeviceKind, DeviceKindId, DeviceKindTrait};
+use tosca::device::{DeviceDescription, DeviceEnvironment, DeviceKind, DeviceKindId, DeviceKindTrait};
 use tosca::route::{RouteConfig, RouteConfigs};
 
 use axum::Router;
@@ -113,7 +113,7 @@ where
         self
     }
 
-    pub(crate) fn finalize(self) -> (&'static str, DeviceData, Router) {
+    pub(crate) fn finalize(self) -> (&'static str, DeviceDescription, Router) {
         let (wifi_mac, ethernet_mac) = get_mac_addresses();
         if wifi_mac.is_none() && ethernet_mac.is_none() {
             warn!("Unable to retrieve any Wi-Fi or Ethernet MAC address.");
@@ -128,7 +128,7 @@ where
 
         (
             self.main_route,
-            DeviceData::new(
+            DeviceDescription::new(
                 self.kind,
                 DeviceEnvironment::Os,
                 wifi_mac,
