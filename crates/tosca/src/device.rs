@@ -247,15 +247,15 @@ impl DeviceDescription {
 
     /// Sets the Wi-Fi MAC address.
     #[must_use]
-    pub const fn wifi_mac(mut self, wifi_mac: Option<[u8; 6]>) -> Self {
-        self.data.wifi_mac = wifi_mac;
+    pub const fn wifi_mac(mut self, wifi_mac: [u8; 6]) -> Self {
+        self.data.wifi_mac = Some(wifi_mac);
         self
     }
 
     /// Sets the Ethernet MAC address.
     #[must_use]
-    pub const fn ethernet_mac(mut self, ethernet_mac: Option<[u8; 6]>) -> Self {
-        self.data.ethernet_mac = ethernet_mac;
+    pub const fn ethernet_mac(mut self, ethernet_mac: [u8; 6]) -> Self {
+        self.data.ethernet_mac = Some(ethernet_mac);
         self
     }
 
