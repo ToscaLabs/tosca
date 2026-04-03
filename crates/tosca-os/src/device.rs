@@ -21,18 +21,14 @@ pub struct Device<S = ()>
 where
     S: Clone + Send + Sync + 'static,
 {
+    // Device description.
+    description: DeviceDescription,
     // Device main route.
     main_route: &'static str,
     // Device router.
     router: Router,
     // Device state.
     pub(crate) state: S,
-    // Device kind.
-    kind: DeviceKindId,
-    // All device routes along with their associated hazards.
-    route_configs: RouteConfigs,
-    // Number of mandatory routes.
-    num_mandatory_routes: u8,
 }
 
 impl Default for Device<()> {
@@ -84,19 +80,20 @@ where
     }
 
     pub(crate) fn init<K: DeviceKindTrait>(kind: &K, state: S) -> Self {
+        let description =
+            DeviceDescription::new(DeviceKindId::from(kind), MAIN_ROUTE, RouteConfigs::new(), 0)
+                .environment(DeviceEnvironment::Os);
         Self {
+            description,
             main_route: MAIN_ROUTE,
             router: Router::new(),
-            kind: DeviceKindId::from(kind),
-            route_configs: RouteConfigs::new(),
             state,
-            num_mandatory_routes: 0,
         }
     }
 
     pub(crate) fn response_data(mut self, data: (RouteConfig, Router)) -> Self {
         self.router = self.router.merge(data.1);
-        self.route_configs.add(data.0);
+        self.description.route_configs.add(data.0);
         self
     }
 
@@ -107,40 +104,32 @@ where
         let mut mandatory_routes = RouteConfigs::new();
         for response in responses {
             self.router = self.router.merge(response.1);
-            self.num_mandatory_routes += 1;
+            self.description.mandatory_routes += 1;
             mandatory_routes.add(response.0);
         }
 
-        self.route_configs = mandatory_routes.merge(self.route_configs);
+        self.description.route_configs = mandatory_routes.merge(self.description.route_configs);
         self
     }
 
-    pub(crate) fn finalize(self) -> (&'static str, DeviceDescription, Router) {
+    pub(crate) fn finalize(mut self) -> (&'static str, DeviceDescription, Router) {
         let (wifi_mac, ethernet_mac) = get_mac_addresses();
         if wifi_mac.is_none() && ethernet_mac.is_none() {
             warn!("Unable to retrieve any Wi-Fi or Ethernet MAC address.");
         }
 
-        for route in &self.route_configs {
+        for route in &self.description.route_configs {
             info!(
                 "Device route: [{}, \"{}{}\"]",
                 route.rest_kind, self.main_route, route.data.path,
             );
         }
 
-        (
-            self.main_route,
-            DeviceDescription::new(
-                self.kind,
-                self.main_route,
-                self.route_configs,
-                self.num_mandatory_routes,
-            )
-            .environment(DeviceEnvironment::Os)
-            .wifi_mac(wifi_mac)
-            .ethernet_mac(ethernet_mac),
-            self.router,
-        )
+        self.description.data.wifi_mac = wifi_mac;
+        self.description.data.ethernet_mac = ethernet_mac;
+        self.description.main_route = self.main_route.into();
+
+        (self.main_route, self.description, self.router)
     }
 }
 
