@@ -170,10 +170,10 @@ impl DeviceMetrics {
     }
 }
 
-/// Device data.
+/// Device description.
 #[derive(Debug, PartialEq, Serialize)]
 #[cfg_attr(feature = "deserialize", derive(serde::Deserialize))]
-pub struct DeviceData {
+pub struct DeviceDescription {
     /// Device kind.
     pub kind: DeviceKindId,
     /// Device environment.
@@ -197,8 +197,8 @@ pub struct DeviceData {
     pub events_description: Option<EventsDescription>,
 }
 
-impl DeviceData {
-    /// Creates [`DeviceData`].
+impl DeviceDescription {
+    /// Creates [`DeviceDescription`].
     #[must_use]
     pub fn new(
         kind: DeviceKindId,
@@ -250,7 +250,7 @@ mod tests {
     };
     use crate::{deserialize, serialize};
 
-    use super::{DeviceData, DeviceEnvironment, DeviceKind, DeviceKindId, DeviceMetrics};
+    use super::{DeviceDescription, DeviceEnvironment, DeviceKind, DeviceKindId, DeviceMetrics};
 
     fn energy() -> Energy {
         let energy_efficiencies =
@@ -321,8 +321,8 @@ mod tests {
     }
 
     #[test]
-    fn test_device_data() {
-        let device_data = DeviceData::new(
+    fn test_device_description() {
+        let device_description = DeviceDescription::new(
             DeviceKindId::from(&DeviceKind::Light),
             DeviceEnvironment::Os,
             None,
@@ -334,8 +334,8 @@ mod tests {
         .description("A light device.");
 
         assert_eq!(
-            deserialize::<DeviceData>(serialize(&device_data)),
-            device_data
+            deserialize::<DeviceDescription>(serialize(&device_description)),
+            device_description
         );
     }
 }
