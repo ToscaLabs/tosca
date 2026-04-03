@@ -387,7 +387,7 @@ where
 
         let device_data = DeviceData::new(
             DeviceKindId::from(&DeviceKind::Light),
-            DeviceEnvironment::Esp32,
+            DeviceEnvironment::Embedded,
             None,
             None,
             MAIN_ROUTE,
