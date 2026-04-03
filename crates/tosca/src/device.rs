@@ -174,7 +174,6 @@ pub struct DeviceData {
     #[serde(skip_serializing_if = "Option::is_none")]
     pub ethernet_mac: Option<[u8; 6]>,
     /// Device main route.
-    #[serde(rename = "main route")]
     pub main_route: alloc::borrow::Cow<'static, str>,
     /// All device route configurations.
     pub route_configs: RouteConfigs,
