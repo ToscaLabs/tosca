@@ -1,4 +1,6 @@
-use tosca::device::{DeviceDescription, DeviceEnvironment, DeviceKind, DeviceKindId, DeviceKindTrait};
+use tosca::device::{
+    DeviceDescription, DeviceEnvironment, DeviceKind, DeviceKindId, DeviceKindTrait,
+};
 use tosca::route::{RouteConfig, RouteConfigs};
 
 use axum::Router;
@@ -130,13 +132,13 @@ where
             self.main_route,
             DeviceDescription::new(
                 self.kind,
-                DeviceEnvironment::Os,
-                wifi_mac,
-                ethernet_mac,
                 self.main_route,
                 self.route_configs,
                 self.num_mandatory_routes,
-            ),
+            )
+            .environment(DeviceEnvironment::Os)
+            .wifi_mac(wifi_mac)
+            .ethernet_mac(ethernet_mac),
             self.router,
         )
     }
