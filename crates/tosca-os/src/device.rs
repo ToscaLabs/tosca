@@ -144,11 +144,11 @@ where
 
 #[cfg(test)]
 mod tests {
-    use std::sync::Arc;
+    use std::sync::{Arc, Mutex};
 
     use core::ops::{Deref, DerefMut};
 
-    use tosca::device::DeviceInfo;
+    use tosca::device::DeviceMetrics;
     use tosca::energy::Energy;
     use tosca::route::Route;
 
@@ -156,7 +156,7 @@ mod tests {
 
     use serde::{Deserialize, Serialize};
 
-    use tokio::sync::Mutex;
+    use tracing::error;
 
     use crate::responses::error::ErrorResponse;
     use crate::responses::info::{InfoResponse, info_stateful};
@@ -170,7 +170,7 @@ mod tests {
         S: Clone + Send + Sync + 'static,
     {
         state: S,
-        info: DeviceInfoState,
+        info_state: DeviceInfoState,
     }
 
     impl DeviceState<()> {
@@ -186,12 +186,15 @@ mod tests {
         fn new(state: S) -> Self {
             Self {
                 state,
-                info: DeviceInfoState::new(DeviceInfo::empty()),
+                info_state: DeviceInfoState::new(DeviceMetrics::with_energy(Energy::empty())),
             }
         }
 
-        fn add_device_info(mut self, info: DeviceInfo) -> Self {
-            self.info = DeviceInfoState::new(info);
+        fn add_device_info(self, metrics: DeviceMetrics) -> Self {
+            match self.info_state.lock() {
+                Ok(mut info_state) => *info_state = metrics,
+                Err(e) => error!("Failed to obtain info state, leaving state unchanged: {e}"),
+            }
             self
         }
     }
@@ -207,19 +210,19 @@ mod tests {
 
     #[derive(Clone)]
     struct DeviceInfoState {
-        info: Arc<Mutex<DeviceInfo>>,
+        info: Arc<Mutex<DeviceMetrics>>,
     }
 
     impl DeviceInfoState {
-        fn new(info: DeviceInfo) -> Self {
+        fn new(metrics: DeviceMetrics) -> Self {
             Self {
-                info: Arc::new(Mutex::new(info)),
+                info: Arc::new(Mutex::new(metrics)),
             }
         }
     }
 
     impl Deref for DeviceInfoState {
-        type Target = Arc<Mutex<DeviceInfo>>;
+        type Target = Arc<Mutex<DeviceMetrics>>;
 
         fn deref(&self) -> &Self::Target {
             &self.info
@@ -237,7 +240,7 @@ mod tests {
         S: Clone + Send + Sync + 'static,
     {
         fn from_ref(device_state: &DeviceState<S>) -> DeviceInfoState {
-            device_state.info.clone()
+            device_state.info_state.clone()
         }
     }
 
@@ -272,7 +275,7 @@ mod tests {
     #[derive(Serialize)]
     struct DeviceInfoResponse {
         parameter: f64,
-        device_info: DeviceInfo,
+        device_metrics: DeviceMetrics,
     }
 
     // This method demonstrates the library flexibility, but its use is
@@ -284,14 +287,16 @@ mod tests {
         Json(inputs): Json<Inputs>,
     ) -> Result<SerialResponse<DeviceInfoResponse>, ErrorResponse> {
         // Retrieve the internal state.
-        let mut device_info = state.lock().await;
+        let mut device_metrics = state.lock().map_err(|e| {
+            ErrorResponse::internal_with_error("Failed to obtain state lock", &e.to_string())
+        })?;
 
         // Change the state.
-        device_info.energy = Energy::empty();
+        device_metrics.energy = Energy::empty();
 
         Ok(SerialResponse::new(DeviceInfoResponse {
             parameter: inputs.parameter,
-            device_info: device_info.clone(),
+            device_metrics: device_metrics.clone(),
         }))
     }
 
@@ -299,7 +304,9 @@ mod tests {
         State(state): State<DeviceInfoState>,
     ) -> Result<InfoResponse, ErrorResponse> {
         // Retrieve the internal state.
-        let mut device_info = state.lock().await;
+        let mut device_info = state.lock().map_err(|e| {
+            ErrorResponse::internal_with_error("Failed to obtain state lock", &e.to_string())
+        })?;
 
         // Change the state.
         device_info.energy = Energy::empty();
@@ -335,7 +342,7 @@ mod tests {
     fn with_state() {
         let routes = create_routes();
 
-        let state = DeviceState::empty().add_device_info(DeviceInfo::empty());
+        let state = DeviceState::empty();
 
         let _ = Device::with_state(state)
             .route(serial_stateful(
@@ -352,7 +359,8 @@ mod tests {
     fn with_substates() {
         let routes = create_routes();
 
-        let state = DeviceState::new(SubState {}).add_device_info(DeviceInfo::empty());
+        let state = DeviceState::new(SubState {})
+            .add_device_info(DeviceMetrics::with_energy(Energy::empty()));
 
         let _ = Device::with_state(state)
             .route(serial_stateful(
