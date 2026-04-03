@@ -2,7 +2,7 @@ use alloc::borrow::Cow;
 use alloc::boxed::Box;
 use alloc::vec::Vec;
 
-use tosca::device::{DeviceDescription, DeviceEnvironment, DeviceKind, DeviceKindId};
+use tosca::device::{DeviceDescription, DeviceKind, DeviceKindId};
 use tosca::hazards::Hazard;
 use tosca::response::ResponseKind;
 use tosca::route::{Route, RouteConfigs};
@@ -387,14 +387,11 @@ where
 
         let device_data = DeviceDescription::new(
             DeviceKindId::from(&DeviceKind::Light),
-            DeviceEnvironment::Embedded,
-            None,
-            None,
             MAIN_ROUTE,
             RouteConfigs::new(),
             2,
         )
-        .description("A light device.");
+        .text_description("A light device.");
 
         Self {
             wifi_mac,
