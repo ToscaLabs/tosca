@@ -54,7 +54,7 @@ where
 
     #[inline]
     pub(crate) fn into_internal(mut self) -> InternalDevice<S> {
-        self.description.wifi_mac = Some(self.wifi_mac);
+        self.description.data.wifi_mac = Some(self.wifi_mac);
         InternalDevice {
             state: self.state,
             main_route: self.main_route,
