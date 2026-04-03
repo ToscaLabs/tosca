@@ -1,6 +1,6 @@
 use core::future::Future;
 
-use tosca::device::DeviceInfo;
+use tosca::device::DeviceMetrics;
 use tosca::response::{InfoResponse as ToscaInfoResponse, ResponseKind};
 use tosca::route::Route;
 
@@ -15,16 +15,16 @@ use serde::Serialize;
 
 use super::{BaseResponse, error::ErrorResponse};
 
-/// A response which transmits a JSON message over the network containing
-/// a device energy and economy information.
+/// A response which transmits runtime device information as a JSON message
+/// over the network.
 #[derive(Serialize)]
 pub struct InfoResponse(ToscaInfoResponse);
 
 impl InfoResponse {
     /// Creates an [`InfoResponse`].
     #[must_use]
-    pub const fn new(info: DeviceInfo) -> Self {
-        Self(ToscaInfoResponse::new(info))
+    pub const fn new(metrics: DeviceMetrics) -> Self {
+        Self(ToscaInfoResponse::new(metrics))
     }
 }
 
