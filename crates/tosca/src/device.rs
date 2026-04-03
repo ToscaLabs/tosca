@@ -259,10 +259,13 @@ impl DeviceDescription {
         self
     }
 
-    /// Sets a device description.
+    /// Sets the device text description.
     #[inline]
     #[must_use]
-    pub fn description(mut self, description: impl Into<alloc::borrow::Cow<'static, str>>) -> Self {
+    pub fn text_description(
+        mut self,
+        description: impl Into<alloc::borrow::Cow<'static, str>>,
+    ) -> Self {
         self.data.description = Some(description.into());
         self
     }
@@ -366,7 +369,7 @@ mod tests {
             routes(),
             2,
         )
-        .description("A light device.");
+        .text_description("A light device.");
 
         assert_eq!(
             deserialize::<DeviceDescription>(serialize(&device_description)),
