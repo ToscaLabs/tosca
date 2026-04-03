@@ -118,31 +118,43 @@ pub enum DeviceEnvironment {
     Esp32,
 }
 
-/// Device information.
+/// Device metrics.
 #[derive(Debug, PartialEq, Clone, Serialize)]
 #[cfg_attr(feature = "deserialize", derive(serde::Deserialize))]
-pub struct DeviceInfo {
-    /// Energy information.
+pub struct DeviceMetrics {
+    /// Energy metrics.
     #[serde(skip_serializing_if = "Energy::is_empty")]
     #[serde(default = "Energy::empty")]
     pub energy: Energy,
-    /// Economy information.
+    /// Economy metrics.
     #[serde(skip_serializing_if = "Economy::is_empty")]
     #[serde(default = "Economy::empty")]
     pub economy: Economy,
 }
 
-impl DeviceInfo {
-    /// Creates an empty [`DeviceInfo`].
+impl DeviceMetrics {
+    /// Creates a [`DeviceMetrics`] populated exclusively with [`Energy`]
+    /// metrics.
     #[must_use]
-    pub fn empty() -> Self {
+    pub const fn with_energy(energy: Energy) -> Self {
         Self {
-            energy: Energy::empty(),
+            energy,
             economy: Economy::empty(),
         }
     }
 
+    /// Creates a [`DeviceMetrics`] populated exclusively with [`Economy`]
+    /// metrics.
+    #[must_use]
+    pub const fn with_economy(economy: Economy) -> Self {
+        Self {
+            energy: Energy::empty(),
+            economy,
+        }
+    }
+
     /// Adds [`Energy`] data.
+    #[inline]
     #[must_use]
     pub fn add_energy(mut self, energy: Energy) -> Self {
         self.energy = energy;
@@ -150,6 +162,7 @@ impl DeviceInfo {
     }
 
     /// Adds [`Economy`] data.
+    #[inline]
     #[must_use]
     pub fn add_economy(mut self, economy: Economy) -> Self {
         self.economy = economy;
@@ -237,7 +250,7 @@ mod tests {
     };
     use crate::{deserialize, serialize};
 
-    use super::{DeviceData, DeviceEnvironment, DeviceInfo, DeviceKind, DeviceKindId};
+    use super::{DeviceData, DeviceEnvironment, DeviceKind, DeviceKindId, DeviceMetrics};
 
     fn energy() -> Energy {
         let energy_efficiencies =
@@ -291,14 +304,19 @@ mod tests {
     }
 
     #[test]
-    fn test_device_info() {
-        let mut device_info = DeviceInfo::empty();
-
-        device_info = device_info.add_energy(energy()).add_economy(economy());
+    fn test_device_metrics() {
+        let device_metrics = DeviceMetrics::with_energy(energy()).add_economy(economy());
 
         assert_eq!(
-            deserialize::<DeviceInfo>(serialize(&device_info)),
-            device_info
+            deserialize::<DeviceMetrics>(serialize(&device_metrics)),
+            device_metrics
+        );
+
+        let device_metrics = DeviceMetrics::with_economy(economy()).add_energy(energy());
+
+        assert_eq!(
+            deserialize::<DeviceMetrics>(serialize(&device_metrics)),
+            device_metrics
         );
     }
 
