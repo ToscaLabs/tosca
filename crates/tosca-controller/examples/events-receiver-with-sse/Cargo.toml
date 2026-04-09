@@ -51,17 +51,3 @@ tracing.default-features = false
 tracing-subscriber.version = "0.3"
 tracing-subscriber.default-features = false
 tracing-subscriber.features = ["ansi", "fmt"]
-
-[profile.release]
-opt-level = 3
-debug = false
-rpath = false
-lto = true
-debug-assertions = false
-codegen-units = 1
-panic = "unwind"
-incremental = false
-overflow-checks = false
-strip = "debuginfo"
-
-[workspace]
