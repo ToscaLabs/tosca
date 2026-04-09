@@ -3,8 +3,8 @@ mod light_mockup;
 use std::net::Ipv4Addr;
 use std::sync::Arc;
 
-use tosca::device::DeviceInfo;
-use tosca::energy::{EnergyClass, EnergyEfficiencies, EnergyEfficiency};
+use tosca::device::DeviceMetrics;
+use tosca::energy::{Energy, EnergyClass, EnergyEfficiencies, EnergyEfficiency};
 use tosca::hazards::Hazard;
 use tosca::parameters::Parameters;
 use tosca::route::{LightOffRoute, LightOnRoute, Route};
@@ -37,10 +37,10 @@ struct LightState {
 }
 
 impl LightState {
-    fn new(state: LightMockup, info: DeviceInfo) -> Self {
+    fn new(state: LightMockup, metrics: DeviceMetrics) -> Self {
         Self {
             state: InternalState::new(state),
-            info: LightInfoState::new(info),
+            info: LightInfoState::new(metrics),
         }
     }
 }
@@ -76,19 +76,19 @@ impl FromRef<LightState> for InternalState {
 
 #[derive(Clone)]
 struct LightInfoState {
-    info: Arc<Mutex<DeviceInfo>>,
+    info: Arc<Mutex<DeviceMetrics>>,
 }
 
 impl LightInfoState {
-    fn new(info: DeviceInfo) -> Self {
+    fn new(metrics: DeviceMetrics) -> Self {
         Self {
-            info: Arc::new(Mutex::new(info)),
+            info: Arc::new(Mutex::new(metrics)),
         }
     }
 }
 
 impl core::ops::Deref for LightInfoState {
-    type Target = Arc<Mutex<DeviceInfo>>;
+    type Target = Arc<Mutex<DeviceMetrics>>;
 
     fn deref(&self) -> &Self::Target {
         &self.info
@@ -219,7 +219,10 @@ async fn main() -> Result<(), Error> {
     let cli = Cli::parse();
 
     // Define a state for the light.
-    let state = LightState::new(LightMockup::default(), DeviceInfo::empty());
+    let state = LightState::new(
+        LightMockup::default(),
+        DeviceMetrics::with_energy(Energy::empty()),
+    );
 
     // Turn light on `PUT` route.
     let light_on_route = LightOnRoute::put("On")
