@@ -26,6 +26,7 @@ async fn run_camera_screenshot(
     let camera = state.camera.lock().await;
     let index = camera.index.clone();
 
+    #[allow(clippy::result_large_err)]
     let buffer = spawn_blocking(move || {
         let mut camera = Camera::new(index.clone(), format)
             .map_err(|e| camera_error("Impossible to create camera", e))?;
