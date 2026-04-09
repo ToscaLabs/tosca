@@ -90,7 +90,7 @@ jobs:
           toolchain: ${{ matrix.rust == 'minimal-version' && needs.prepare-checks.outputs.rust-minimal-version || 'stable' }}
 
       - name: Build
-        run: cargo build --all-targets --verbose
+        run: cargo build
 
   docs:
     needs: [build]
@@ -110,7 +110,7 @@ jobs:
       - name: Generate docs
         env:
           RUSTDOCFLAGS: "-D warnings"
-        run: cargo doc --verbose --no-deps
+        run: cargo doc --no-deps
 
 ################################## CODE COVERAGE LAYER ##################################
 
