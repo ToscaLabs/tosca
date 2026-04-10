@@ -10,9 +10,13 @@ publish = false
 [dependencies]
 tosca.path = "../../../tosca"
 tosca.version = "0.1"
+tosca.default-features = false
+tosca.features = ["stream"]
 
 tosca-os.path = "../../"
 tosca-os.version = "0.1"
+tosca-os.default-features = false
+tosca-os.features = ["stream"]
 
 clap.version = "4.5"
 clap.features = ["derive"]
