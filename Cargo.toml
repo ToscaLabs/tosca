@@ -5,10 +5,9 @@ resolver = "2"
 members = [
     "crates/tosca",
     "crates/tosca-os",
-    "crates/tosca-os/examples/*",
     "crates/tosca-controller",
-    "crates/tosca-controller/examples/*",
     "crates/tosca-drivers",
+    "examples/*",
 ]
 exclude = ["crates/tosca-esp32c3"]
 

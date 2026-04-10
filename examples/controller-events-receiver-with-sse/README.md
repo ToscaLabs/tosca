@@ -2,9 +2,9 @@
 
 [![LICENSE][license badge]][license]
 
-A receiver for events produced by `tosca` devices. It scans the network for
-`tosca` devices, subscribes to their brokers to receive events, and displays
-their data in real-time on a web page.
+A receiver for events produced by `tosca` devices built with `tosca-controller`.
+It scans the network for `tosca` devices, subscribes to their brokers
+to receive events, and displays their data in real-time on a web page.
 
 To send real-time updates from the server to the browser over a single `HTTP`
 connection, it utilizes

@@ -1,5 +1,5 @@
 [package]
-name = "events-receiver"
+name = "controller-events-receiver"
 version = "0.1.0"
 edition = "2024"
 authors = ["Michele Valsesia <michele.valsesia@toscalabs.org>"]
@@ -11,16 +11,14 @@ license = "Apache-2.0 OR MIT"
 publish = false
 
 [dependencies]
-tosca.path = "../../../tosca"
+tosca.path = "../../crates/tosca"
 tosca.version = "0.1"
 tosca.default-features = false
 tosca.features = ["deserialize"]
 
-tosca-controller.path = "../../"
+tosca-controller.path = "../../crates/tosca-controller"
 tosca-controller.version = "0.1"
-# FIXME: For some reason, default features must be enabled for dependencies to
-# work correctly.
-#tosca-controller.default-features = false
+tosca-controller.default-features = false
 
 clap.version = "4.5"
 clap.features = ["derive"]

@@ -1,9 +1,9 @@
-# Ip-Camera Server
+# An OS-based `ip-camera`
 
 [![LICENSE][license badge]][license]
 
-An Ip-Camera server usable from different operating systems for taking
-screenshots and sending a video stream of the surrounding environment.
+An `ip-camera` built with `tosca-os` and usable from different operating systems
+for taking screenshots and sending video streams of the surrounding environment.
 
 # Building
 

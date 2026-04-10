@@ -2,8 +2,9 @@
 
 [![LICENSE][license badge]][license]
 
-A receiver for events produced by `tosca` devices. It scans the network for
-`tosca` devices and subscribes to their brokers to receive these events.
+A receiver for events produced by `tosca` devices built with `tosca-controller`.
+It scans the network for `tosca` devices and subscribes to their brokers to
+receive these events.
 
 This example demonstrates how to build a terminal program using
 the `tosca-controller` APIs to manage events.
