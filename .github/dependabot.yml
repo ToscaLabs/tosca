@@ -9,14 +9,9 @@ updates:
   - package-ecosystem: "cargo"
     directories:
       - "/"
-      - "crates/tosca"
-      - "crates/tosca-*"
-      - "crates/tosca-os/examples/light"
-      - "crates/tosca-os/examples/ip-camera"
-      - "crates/tosca-esp32c3/examples/light"
-      - "crates/tosca-esp32c3/examples/light-with-state"
-      - "crates/tosca-esp32c3/examples/light-with-events"
-      - "crates/tosca-controller/examples/events-receiver"
-      - "crates/tosca-controller/examples/events-receiver-with-sse"
+      - "/examples"
+      - "/crates/tosca-esp32c3/examples/light"
+      - "/crates/tosca-esp32c3/examples/light-with-state"
+      - "/crates/tosca-esp32c3/examples/light-with-events"
     schedule:
       interval: "daily"
