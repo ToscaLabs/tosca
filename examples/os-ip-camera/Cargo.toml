@@ -1,31 +1,49 @@
 [package]
-name = "light"
+name = "os-ip-camera"
 version = "0.1.0"
 edition = "2024"
 authors = ["Michele Valsesia <michele.valsesia@toscalabs.org>"]
-description = "A light implemented with the tosca-os crate."
+description = "An ip-camera implemented with the tosca-os crate."
 license = "Apache-2.0 OR MIT"
 publish = false
 
 [dependencies]
-tosca.path = "../../../tosca"
+tosca.path = "../../crates/tosca"
 tosca.version = "0.1"
 tosca.default-features = false
+tosca.features = ["stream"]
 
-tosca-os.path = "../../"
+tosca-os.path = "../../crates/tosca-os"
 tosca-os.version = "0.1"
 tosca-os.default-features = false
+tosca-os.features = ["stream"]
 
 clap.version = "4.5"
 clap.features = ["derive"]
+
+image.version = "0.25"
+image.default-features = false
+image.features = ["png"]
+
+nokhwa.version = "0.10"
+nokhwa.default-features = false
+nokhwa.features = ["input-native", "serialize", "output-threaded"]
 
 serde.version = "1.0"
 serde.default-features = false
 serde.features = ["derive"]
 
+thiserror.version = "2.0.17"
+
 tokio.version = "1.0"
 tokio.default-features = false
 tokio.features = ["rt", "rt-multi-thread"]
+
+tokio-stream.version = "0.1"
+tokio-stream.default-features = false
+
+tracing.version = "0.1"
+tracing.default-features = false
 
 tracing-subscriber.version = "0.3"
 tracing-subscriber.default-features = false

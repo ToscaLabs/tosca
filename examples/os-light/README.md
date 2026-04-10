@@ -1,6 +1,8 @@
-# Light
+# An OS-based `light`
 
 [![LICENSE][license badge]][license]
+
+A light built with `tosca-os`.
 
 ## Building
 
