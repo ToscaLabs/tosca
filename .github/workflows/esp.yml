@@ -46,76 +46,38 @@ jobs:
         run: |
           cargo install ldproxy
 
-################################## tosca-esp32c3 ##############################
+      - name: Run tosca-esp32c3
+        shell: bash
+        run: |
+          set -e
 
-      - name: Run rustfmt (tosca-esp32c3)
-        working-directory: crates/tosca-esp32c3
-        run: cargo fmt --all -- --check --verbose
+          cd crates/tosca-esp32c3
 
-      - name: Run cargo clippy (tosca-esp32c3)
-        working-directory: crates/tosca-esp32c3
-        run: cargo clippy -- -Dclippy::all -Dclippy::pedantic
+          cargo fmt --all -- --check --verbose
+          cargo clippy -- -Dclippy::all -Dclippy::pedantic
 
-      - name: Run cargo doc (tosca-esp32c3)
-        working-directory: crates/tosca-esp32c3
-        env:
-          RUSTDOCFLAGS: "-D warnings"
-        run: cargo doc --verbose --no-deps
+          RUSTDOCFLAGS="-D warnings" cargo doc --no-deps
 
-      - name: Build (tosca-esp32c3)
-        working-directory: crates/tosca-esp32c3
-        run: cargo build --verbose
+          cargo build
 
-################################## light ######################################
+      - name: Run all examples
+        run: |
+          set -e
+          for ex in crates/tosca-esp32c3/examples/*; do
+            if [ -d "$ex" ] && [ -f "$ex/Cargo.toml" ]; then
+              name=$(basename "$ex")
 
-      - name: Run rustfmt (light)
-        working-directory: crates/tosca-esp32c3/examples/light
-        run: cargo fmt --all -- --check --verbose
+              echo "=============================="
+              echo "CI: $name"
+              echo "=============================="
 
-      - name: Set up cfg.toml
-        working-directory: crates/tosca-esp32c3/examples/light
-        run: cp cfg.toml.example cfg.toml
+              (
+                cd "$ex"
 
-      - name: Run cargo clippy (light)
-        working-directory: crates/tosca-esp32c3/examples/light
-        run: cargo clippy -- -Dclippy::all -Dclippy::pedantic
-
-      - name: Build (light)
-        working-directory: crates/tosca-esp32c3/examples/light
-        run: cargo build --verbose
-
-################################## light-with-state ###########################
-
-      - name: Run rustfmt (light-with-state)
-        working-directory: crates/tosca-esp32c3/examples/light-with-state
-        run: cargo fmt --all -- --check --verbose
-
-      - name: Set up cfg.toml
-        working-directory: crates/tosca-esp32c3/examples/light-with-state
-        run: cp cfg.toml.example cfg.toml
-
-      - name: Run cargo clippy (light-with-state)
-        working-directory: crates/tosca-esp32c3/examples/light-with-state
-        run: cargo clippy -- -Dclippy::all -Dclippy::pedantic
-
-      - name: Build (light-with-state)
-        working-directory: crates/tosca-esp32c3/examples/light-with-state
-        run: cargo build --verbose
-
-################################## light-with-events ##########################
-
-      - name: Run rustfmt (light-with-events)
-        working-directory: crates/tosca-esp32c3/examples/light-with-events
-        run: cargo fmt --all -- --check --verbose
-
-      - name: Set up cfg.toml
-        working-directory: crates/tosca-esp32c3/examples/light-with-events
-        run: cp cfg.toml.example cfg.toml
-
-      - name: Run cargo clippy (light-with-events)
-        working-directory: crates/tosca-esp32c3/examples/light-with-events
-        run: cargo clippy -- -Dclippy::all -Dclippy::pedantic
-
-      - name: Build (light-with-events)
-        working-directory: crates/tosca-esp32c3/examples/light-with-events
-        run: cargo build --verbose
+                cargo fmt --all -- --check --verbose
+                cp cfg.toml.example cfg.toml
+                cargo clippy -- -Dclippy::all -Dclippy::pedantic
+                cargo build
+              )
+            fi
+          done
