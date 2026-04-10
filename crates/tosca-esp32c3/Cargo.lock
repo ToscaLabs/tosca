@@ -257,7 +257,7 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "16f9b24aa48b6e43e6316a02bed8291f8a856cb6d4e63a2f533d35d74d04141d"
 dependencies = [
  "base64",
- "edge-nal",
+ "edge-nal 0.5.0",
  "embassy-futures",
  "embassy-sync 0.7.2",
  "embassy-time 0.4.0",
@@ -274,7 +274,7 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "d07725570484c42bbf289cb1b55bb6e941cef107993ee8a0f317e5fed7538165"
 dependencies = [
  "domain",
- "edge-nal",
+ "edge-nal 0.5.0",
  "embassy-futures",
  "embassy-sync 0.7.2",
  "embassy-time 0.4.0",
@@ -292,12 +292,22 @@ dependencies = [
 ]
 
 [[package]]
+name = "edge-nal"
+version = "0.6.0"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "f3c7d7163586cb9d457a34561a644aa957ce870226729bf6c9c8beeaead7e0d8"
+dependencies = [
+ "embassy-time 0.5.0",
+ "embedded-io-async 0.7.0",
+]
+
+[[package]]
 name = "edge-nal-embassy"
 version = "0.7.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "fb09ea0c604bbcb694ecf9cf6596bc5f59bbb5360b68c3e471b61ae9a55a8533"
 dependencies = [
- "edge-nal",
+ "edge-nal 0.5.0",
  "embassy-futures",
  "embassy-net",
  "embedded-io-async 0.6.1",
@@ -1573,7 +1583,7 @@ dependencies = [
  "critical-section",
  "edge-http",
  "edge-mdns",
- "edge-nal",
+ "edge-nal 0.6.0",
  "edge-nal-embassy",
  "embassy-executor",
  "embassy-net",
