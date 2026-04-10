@@ -10,7 +10,8 @@ on:
       - '**.yml'
       - '**.toml'
       - '!**.md'
-      - '!LICENSE'
+      - '!LICENSE-MIT'
+      - '!LICENSE-APACHE'
     tags:
       - 'v*.*.*' # Run when a new version is being published
   pull_request:
@@ -23,7 +24,8 @@ on:
       - '**.yml'
       - '**.toml'
       - '!**.md'
-      - '!LICENSE'
+      - '!LICENSE-MIT'
+      - '!LICENSE-APACHE'
 
 env:
   RUST_MINIMAL_VERSION: 1.90.0
