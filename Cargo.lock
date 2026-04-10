@@ -305,18 +305,12 @@ dependencies = [
 
 [[package]]
 name = "hashbrown"
-version = "0.16.1"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "841d1cc9bed7f9236f321df977030373f4a4163ae1a7dbfe1a51a2c1a51d9100"
-dependencies = [
- "foldhash",
-]
-
-[[package]]
-name = "hashbrown"
 version = "0.17.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "4f467dd6dccf739c208452f8014c75c18bb8301b050ad1cfb27153803edb0f51"
+dependencies = [
+ "foldhash",
+]
 
 [[package]]
 name = "http"
@@ -528,7 +522,7 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "d466e9454f08e4a911e14806c24e16fba1b4c121d1ea474396f396069cf949d9"
 dependencies = [
  "equivalent",
- "hashbrown 0.17.0",
+ "hashbrown",
  "serde",
  "serde_core",
 ]
@@ -1144,7 +1138,7 @@ dependencies = [
 name = "tosca"
 version = "0.1.1"
 dependencies = [
- "hashbrown 0.16.1",
+ "hashbrown",
  "indexmap",
  "log",
  "serde",
@@ -1158,7 +1152,7 @@ dependencies = [
  "bytes",
  "flume 0.12.0",
  "futures-util",
- "hashbrown 0.16.1",
+ "hashbrown",
  "indexmap",
  "mdns-sd",
  "reqwest",
