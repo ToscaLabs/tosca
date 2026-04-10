@@ -18,7 +18,10 @@ tosca.features = ["deserialize"]
 
 tosca-controller.path = "../../crates/tosca-controller"
 tosca-controller.version = "0.1"
-tosca-controller.default-features = false
+# FIXME: Default features must be enabled for dependencies to work correctly.
+# To resolve this, we may need to move the examples into another workspace or
+# a separate repository.
+#tosca-controller.default-features = false
 
 clap.version = "4.5"
 clap.features = ["derive"]
