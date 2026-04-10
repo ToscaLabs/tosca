@@ -1,4 +1,4 @@
-# `events-receiver-with-sse`
+# `events-sse-receiver`
 
 [![LICENSE][license badge]][license]
 
