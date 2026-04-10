@@ -241,13 +241,25 @@ dependencies = [
 
 [[package]]
 name = "domain"
-version = "0.10.4"
+version = "0.11.1"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "4c84070523f8ba0f9127ff156920f27eb27b302b425efe60bf5f41ec244d1c60"
+checksum = "7f7ff15f82df7d5086fb15dfc1c1e96598a6ded9829840a9bcfa1fa3ccd8d01d"
 dependencies = [
+ "domain-macros",
  "heapless 0.8.0",
  "octseq",
  "time",
+]
+
+[[package]]
+name = "domain-macros"
+version = "0.11.1"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "8d1a6796ad411f6812d691955066ad27450196bfb181bb91b66a643cc3e8f5b7"
+dependencies = [
+ "proc-macro2",
+ "quote",
+ "syn 2.0.112",
 ]
 
 [[package]]
@@ -257,7 +269,7 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "16f9b24aa48b6e43e6316a02bed8291f8a856cb6d4e63a2f533d35d74d04141d"
 dependencies = [
  "base64",
- "edge-nal",
+ "edge-nal 0.5.0",
  "embassy-futures",
  "embassy-sync 0.7.2",
  "embassy-time 0.4.0",
@@ -269,16 +281,17 @@ dependencies = [
 
 [[package]]
 name = "edge-mdns"
-version = "0.6.1"
+version = "0.7.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "d07725570484c42bbf289cb1b55bb6e941cef107993ee8a0f317e5fed7538165"
+checksum = "73e6e268ceceab96a31eeefb7fc4afbb8f005313de23944a0ecb10a20f382193"
 dependencies = [
  "domain",
- "edge-nal",
+ "edge-nal 0.6.0",
  "embassy-futures",
  "embassy-sync 0.7.2",
- "embassy-time 0.4.0",
- "heapless 0.8.0",
+ "embassy-time 0.5.0",
+ "heapless 0.9.2",
+ "rand_core 0.9.3",
 ]
 
 [[package]]
@@ -292,12 +305,22 @@ dependencies = [
 ]
 
 [[package]]
+name = "edge-nal"
+version = "0.6.0"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "f3c7d7163586cb9d457a34561a644aa957ce870226729bf6c9c8beeaead7e0d8"
+dependencies = [
+ "embassy-time 0.5.0",
+ "embedded-io-async 0.7.0",
+]
+
+[[package]]
 name = "edge-nal-embassy"
 version = "0.7.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "fb09ea0c604bbcb694ecf9cf6596bc5f59bbb5360b68c3e471b61ae9a55a8533"
 dependencies = [
- "edge-nal",
+ "edge-nal 0.5.0",
  "embassy-futures",
  "embassy-net",
  "embedded-io-async 0.6.1",
@@ -1573,7 +1596,7 @@ dependencies = [
  "critical-section",
  "edge-http",
  "edge-mdns",
- "edge-nal",
+ "edge-nal 0.5.0",
  "edge-nal-embassy",
  "embassy-executor",
  "embassy-net",
