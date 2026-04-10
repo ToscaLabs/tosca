@@ -15,6 +15,7 @@ publish = false
 tosca.path = "../../../tosca"
 tosca.version = "0.1"
 tosca.default-features = false
+tosca.features = ["deserialize"]
 
 tosca-controller.path = "../../"
 tosca-controller.version = "0.1"

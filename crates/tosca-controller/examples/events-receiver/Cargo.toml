@@ -14,10 +14,13 @@ publish = false
 tosca.path = "../../../tosca"
 tosca.version = "0.1"
 tosca.default-features = false
+tosca.features = ["deserialize"]
 
 tosca-controller.path = "../../"
 tosca-controller.version = "0.1"
-tosca-controller.default-features = false
+# FIXME: For some reason, default features must be enabled for dependencies to
+# work correctly.
+#tosca-controller.default-features = false
 
 clap.version = "4.5"
 clap.features = ["derive"]
