@@ -93,7 +93,8 @@ common interface.
 
 The `tosca-os` library crate is designed for firmware running on operating
 systems.
-In the [tosca-os/examples](https://github.com/ToscaLabs/tosca/tree/master/crates/tosca-os/examples) directory, you will find a simple example of both light and IP-camera firmware.
+In the [examples](https://github.com/ToscaLabs/tosca/tree/master/examples)
+directory, you will find firmware examples, all identified by the `os` prefix.
 
 The `tosca-esp32c3` library crate is designed for firmware running on
 `ESP32-C3` microcontrollers.
@@ -111,8 +112,9 @@ hardware platforms.
 The [tosca-controller](https://github.com/ToscaLabs/tosca/tree/master/crates/tosca-controller)
 library crate defines a set of APIs for managing, orchestrating, and interacting
 with firmware built using the crates mentioned above. In the
-[tosca-controller/examples](https://github.com/ToscaLabs/tosca/tree/master/crates/tosca-controller/examples) directory, you will find some examples demonstrating various methods
-for receiving events from devices.
+[examples](https://github.com/ToscaLabs/tosca/tree/master/examples) directory,
+you will find examples, all identified by the `controller` prefix, demonstrating
+various methods for receiving events from devices.
 
 ## Building
 
