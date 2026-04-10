@@ -64,6 +64,17 @@ jobs:
       - name: Run cargo clippy
         run: cargo clippy --all-targets -- -Dclippy::all -Dclippy::pedantic
 
+      - name: Run cargo clippy for examples
+        shell: bash
+        run: |
+          set -e
+          for dir in examples/*; do
+            if [ -f "$dir/Cargo.toml" ]; then
+              cargo clippy --manifest-path "$dir/Cargo.toml" -- -Dclippy::all -Dclippy::pedantic
+            fi
+          done
+
+
 ################################## BUILD AND DOCS LAYER ########################
 
   build:
@@ -91,6 +102,16 @@ jobs:
 
       - name: Build
         run: cargo build
+
+      - name: Build examples
+        shell: bash
+        run: |
+          set -e
+          for dir in examples/*; do
+            if [ -f "$dir/Cargo.toml" ]; then
+              cargo build --manifest-path "$dir/Cargo.toml"
+            fi
+          done
 
   docs:
     needs: [build]
