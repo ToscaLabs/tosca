@@ -17,7 +17,7 @@ workspace = true
 [features]
 stream = []
 deserialize = []
-default = ["deserialize"]
+default = ["deserialize", "stream"]
 
 [dependencies]
 hashbrown.workspace = true
