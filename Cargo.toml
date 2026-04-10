@@ -31,14 +31,14 @@ broken_intra_doc_links = "deny"
 invalid_html_tags = "deny"
 
 [workspace.dependencies]
-hashbrown.version = "0.16"
+hashbrown.version = "0.17"
 hashbrown.default-features = false
 hashbrown.features = ["default-hasher"]
 
 indexmap.version = "2.12"
 indexmap.default-features = false
 
-mdns-sd.version = "0.18.0"
+mdns-sd.version = "0.19.0"
 mdns-sd.default-features = false
 
 serde.version = "1.0"
