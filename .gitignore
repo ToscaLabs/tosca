@@ -4,3 +4,5 @@ target/
 crates/tosca-os/**/*.lock
 crates/tosca-esp32c3/examples/**/*.lock
 crates/tosca-controller/**/*.lock
+
+examples/**/*.lock
