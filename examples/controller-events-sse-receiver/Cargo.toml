@@ -1,5 +1,5 @@
 [package]
-name = "controller-events-receiver-with-sse"
+name = "controller-events-sse-receiver"
 version = "0.1.0"
 edition = "2024"
 authors = ["Michele Valsesia <michele.valsesia@toscalabs.org>"]
