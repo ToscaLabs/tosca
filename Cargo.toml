@@ -2,13 +2,7 @@
 # https://doc.rust-lang.org/cargo/reference/resolver.html#feature-resolver-version-2
 resolver = "2"
 
-members = [
-    "crates/tosca",
-    "crates/tosca-os",
-    "crates/tosca-controller",
-    "crates/tosca-drivers",
-    "examples/*",
-]
+members = ["crates/*"]
 exclude = ["crates/tosca-esp32c3"]
 
 [workspace.package]
