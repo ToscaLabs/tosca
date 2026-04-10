@@ -22,6 +22,8 @@ default = ["stream", "metadata"]
 [dependencies]
 tosca.path = "../tosca"
 tosca.version = "0.1.0"
+tosca.default-features = false
+tosca.features = ["deserialize"]
 
 hashbrown.workspace = true
 
