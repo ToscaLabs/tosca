@@ -17,7 +17,7 @@ workspace = true
 [features]
 metadata = []
 stream = ["dep:futures-util", "tosca/stream"]
-default = ["stream", "metadata"]
+default = ["metadata"]
 
 [dependencies]
 tosca.path = "../tosca"
