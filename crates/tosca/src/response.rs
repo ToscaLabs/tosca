@@ -26,7 +26,6 @@ pub enum ResponseKind {
     /// a device energy and economy information.
     Info,
     /// This response transmits a byte stream of data over the network.
-    #[cfg(feature = "stream")]
     Stream,
 }
 
@@ -36,7 +35,6 @@ impl core::fmt::Display for ResponseKind {
             Self::Ok => "Ok",
             Self::Serial => "Serial",
             Self::Info => "Info",
-            #[cfg(feature = "stream")]
             Self::Stream => "Stream",
         }
         .fmt(f)
