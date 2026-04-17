@@ -95,7 +95,7 @@ pub(crate) async fn show_camera_info(
                         .collect::<Vec<(Resolution, Vec<u32>)>>();
 
                     // Sort formats by name
-                    formats.sort_by(|a, b| a.0.cmp(&b.0));
+                    formats.sort_by_key(|a| a.0);
 
                     // Show sorted formats.
                     let format_data = formats
