@@ -13,7 +13,6 @@ publish = false
 tosca.path = "../../crates/tosca"
 tosca.version = "0.1"
 tosca.default-features = false
-tosca.features = ["stream"]
 
 tosca-os.path = "../../crates/tosca-os"
 tosca-os.version = "0.1"
