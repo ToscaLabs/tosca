@@ -16,7 +16,7 @@ workspace = true
 
 [features]
 deserialize = []
-default = ["deserialize"]
+default = []
 
 [dependencies]
 hashbrown.workspace = true
