@@ -17,7 +17,6 @@ publish = false
 tosca.path = "../../crates/tosca"
 tosca.version = "0.1"
 tosca.default-features = false
-tosca.features = ["deserialize"]
 
 tosca-controller.path = "../../crates/tosca-controller"
 tosca-controller.version = "0.1"
