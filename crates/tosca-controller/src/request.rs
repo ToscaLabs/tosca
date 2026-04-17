@@ -216,6 +216,13 @@ impl Request {
             ResponseKind::Ok => Response::OkBody(OkResponseParser::new(response)),
             ResponseKind::Serial => Response::SerialBody(SerialResponseParser::new(response)),
             ResponseKind::Info => Response::InfoBody(InfoResponseParser::new(response)),
+            #[cfg(not(feature = "stream"))]
+            ResponseKind::Stream => {
+                tracing::warn!(
+                    "Skipping stream response because the `stream` feature is not enabled."
+                );
+                Response::Skipped
+            }
             #[cfg(feature = "stream")]
             ResponseKind::Stream => {
                 Response::StreamBody(crate::response::StreamResponse::new(response))
