@@ -7,16 +7,10 @@ description = "A light implemented with the tosca-os crate."
 license = "Apache-2.0 OR MIT"
 publish = false
 
-[workspace]
-
 [dependencies]
-tosca.path = "../../crates/tosca"
-tosca.version = "0.1"
-tosca.default-features = false
+tosca.workspace = true
 
-tosca-os.path = "../../crates/tosca-os"
-tosca-os.version = "0.1"
-tosca-os.default-features = false
+tosca-os.workspace = true
 
 clap.version = "4.5"
 clap.features = ["derive"]

@@ -10,16 +10,11 @@ A receiver for events produced by `tosca` devices. It scans the network for
 license = "Apache-2.0 OR MIT"
 publish = false
 
-[workspace]
-
 [dependencies]
-tosca.path = "../../crates/tosca"
-tosca.version = "0.1"
-tosca.default-features = false
+tosca.workspace = true
+tosca.features = ["deserialize"]
 
-tosca-controller.path = "../../crates/tosca-controller"
-tosca-controller.version = "0.1"
-tosca-controller.default-features = false
+tosca-controller.workspace = true
 
 clap.version = "4.5"
 clap.features = ["derive"]
