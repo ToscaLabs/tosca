@@ -31,6 +31,21 @@ broken_intra_doc_links = "deny"
 invalid_html_tags = "deny"
 
 [workspace.dependencies]
+tosca.version = "0.1.1"
+tosca.path = "crates/tosca"
+tosca.default-features = false
+
+tosca-os.version = "0.1.1"
+tosca-os.path = "crates/tosca-os"
+tosca-os.default-features = false
+
+tosca-drivers.version = "0.1.1"
+tosca-drivers.path = "crates/tosca-drivers"
+tosca-drivers.default-features = false
+
+tosca-controller.version = "0.1.1"
+tosca-controller.path = "crates/tosca-controller"
+
 hashbrown.version = "0.17"
 hashbrown.default-features = false
 hashbrown.features = ["default-hasher"]
