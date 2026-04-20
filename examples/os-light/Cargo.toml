@@ -8,21 +8,18 @@ license = "Apache-2.0 OR MIT"
 publish = false
 
 [dependencies]
-tosca.workspace = true
+# Workspace crates
+tosca = { workspace = true }
+tosca-os = { workspace = true }
 
-tosca-os.workspace = true
+# CLI parsing
+clap = { version = "4.5", features = ["derive"] }
 
-clap.version = "4.5"
-clap.features = ["derive"]
+# Serialization
+serde = { version = "1.0", default-features = false, features = ["derive"] }
 
-serde.version = "1.0"
-serde.default-features = false
-serde.features = ["derive"]
+# Async runtime
+tokio = { version = "1.0", default-features = false, features = ["rt", "rt-multi-thread"] }
 
-tokio.version = "1.0"
-tokio.default-features = false
-tokio.features = ["rt", "rt-multi-thread"]
-
-tracing-subscriber.version = "0.3"
-tracing-subscriber.default-features = false
-tracing-subscriber.features = ["ansi", "fmt"]
+# Logging
+tracing-subscriber = { version = "0.3", default-features = false, features = ["ansi", "fmt"] }

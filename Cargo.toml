@@ -18,42 +18,20 @@ rust-version = "1.90"
 readme = "README.md"
 
 [workspace.dependencies]
-tosca.version = "0.1.1"
-tosca.path = "crates/tosca"
-tosca.default-features = false
+tosca = { version = "0.1.1", path = "crates/tosca", default-features = false }
+tosca-os = { version = "0.1.1", path = "crates/tosca-os", default-features = false }
+tosca-drivers = { version = "0.1.1", path = "crates/tosca-drivers", default-features = false }
+tosca-controller = { version = "0.1.1", path = "crates/tosca-controller" }
 
-tosca-os.version = "0.1.1"
-tosca-os.path = "crates/tosca-os"
-tosca-os.default-features = false
+hashbrown = { version = "0.17", default-features = false, features = ["default-hasher"] }
+indexmap = { version = "2.12", default-features = false }
 
-tosca-drivers.version = "0.1.1"
-tosca-drivers.path = "crates/tosca-drivers"
-tosca-drivers.default-features = false
+mdns-sd = { version = "0.19.0", default-features = false }
+serde = { version = "1.0", default-features = false }
+serde_json = { version = "1", default-features = false }
 
-tosca-controller.version = "0.1.1"
-tosca-controller.path = "crates/tosca-controller"
-
-hashbrown.version = "0.17"
-hashbrown.default-features = false
-hashbrown.features = ["default-hasher"]
-
-indexmap.version = "2.12"
-indexmap.default-features = false
-
-mdns-sd.version = "0.19.0"
-mdns-sd.default-features = false
-
-serde.version = "1.0"
-serde.default-features = false
-
-serde_json.version = "1"
-serde_json.default-features = false
-
-tokio.version = "1.0"
-tokio.default-features = false
-
-tracing.version = "0.1"
-tracing.default-features = false
+tokio = { version = "1.0", default-features = false }
+tracing = { version = "0.1", default-features = false }
 
 [profile.release]
 opt-level = 3

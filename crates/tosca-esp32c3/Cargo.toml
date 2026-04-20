@@ -16,72 +16,50 @@ default-target = "riscv32imc-unknown-none-elf"
 rustdoc-args = ["--cfg", "docsrs"]
 
 [dependencies]
-tosca.path = "../tosca"
-tosca.version = "0.1.0"
-tosca.default-features = false
+# Tosca workspace crate
+tosca = { path = "../tosca", version = "0.1.0", default-features = false }
 
-# A critical section for a multithread context.
-critical-section.version = "1.2.0"
+# Multithread critical section
+critical-section = "1.2.0"
 
 # HTTP server
-edge-http.version = "0.6.1"
+edge-http = "0.6.1"
 
 # mDNS service
-edge-mdns.version = "0.6.1"
+edge-mdns = "0.6.1"
 
 # Networking traits
-edge-nal.version = "0.5.0"
-edge-nal-embassy.version = "0.7.0"
+edge-nal = "0.5.0"
+edge-nal-embassy = "0.7.0"
 
 # Embassy framework
-embassy-executor.version = "0.9.1"
-embassy-executor.features = ["log"]
+embassy-executor = { version = "0.9.1", features = ["log"] }
+embassy-net = { version = "0.7.1", features = ["dhcpv4", "log", "medium-ethernet", "tcp", "udp"] }
+embassy-sync = "0.7.2"
+embassy-time = { version = "0.5.0", features = ["log"] }
 
-embassy-net.version = "0.7.1"
-embassy-net.features = ["dhcpv4", "log", "medium-ethernet", "tcp", "udp"]
+# Async IO traits
+embedded-io-async = "0.6.1"
 
-embassy-sync.version = "0.7.2"
+# ESP dependencies
+esp-alloc = "0.9.0"
+esp-hal = { version = "1.0.0", features = ["esp32c3", "log-04", "unstable"] }
+esp-rtos = { version = "0.2.0", features = ["embassy", "esp-alloc", "esp-radio", "esp32c3", "log-04"] }
+esp-println = { version = "0.16.1", features = ["esp32c3", "log-04"] }
+esp-radio = { version = "0.17.0", features = ["esp-alloc", "esp32c3", "log-04", "wifi"] }
 
-embassy-time.version = "0.5.0"
-embassy-time.features = ["log"]
+# Logging
+log = "0.4.29"
 
-# Asynchronous read and write traits
-embedded-io-async.version = "0.6.1"
+# MQTT protocol
+rust-mqtt = { version = "0.3.1", default-features = false }
 
-# Esp dependencies
-esp-alloc.version = "0.9.0"
-
-# The "unstable" feature is required in order to use Embassy
-esp-hal.version = "1.0.0"
-esp-hal.features = ["esp32c3", "log-04", "unstable"]
-
-esp-rtos.version = "0.2.0"
-esp-rtos.features = ["embassy", "esp-alloc", "esp-radio", "esp32c3", "log-04"]
-
-esp-println.version = "0.16.1"
-esp-println.features = ["esp32c3", "log-04"]
-
-esp-radio.version = "0.17.0"
-esp-radio.features = ["esp-alloc", "esp32c3", "log-04", "wifi"]
-
-# Logging utilities
-log.version = "0.4.29"
-
-# Mqtt protocol
-rust-mqtt.version = "0.3.1"
-rust-mqtt.default-features = false
-
-# Serialization process
-serde.version = "1.0"
-serde.default-features = false
-serde.features = ["derive"]
-
-serde_json.version = "1"
-serde_json.default-features = false
-serde_json.features = ["alloc"]
+# Serialization
+serde = { version = "1.0", default-features = false, features = ["derive"] }
+serde_json = { version = "1", default-features = false, features = ["alloc"] }
 
 # Static cell
-static_cell.version = "2.1.1"
+static_cell = "2.1.1"
 
 [lints.rust]
 rust_2018_idioms = { level = "deny", priority = -1 }
