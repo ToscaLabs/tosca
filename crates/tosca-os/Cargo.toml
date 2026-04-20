@@ -16,7 +16,6 @@ workspace = true
 
 [features]
 stream = ["dep:futures-core", "dep:tokio-util"]
-default = []
 
 [dependencies]
 tosca.workspace = true
