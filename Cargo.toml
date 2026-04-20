@@ -1,5 +1,4 @@
 [workspace]
-# https://doc.rust-lang.org/cargo/reference/resolver.html#feature-resolver-version-2
 resolver = "2"
 
 members = ["crates/*", "examples/*"]
@@ -12,8 +11,9 @@ description = "A versatile, customizable, and secure IoT framework."
 edition = "2024"
 license = "Apache-2.0 OR MIT"
 repository = "https://github.com/ToscaLabs/tosca"
+homepage = "https://toscalabs.org/tosca"
 categories = ["iot"]
-keywords = ["iot", "framework", "library", "controller", "devices"]
+keywords = ["iot", "framework", "devices", "firmware", "controller"]
 rust-version = "1.90"
 readme = "README.md"
 
