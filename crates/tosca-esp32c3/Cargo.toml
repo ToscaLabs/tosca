@@ -15,18 +15,6 @@ rust-version = "1.90"
 default-target = "riscv32imc-unknown-none-elf"
 rustdoc-args = ["--cfg", "docsrs"]
 
-[lints.rust]
-rust_2018_idioms = { level = "deny", priority = -1 }
-missing_docs = "deny"
-warnings = "deny"
-unused_results = "deny"
-
-[lints.clippy]
-
-[lints.rustdoc]
-broken_intra_doc_links = "deny"
-invalid_html_tags = "deny"
-
 [dependencies]
 tosca.path = "../tosca"
 tosca.version = "0.1.0"
@@ -94,3 +82,15 @@ serde_json.features = ["alloc"]
 
 # Static cell
 static_cell.version = "2.1.1"
+
+[lints.rust]
+rust_2018_idioms = { level = "deny", priority = -1 }
+missing_docs = "deny"
+warnings = "deny"
+unused_results = "deny"
+
+[lints.clippy]
+
+[lints.rustdoc]
+broken_intra_doc_links = "deny"
+invalid_html_tags = "deny"
