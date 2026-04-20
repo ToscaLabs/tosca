@@ -14,22 +14,23 @@
 //!
 //! A device description is defined as a sequence of fields, such as the
 //! device name, the device kind, and other data used to establish a
-//! connection with the a controller.
+//! connection with a controller.
 //!
-//! When a controller makes a request to the firmware through route, the
-//! firmware executes the corresponding task and sends a response! back to the
+//! When a controller makes a request to the firmware through a route, the
+//! firmware executes the associated task and sends a response back to the
 //! controller.
 //! Routes may also accept parameters to configure tasks.
 //!
-//! Each route may have zero or more associated hazards, representing potential
-//! risks during task execution. Even if no hazards are declared, a route may
-//! still pose unknown risks to the device.
+//! Each route may have zero or more associated hazards, which represent
+//! potential risks during task execution. Even if no hazards are declared,
+//! a route may still pose unknown risks to the device.
 //! In such cases, the controller must decide whether to allow or block the
 //! request based on its privacy policy.
 //!
 //! This crate **cannot** determine the outcome of device tasks at compile
-//! time, as they depend on the runtime environment. Therefore, hazards
-//! only informs a controller of the **possible** risks that might arise.
+//! time, as their execution depend on the runtime environment. Therefore,
+//! hazards only informs a controller of the **possible** risks that might
+//! arise.
 //!
 //! An `std` environment is required to obtain full crate functionality.
 
