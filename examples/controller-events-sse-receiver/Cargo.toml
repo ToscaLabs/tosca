@@ -12,39 +12,30 @@ license = "Apache-2.0 OR MIT"
 publish = false
 
 [dependencies]
-tosca.workspace = true
-tosca.features = ["deserialize"]
+# Workspace crates
+tosca = { workspace = true, features = ["deserialize"] }
+tosca-controller = { workspace = true }
 
-tosca-controller.workspace = true
+# Template engine
+askama = "0.15"
 
-askama.version = "0.15"
+# Web framework
+axum = { version = "0.8", default-features = false, features = ["tokio", "http1"] }
 
-axum.version = "0.8"
-axum.default-features = false
-axum.features = ["tokio", "http1"]
+# CLI parsing
+clap = { version = "4.5", features = ["derive"] }
 
-clap.version = "4.5"
-clap.features = ["derive"]
+# Futures and async utilities
+futures = { version = "0.3.31", default-features = false }
+tokio = { version = "1.0", default-features = false, features = ["rt", "rt-multi-thread", "signal"] }
+tokio-stream = { version = "0.1.17", features = ["sync"] }
 
-futures.version = "0.3.31"
-futures.default-features = false
+# HTTP utilities
+tower-http = { version = "0.6.1", default-features = false, features = ["fs", "trace"] }
 
+# Error handling
 thiserror = "2.0.17"
 
-tokio.version = "1.0"
-tokio.default-features = false
-tokio.features = ["rt", "rt-multi-thread", "signal"]
-
-tokio-stream.version = "0.1.17"
-tokio-stream.features = ["sync"]
-
-tower-http.version = "0.6.1"
-tower-http.default-features = false
-tower-http.features = ["fs", "trace"]
-
-tracing.version = "0.1"
-tracing.default-features = false
-
-tracing-subscriber.version = "0.3"
-tracing-subscriber.default-features = false
-tracing-subscriber.features = ["ansi", "fmt"]
+# Logging
+tracing = { version = "0.1", default-features = false }
+tracing-subscriber = { version = "0.3", default-features = false, features = ["ansi", "fmt"] }

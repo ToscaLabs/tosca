@@ -22,16 +22,10 @@ workspace = true
 deserialize = []
 
 [dependencies]
-hashbrown.workspace = true
-
-indexmap.workspace = true
-indexmap.features = ["serde"]
-
-log.version = "0.4.29"
-
-serde.workspace = true
-serde.features = ["derive", "alloc"]
+hashbrown = { workspace = true }
+indexmap = { workspace = true, features = ["serde"] }
+log = "0.4.29"
+serde = { workspace = true, features = ["derive", "alloc"] }
 
 [dev-dependencies]
-serde_json.workspace = true
-serde_json.features = ["alloc"]
+serde_json = { workspace = true, features = ["alloc"] }

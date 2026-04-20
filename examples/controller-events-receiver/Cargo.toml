@@ -11,21 +11,14 @@ license = "Apache-2.0 OR MIT"
 publish = false
 
 [dependencies]
-tosca.workspace = true
-tosca.features = ["deserialize"]
+# Workspace crates
+tosca = { workspace = true, features = ["deserialize"] }
+tosca-controller = { workspace = true }
 
-tosca-controller.workspace = true
+# CLI parsing
+clap = { version = "4.5", features = ["derive"] }
 
-clap.version = "4.5"
-clap.features = ["derive"]
-
-tokio.version = "1.0"
-tokio.default-features = false
-tokio.features = ["rt", "rt-multi-thread", "signal"]
-
-tracing.version = "0.1"
-tracing.default-features = false
-
-tracing-subscriber.version = "0.3"
-tracing-subscriber.default-features = false
-tracing-subscriber.features = ["ansi", "fmt"]
+# Async runtime and logging
+tokio = { version = "1.0", default-features = false, features = ["rt", "rt-multi-thread", "signal"] }
+tracing = { version = "0.1", default-features = false }
+tracing-subscriber = { version = "0.3", default-features = false, features = ["ansi", "fmt"] }

@@ -22,33 +22,26 @@ workspace = true
 stream = ["dep:futures-core", "dep:tokio-util"]
 
 [dependencies]
-tosca.workspace = true
+tosca = { workspace = true }
 
-axum.version = "0.8.8"
-axum.default-features = false
-axum.features = ["tokio", "http1", "http2", "json"]
+axum = { version = "0.8.8", default-features = false, features = ["tokio", "http1", "http2", "json"] }
 
-mdns-sd.workspace = true
+mdns-sd = { workspace = true }
 
-serde.workspace = true
-serde.features = ["derive"]
+serde = { workspace = true, features = ["derive"] }
+serde_json = { workspace = true }
 
-serde_json.workspace = true
-
-tokio.workspace = true
-
-tracing.workspace = true
+tokio = { workspace = true }
+tracing = { workspace = true }
 
 # Stream feature dependencies
-futures-core.version = "0.3" # Just for the TryStream trait
-futures-core.default-features = false
-futures-core.optional = true
-
-tokio-util.version = "0.7"
-tokio-util.default-features = false
-tokio-util.features = ["io"]
-tokio-util.optional = true
+futures-core = { version = "0.3", default-features = false, optional = true }
+tokio-util = { version = "0.7", default-features = false, features = ["io"], optional = true }
 
 [target.'cfg(windows)'.dependencies]
-windows-sys.version = "0.61.0"
-windows-sys.features = ["Win32_NetworkManagement_IpHelper", "Win32_Foundation", "Win32_Networking_WinSock", "Win32_NetworkManagement_Ndis"]
+windows-sys = { version = "0.61.0", features = [
+    "Win32_NetworkManagement_IpHelper",
+    "Win32_Foundation",
+    "Win32_Networking_WinSock",
+    "Win32_NetworkManagement_Ndis"
+] }

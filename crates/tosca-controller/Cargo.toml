@@ -24,53 +24,27 @@ stream = ["dep:futures-util"]
 default = ["metadata"]
 
 [dependencies]
-tosca.workspace = true
-tosca.features = ["deserialize"]
+# Workspace crates
+tosca = { workspace = true, features = ["deserialize"] }
+hashbrown = { workspace = true }
+indexmap = { workspace = true }
+mdns-sd = { workspace = true }
+serde = { workspace = true }
+serde_json = { workspace = true, features = ["alloc"] }
+tracing = { workspace = true }
+tokio = { workspace = true, features = ["macros", "rt", "rt-multi-thread"] }
 
-hashbrown.workspace = true
+# External crates
+bytes = { version = "1.11.0", default-features = false }
+flume = { version = "0.12", default-features = false, features = ["async"] }
+reqwest = { version = "0.13", default-features = false, features = ["blocking", "json", "stream"] }
+rumqttc = { version = "0.25.1", default-features = false }
+tokio-util = { version = "0.7", default-features = false }
 
-indexmap.workspace = true
-
-mdns-sd.workspace = true
-
-serde.workspace = true
-
-serde_json.workspace = true
-serde_json.features = ["alloc"]
-
-tracing.workspace = true
-
-bytes.version = "1.11.0"
-bytes.default-features = false
-
-flume.version = "0.12"
-flume.default-features = false
-flume.features = ["async"]
-
-reqwest.version = "0.13"
-reqwest.default-features = false
-reqwest.features = ["blocking", "json", "stream"]
-
-rumqttc.version = "0.25.1"
-rumqttc.default-features = false
-
-tokio.workspace = true
-tokio.features = ["macros", "rt", "rt-multi-thread"]
-
-tokio-util.version = "0.7"
-tokio-util.default-features = false
-
-# Stream feature dependencies
-futures-util.version = "0.3.31"
-futures-util.default-features = false
-futures-util.optional = true
+# Optional stream utilities
+futures-util = { version = "0.3.31", default-features = false, optional = true }
 
 [dev-dependencies]
-tosca-os.workspace = true
-
-serial_test.version = "3.2.0"
-serial_test.default-features = false
-
-tracing-subscriber.version = "0.3"
-tracing-subscriber.default-features = false
-tracing-subscriber.features = ["ansi", "fmt"]
+tosca-os = { workspace = true }
+serial_test = { version = "3.2.0", default-features = false }
+tracing-subscriber = { version = "0.3", default-features = false, features = ["ansi", "fmt"] }
