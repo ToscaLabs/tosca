@@ -3,8 +3,11 @@ name = "tosca-controller"
 version.workspace = true
 edition.workspace = true
 authors.workspace = true
-description = "A library for building a controller that manages all Tosca devices across a network."
-keywords = ["iot", "iot-library", "controller", "devices", "events"]
+description = """
+A library crate for building a controller to manage all `tosca` devices
+on a network.
+"""
+keywords = ["iot", "library", "controller", "devices", "events"]
 documentation = "https://docs.rs/tosca-controller"
 readme = "README.md"
 license.workspace = true
