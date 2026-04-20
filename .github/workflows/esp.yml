@@ -46,7 +46,7 @@ jobs:
         run: |
           cargo install ldproxy
 
-      - name: Run tosca-esp32c3
+      - name: Build tosca-esp32c3
         shell: bash
         run: |
           set -e
@@ -60,7 +60,7 @@ jobs:
 
           cargo build
 
-      - name: Run all examples
+      - name: Build all examples
         run: |
           set -e
           for ex in crates/tosca-esp32c3/examples/*; do
