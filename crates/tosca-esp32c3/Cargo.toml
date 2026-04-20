@@ -11,6 +11,10 @@ license = "Apache-2.0 OR MIT"
 repository = "https://github.com/ToscaLabs/tosca/tree/master/crates/tosca-esp32c3"
 rust-version = "1.90"
 
+[package.metadata.docs.rs]
+default-target = "riscv32imc-unknown-none-elf"
+rustdoc-args = ["--cfg", "docsrs"]
+
 [lints.rust]
 rust_2018_idioms = { level = "deny", priority = -1 }
 missing_docs = "deny"
@@ -90,7 +94,3 @@ serde_json.features = ["alloc"]
 
 # Static cell
 static_cell.version = "2.1.1"
-
-[package.metadata.docs.rs]
-default-target = "riscv32imc-unknown-none-elf"
-rustdoc-args = ["--cfg", "docsrs"]

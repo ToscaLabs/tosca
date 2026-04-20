@@ -11,6 +11,10 @@ license.workspace = true
 repository = "https://github.com/ToscaLabs/tosca/tree/master/crates/tosca-os"
 rust-version.workspace = true
 
+[package.metadata.docs.rs]
+features = ["default"]
+rustdoc-args = ["--cfg", "docsrs"]
+
 [lints]
 workspace = true
 
@@ -48,7 +52,3 @@ tokio-util.optional = true
 [target.'cfg(windows)'.dependencies]
 windows-sys.version = "0.61.0"
 windows-sys.features = ["Win32_NetworkManagement_IpHelper", "Win32_Foundation", "Win32_Networking_WinSock", "Win32_NetworkManagement_Ndis"]
-
-[package.metadata.docs.rs]
-features = ["default"]
-rustdoc-args = ["--cfg", "docsrs"]
