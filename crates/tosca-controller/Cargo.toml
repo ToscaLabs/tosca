@@ -11,6 +11,10 @@ license.workspace = true
 repository = "https://github.com/ToscaLabs/tosca/tree/master/crates/tosca-controller"
 rust-version.workspace = true
 
+[package.metadata.docs.rs]
+features = ["default"]
+rustdoc-args = ["--cfg", "docsrs"]
+
 [lints]
 workspace = true
 
@@ -70,7 +74,3 @@ serial_test.default-features = false
 tracing-subscriber.version = "0.3"
 tracing-subscriber.default-features = false
 tracing-subscriber.features = ["ansi", "fmt"]
-
-[package.metadata.docs.rs]
-features = ["default"]
-rustdoc-args = ["--cfg", "docsrs"]

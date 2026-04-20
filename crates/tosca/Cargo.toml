@@ -11,6 +11,10 @@ license.workspace = true
 repository.workspace = true
 rust-version.workspace = true
 
+[package.metadata.docs.rs]
+features = ["default"]
+rustdoc-args = ["--cfg", "docsrs"]
+
 [lints]
 workspace = true
 
@@ -31,7 +35,3 @@ serde.features = ["derive", "alloc"]
 [dev-dependencies]
 serde_json.workspace = true
 serde_json.features = ["alloc"]
-
-[package.metadata.docs.rs]
-features = ["default"]
-rustdoc-args = ["--cfg", "docsrs"]
