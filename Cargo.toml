@@ -17,19 +17,6 @@ keywords = ["iot", "framework", "library", "controller", "devices"]
 rust-version = "1.90"
 readme = "README.md"
 
-[workspace.lints.rust]
-rust_2018_idioms = { level = "deny", priority = -1 }
-missing_docs = "deny"
-warnings = "deny"
-unsafe_code = "deny"
-unused_results = "deny"
-
-[workspace.lints.clippy]
-
-[workspace.lints.rustdoc]
-broken_intra_doc_links = "deny"
-invalid_html_tags = "deny"
-
 [workspace.dependencies]
 tosca.version = "0.1.1"
 tosca.path = "crates/tosca"
@@ -79,3 +66,16 @@ panic = "unwind"
 incremental = false
 overflow-checks = false
 strip = "debuginfo"
+
+[workspace.lints.rust]
+rust_2018_idioms = { level = "deny", priority = -1 }
+missing_docs = "deny"
+warnings = "deny"
+unsafe_code = "deny"
+unused_results = "deny"
+
+[workspace.lints.clippy]
+
+[workspace.lints.rustdoc]
+broken_intra_doc_links = "deny"
+invalid_html_tags = "deny"
