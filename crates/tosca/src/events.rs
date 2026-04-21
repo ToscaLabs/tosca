@@ -851,7 +851,7 @@ mod tests {
     fn test_events_description() {
         let broker_data = BrokerData::new(Ipv4Addr::LOCALHOST.into(), 80);
         assert_eq!(
-            deserialize::<BrokerData>(serialize(&broker_data)),
+            deserialize::<BrokerData>(serialize(broker_data)),
             broker_data
         );
 
