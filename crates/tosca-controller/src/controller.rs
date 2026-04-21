@@ -50,7 +50,7 @@ impl RequestSender<'_> {
     /// and affect the returned response as well.
     pub async fn send_with_parameters(
         &self,
-        parameters: &ParametersValues<'_>,
+        parameters: &ParametersValues,
     ) -> Result<Response, Error> {
         if self.request.parameters_data.is_empty() {
             warn!("The request does not have input parameters.");
@@ -398,7 +398,7 @@ mod tests {
     async fn check_ok_response_with_parameters(
         device_sender: &DeviceSender<'_>,
         route: &str,
-        parameters: &ParametersValues<'_>,
+        parameters: &ParametersValues,
     ) {
         check_ok_response(device_sender, route, async move |request_sender| {
             request_sender.send_with_parameters(parameters).await
@@ -447,7 +447,7 @@ mod tests {
     >(
         device_sender: &DeviceSender<'_>,
         route: &str,
-        parameters: &ParametersValues<'_>,
+        parameters: &ParametersValues,
         value: T,
     ) {
         check_serial_response(
