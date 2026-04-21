@@ -2,11 +2,10 @@ use core::fmt::{Debug, Display};
 use core::net::SocketAddr;
 use core::pin::Pin;
 
-use alloc::borrow::Cow;
 use alloc::boxed::Box;
 use alloc::format;
 use alloc::str::SplitTerminator;
-use alloc::string::ToString;
+use alloc::string::{String, ToString};
 use alloc::vec::Vec;
 
 use tosca::parameters::{
@@ -387,7 +386,7 @@ struct RouteInfo {
 }
 
 impl RouteInfo {
-    const fn new(index: usize, parameters_payloads: ToscaParametersPayloads<'static>) -> Self {
+    const fn new(index: usize, parameters_payloads: ToscaParametersPayloads) -> Self {
         Self {
             index,
             parameters_payloads: ParametersPayloads(parameters_payloads),
@@ -520,7 +519,7 @@ where
     fn parse_get_parameters(
         route_config: &RouteConfig,
         mut route_iter: SplitTerminator<'_, char>,
-    ) -> Result<ToscaParametersPayloads<'static>, Response> {
+    ) -> Result<ToscaParametersPayloads, Response> {
         // Create parameters payloads.
         let mut parameters_payloads = ToscaParametersPayloads::new();
 
@@ -533,7 +532,7 @@ where
                         .parameters
                         .iter()
                         .skip(index)
-                        .map(|parameter| parameter.0.as_str())
+                        .map(|parameter| parameter.0.as_ref())
                         .collect::<Vec<&str>>()
                 ))
             })?;
@@ -542,7 +541,7 @@ where
             let parameter_value = Self::parse_parameter_value(parameter_value, parameter.1)?;
 
             parameters_payloads.add(
-                parameter.0.clone().into(),
+                String::from(parameter.0.as_ref()),
                 ParameterPayload::new(parameter.1.clone(), parameter_value),
             );
         }
@@ -557,7 +556,7 @@ where
         route_config: &RouteConfig,
         headers: &Headers<'_, N>,
         body: &mut Body<'_, T>,
-    ) -> Result<ToscaParametersPayloads<'static>, Response> {
+    ) -> Result<ToscaParametersPayloads, Response> {
         info!("Headers: {headers:?}");
 
         let content_length = headers
@@ -592,15 +591,13 @@ where
             error_response_with_error("Error reading the request bytes", &format!("{e:?}"))
         })?;
 
-        let route_parameters = serde_json::from_slice::<ParametersValues<'_>>(
-            &bytes[0..content_length],
-        )
-        .map_err(|e| {
-            error_response_with_error(
-                "Failed to convert bytes into a sequence of parameters",
-                &format!("{e}"),
-            )
-        })?;
+        let route_parameters =
+            serde_json::from_slice::<ParametersValues>(&bytes[0..content_length]).map_err(|e| {
+                error_response_with_error(
+                    "Failed to convert bytes into a sequence of parameters",
+                    &format!("{e}"),
+                )
+            })?;
 
         info!("Route parameters: {route_parameters:?}");
 
@@ -657,9 +654,9 @@ where
             ParameterKind::F64 { .. } | ParameterKind::RangeF64 { .. } => {
                 Self::into_value::<f64, _>(parameter_value, "f64", ParameterValue::F64)
             }
-            ParameterKind::CharsSequence { .. } => Ok(ParameterValue::CharsSequence(Cow::Owned(
-                parameter_value.to_string(),
-            ))),
+            ParameterKind::CharsSequence { .. } => {
+                Ok(ParameterValue::CharsSequence(parameter_value.to_string()))
+            }
         }
     }
 
