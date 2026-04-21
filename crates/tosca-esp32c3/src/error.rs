@@ -1,3 +1,5 @@
+use alloc::borrow::Cow;
+
 /// All possible error kinds.
 #[derive(Copy, Clone)]
 pub enum ErrorKind {
@@ -55,7 +57,7 @@ impl core::fmt::Display for ErrorKind {
 /// A library error.
 pub struct Error {
     kind: ErrorKind,
-    info: &'static str,
+    info: Cow<'static, str>,
 }
 
 impl core::fmt::Debug for Error {
@@ -71,8 +73,11 @@ impl core::fmt::Display for Error {
 }
 
 impl Error {
-    pub(crate) fn new(kind: ErrorKind, info: &'static str) -> Self {
-        Self { kind, info }
+    pub(crate) fn new(kind: ErrorKind, info: impl Into<Cow<'static, str>>) -> Self {
+        Self {
+            kind,
+            info: info.into(),
+        }
     }
 
     fn error(&self, f: &mut core::fmt::Formatter<'_>) -> core::fmt::Result {
