@@ -493,15 +493,25 @@ mod tests {
             RestKind::Get,
             Hazards::new(),
             "A GET route",
-            ParametersData::new().insert(
-                "rangeu64".into(),
-                ParameterKind::RangeU64 {
-                    min: 0,
-                    max: 20,
-                    step: 1,
-                    default: 5,
-                },
-            ),
+            ParametersData::new()
+                .insert(
+                    "rangeu64".into(),
+                    ParameterKind::RangeU64 {
+                        min: 0,
+                        max: 20,
+                        step: 1,
+                        default: 5,
+                    },
+                )
+                .insert(
+                    "rangef64".into(),
+                    ParameterKind::RangeF64 {
+                        min: 0.,
+                        max: 20.,
+                        step: 0.1,
+                        default: 0.,
+                    },
+                ),
         );
 
         assert_eq!(
