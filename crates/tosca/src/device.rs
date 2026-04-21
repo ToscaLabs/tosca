@@ -1,106 +1,200 @@
+use alloc::borrow::Cow;
+
 use serde::Serialize;
 
 use crate::economy::Economy;
 use crate::energy::Energy;
 use crate::events::EventsDescription;
+use crate::hazards::Hazard;
 use crate::route::RouteConfigs;
 
-/// Trait for device kind types.
-///
-/// Firmware authors implement this on their own enum.
-///
-/// # Example
-///
-/// ```rust
-/// use tosca::device::DeviceKindTrait;
-///
-/// #[derive(Debug, Clone, Copy, PartialEq)]
-/// enum MyDeviceKind {
-///     Relay,
-///     MotorController,
-/// }
-///
-/// impl DeviceKindTrait for MyDeviceKind {
-///     fn name(&self) -> &'static str {
-///         match self {
-///             Self::Relay => "Relay",
-///             Self::MotorController => "MotorController",
-///         }
-///     }
-/// }
-/// ```
-pub trait DeviceKindTrait {
-    /// Returns the display name of this device kind.
-    fn name(&self) -> &'static str;
-}
-
 /// A device kind.
-#[derive(Debug, Clone, Copy, PartialEq, Serialize)]
+#[derive(Debug, Clone, PartialEq, Serialize)]
 #[cfg_attr(feature = "deserialize", derive(serde::Deserialize))]
 pub enum DeviceKind {
-    /// Unknown.
-    Unknown,
     /// Light.
     Light,
-}
-
-impl DeviceKindTrait for DeviceKind {
-    fn name(&self) -> &'static str {
-        match self {
-            Self::Unknown => "Unknown",
-            Self::Light => "Light",
-        }
-    }
+    /// Custom.
+    Custom(Cow<'static, str>),
 }
 
 impl core::fmt::Display for DeviceKind {
     fn fmt(&self, f: &mut core::fmt::Formatter<'_>) -> core::fmt::Result {
-        write!(f, "{}", self.name())
+        f.write_str(match self {
+            Self::Light => "Light",
+            Self::Custom(kind) => kind,
+        })
     }
 }
 
-/// A string-backed device kind identifier.
+/// A device scheme.
 ///
-/// Used in [`DeviceData`] for serialization over the wire. The controller
-/// deserializes into this type, so it can handle any device kind including
-/// ones it has never seen before.
+/// A scheme consists of:
 ///
-/// On the firmware side, this is constructed automatically from any type
-/// that implements [`DeviceKind`] via the [`From`] impl.
+/// - A device kind
+/// - A list of all mandatory route names
+/// - A list of hazards allowed for the device
 #[derive(Debug, Clone, PartialEq, Serialize)]
-#[cfg_attr(feature = "deserialize", derive(serde::Deserialize))]
-#[serde(transparent)]
-pub struct DeviceKindId(alloc::borrow::Cow<'static, str>);
+pub struct DeviceScheme {
+    pub(super) kind: DeviceKind,
+    pub(super) mandatory_routes: &'static [&'static str],
+    pub(super) allowed_hazards: &'static [Hazard],
+}
 
-impl DeviceKindId {
-    /// Creates a new [`DeviceKindId`] from a static string.
+impl DeviceScheme {
+    /// Creates a base custom scheme with a device kind only.
     #[must_use]
-    pub const fn new(name: &'static str) -> Self {
-        Self(alloc::borrow::Cow::Borrowed(name))
+    #[inline]
+    pub fn base_custom_scheme(custom_kind: &'static str) -> Self {
+        Self::new(DeviceKind::Custom(Cow::Borrowed(custom_kind)), &[], &[])
     }
 
-    /// Returns the device kind name.
+    /// Creates a custom scheme with device kind and mandatory routes.
     #[must_use]
-    pub fn name(&self) -> &str {
-        &self.0
+    #[inline]
+    pub fn custom_scheme_with_mandatory_routes(
+        custom_kind: &'static str,
+        mandatory_routes: &'static [&'static str],
+    ) -> Self {
+        Self::new(
+            DeviceKind::Custom(Cow::Borrowed(custom_kind)),
+            mandatory_routes,
+            &[],
+        )
     }
 
-    /// Checks if this ID matches a known [`DeviceKind`] value.
+    /// Creates a custom scheme with device kind and allowed hazards.
     #[must_use]
-    pub fn matches<K: DeviceKindTrait>(&self, kind: &K) -> bool {
-        self.0 == kind.name()
+    #[inline]
+    pub fn custom_scheme_with_allowed_hazards(
+        custom_kind: &'static str,
+        allowed_hazards: &'static [Hazard],
+    ) -> Self {
+        Self::new(
+            DeviceKind::Custom(Cow::Borrowed(custom_kind)),
+            &[],
+            allowed_hazards,
+        )
+    }
+
+    /// Creates a complete custom scheme.
+    #[must_use]
+    #[inline]
+    pub fn custom_scheme(
+        custom_kind: &'static str,
+        mandatory_routes: &'static [&'static str],
+        allowed_hazards: &'static [Hazard],
+    ) -> Self {
+        Self::new(
+            DeviceKind::Custom(Cow::Borrowed(custom_kind)),
+            mandatory_routes,
+            allowed_hazards,
+        )
+    }
+
+    /// Returns an immutable reference to [`DeviceKind`].
+    #[must_use]
+    pub const fn kind(&self) -> &DeviceKind {
+        &self.kind
+    }
+
+    /// Returns an immutable reference to mandatory routes.
+    #[must_use]
+    pub const fn mandatory_routes(&self) -> &'static [&'static str] {
+        self.mandatory_routes
+    }
+
+    /// Returns an immutable reference to allowed hazards.
+    #[must_use]
+    pub const fn allowed_hazards(&self) -> &'static [Hazard] {
+        self.allowed_hazards
+    }
+
+    const fn new(
+        kind: DeviceKind,
+        mandatory_routes: &'static [&'static str],
+        allowed_hazards: &'static [Hazard],
+    ) -> Self {
+        Self {
+            kind,
+            mandatory_routes,
+            allowed_hazards,
+        }
     }
 }
 
-impl core::fmt::Display for DeviceKindId {
-    fn fmt(&self, f: &mut core::fmt::Formatter<'_>) -> core::fmt::Result {
-        write!(f, "{}", self.0)
+/// A series of device schemes.
+pub mod schemes {
+    use crate::hazards::Hazard;
+
+    use super::{DeviceKind, DeviceScheme};
+
+    /// A light scheme.
+    pub const LIGHT_SCHEME: DeviceScheme = DeviceScheme::new(
+        DeviceKind::Light,
+        &["/on", "/off"],
+        &[
+            Hazard::FireHazard,
+            Hazard::ElectricEnergyConsumption,
+            Hazard::LogEnergyConsumption,
+            Hazard::LogUsageTime,
+            Hazard::PowerOutage,
+            Hazard::PowerSurge,
+        ],
+    );
+}
+
+/// An owned device scheme.
+///
+/// A scheme consists of:
+///
+/// - A device kind
+/// - A list of all mandatory route names
+/// - A list of hazards allowed for the device
+#[derive(Debug, Clone, PartialEq, Serialize, serde::Deserialize)]
+#[cfg(feature = "deserialize")]
+pub struct DeviceSchemeOwned {
+    kind: DeviceKind,
+    mandatory_routes: alloc::vec::Vec<alloc::string::String>,
+    allowed_hazards: alloc::vec::Vec<Hazard>,
+}
+
+#[cfg(feature = "deserialize")]
+impl From<DeviceScheme> for DeviceSchemeOwned {
+    fn from(device_scheme: DeviceScheme) -> Self {
+        Self {
+            kind: device_scheme.kind,
+            mandatory_routes: device_scheme
+                .mandatory_routes
+                .iter()
+                .copied()
+                .map(alloc::string::String::from)
+                .collect(),
+            allowed_hazards: device_scheme.allowed_hazards.to_vec(),
+        }
     }
 }
 
-impl<K: DeviceKindTrait> From<&K> for DeviceKindId {
-    fn from(kind: &K) -> Self {
-        Self::new(kind.name())
+#[cfg(feature = "deserialize")]
+impl DeviceSchemeOwned {
+    /// Returns an immutable reference to [`DeviceKind`].
+    #[must_use]
+    pub const fn kind(&self) -> &DeviceKind {
+        &self.kind
+    }
+
+    /// Returns an immutable reference to mandatory routes.
+    #[must_use]
+    #[inline]
+    pub fn mandatory_routes(&self) -> &[alloc::string::String] {
+        &self.mandatory_routes
+    }
+
+    /// Returns an immutable reference to allowed hazards.
+    #[must_use]
+    #[inline]
+    pub fn allowed_hazards(&self) -> &[Hazard] {
+        &self.allowed_hazards
     }
 }
 
@@ -119,7 +213,7 @@ pub enum DeviceEnvironment {
 }
 
 /// Device metrics.
-#[derive(Debug, PartialEq, Clone, Serialize)]
+#[derive(Debug, Clone, PartialEq, Serialize)]
 #[cfg_attr(feature = "deserialize", derive(serde::Deserialize))]
 pub struct DeviceMetrics {
     /// Energy metrics.
@@ -171,15 +265,19 @@ impl DeviceMetrics {
 }
 
 /// Device data.
-#[derive(Debug, PartialEq, Serialize)]
+#[derive(Debug, Clone, PartialEq, Serialize)]
 #[cfg_attr(feature = "deserialize", derive(serde::Deserialize))]
 pub struct DeviceData {
-    /// Device kind.
-    pub kind: DeviceKindId,
+    /// Device scheme.
+    #[cfg(not(feature = "deserialize"))]
+    pub scheme: DeviceScheme,
+    /// Device scheme.
+    #[cfg(feature = "deserialize")]
+    pub scheme: DeviceSchemeOwned,
     /// Device environment.
     pub environment: DeviceEnvironment,
     /// Device description.
-    pub description: Option<alloc::borrow::Cow<'static, str>>,
+    pub description: Option<Cow<'static, str>>,
     /// Wi-Fi MAC address.
     #[serde(skip_serializing_if = "Option::is_none")]
     pub wifi_mac: Option<[u8; 6]>,
@@ -190,9 +288,12 @@ pub struct DeviceData {
 
 impl DeviceData {
     #[inline]
-    fn new(kind: DeviceKindId) -> Self {
+    fn new(scheme: DeviceScheme) -> Self {
         Self {
-            kind,
+            #[cfg(not(feature = "deserialize"))]
+            scheme,
+            #[cfg(feature = "deserialize")]
+            scheme: DeviceSchemeOwned::from(scheme),
             environment: DeviceEnvironment::Embedded,
             description: None,
             wifi_mac: None,
@@ -202,18 +303,16 @@ impl DeviceData {
 }
 
 /// Device description.
-#[derive(Debug, PartialEq, Serialize)]
+#[derive(Debug, Clone, PartialEq, Serialize)]
 #[cfg_attr(feature = "deserialize", derive(serde::Deserialize))]
 pub struct DeviceDescription {
     /// Device data.
     #[serde(flatten)]
     pub data: DeviceData,
     /// Device main route.
-    pub main_route: alloc::borrow::Cow<'static, str>,
+    pub main_route: Cow<'static, str>,
     /// All device route configurations.
     pub route_configs: RouteConfigs,
-    /// Number of mandatory routes.
-    pub mandatory_routes: u8,
     /// Events description.
     #[serde(skip_serializing_if = "Option::is_none")]
     pub events_description: Option<EventsDescription>,
@@ -224,16 +323,14 @@ impl DeviceDescription {
     #[inline]
     #[must_use]
     pub fn new(
-        kind: DeviceKindId,
-        main_route: impl Into<alloc::borrow::Cow<'static, str>>,
+        scheme: DeviceScheme,
+        main_route: &'static str,
         route_configs: RouteConfigs,
-        mandatory_routes: u8,
     ) -> Self {
         Self {
-            data: DeviceData::new(kind),
-            main_route: main_route.into(),
+            data: DeviceData::new(scheme),
+            main_route: Cow::Borrowed(main_route),
             route_configs,
-            mandatory_routes,
             events_description: None,
         }
     }
@@ -262,11 +359,8 @@ impl DeviceDescription {
     /// Sets the device text description.
     #[inline]
     #[must_use]
-    pub fn text_description(
-        mut self,
-        description: impl Into<alloc::borrow::Cow<'static, str>>,
-    ) -> Self {
-        self.data.description = Some(description.into());
+    pub fn text_description(mut self, description: &'static str) -> Self {
+        self.data.description = Some(Cow::Borrowed(description));
         self
     }
 
@@ -280,8 +374,107 @@ impl DeviceDescription {
 }
 
 #[cfg(test)]
+#[cfg(not(feature = "deserialize"))]
+mod tests {
+    use alloc::borrow::Cow;
+
+    use crate::hazards::Hazard;
+
+    use super::{DeviceKind, DeviceScheme, schemes::LIGHT_SCHEME};
+
+    #[test]
+    fn test_default_schemes() {
+        assert_eq!(
+            LIGHT_SCHEME,
+            DeviceScheme::new(
+                DeviceKind::Light,
+                &["/on", "/off"],
+                &[
+                    Hazard::FireHazard,
+                    Hazard::ElectricEnergyConsumption,
+                    Hazard::LogEnergyConsumption,
+                    Hazard::LogUsageTime,
+                    Hazard::PowerOutage,
+                    Hazard::PowerSurge,
+                ]
+            )
+        );
+    }
+
+    #[test]
+    fn test_base_custom_scheme() {
+        assert_eq!(
+            DeviceScheme::base_custom_scheme("Thermostat"),
+            DeviceScheme::new(DeviceKind::Custom(Cow::Borrowed("Thermostat")), &[], &[])
+        );
+    }
+
+    #[test]
+    fn test_custom_scheme_with_mandatory_routes() {
+        assert_eq!(
+            DeviceScheme::custom_scheme_with_mandatory_routes("Thermostat", &["/on", "/off"]),
+            DeviceScheme::new(
+                DeviceKind::Custom(Cow::Borrowed("Thermostat")),
+                &["/on", "/off"],
+                &[]
+            )
+        );
+    }
+
+    #[test]
+    fn test_custom_scheme_with_allowed_hazards() {
+        assert_eq!(
+            DeviceScheme::custom_scheme_with_allowed_hazards(
+                "Thermostat",
+                &[Hazard::ElectricEnergyConsumption]
+            ),
+            DeviceScheme::new(
+                DeviceKind::Custom(Cow::Borrowed("Thermostat")),
+                &[],
+                &[Hazard::ElectricEnergyConsumption]
+            )
+        );
+    }
+
+    #[test]
+    fn test_custom_scheme() {
+        assert_eq!(
+            DeviceScheme::custom_scheme(
+                "Thermostat",
+                &["/on", "/off"],
+                &[Hazard::ElectricEnergyConsumption]
+            ),
+            DeviceScheme::new(
+                DeviceKind::Custom(Cow::Borrowed("Thermostat")),
+                &["/on", "/off"],
+                &[Hazard::ElectricEnergyConsumption]
+            )
+        );
+    }
+
+    #[test]
+    fn test_getter_methods() {
+        assert_eq!(LIGHT_SCHEME.kind, DeviceKind::Light);
+        assert_eq!(LIGHT_SCHEME.mandatory_routes(), &["/on", "/off"]);
+        assert_eq!(
+            LIGHT_SCHEME.allowed_hazards(),
+            &[
+                Hazard::FireHazard,
+                Hazard::ElectricEnergyConsumption,
+                Hazard::LogEnergyConsumption,
+                Hazard::LogUsageTime,
+                Hazard::PowerOutage,
+                Hazard::PowerSurge,
+            ]
+        );
+    }
+}
+
+#[cfg(test)]
 #[cfg(feature = "deserialize")]
 mod tests {
+    use alloc::borrow::Cow;
+
     use crate::route::{Route, RouteConfigs};
 
     use crate::economy::{Cost, CostTimespan, Costs, Economy, Roi, Rois};
@@ -289,9 +482,12 @@ mod tests {
         CarbonFootprint, CarbonFootprints, Energy, EnergyClass, EnergyEfficiencies,
         EnergyEfficiency, WaterUseEfficiency,
     };
+
     use crate::{deserialize, serialize};
 
-    use super::{DeviceDescription, DeviceEnvironment, DeviceKind, DeviceKindId, DeviceMetrics};
+    use super::{
+        DeviceDescription, DeviceEnvironment, DeviceKind, DeviceMetrics, schemes::LIGHT_SCHEME,
+    };
 
     fn energy() -> Energy {
         let energy_efficiencies =
@@ -326,7 +522,10 @@ mod tests {
 
     #[test]
     fn test_device_kind() {
-        for device_kind in &[DeviceKind::Unknown, DeviceKind::Light] {
+        for device_kind in &[
+            DeviceKind::Light,
+            DeviceKind::Custom(Cow::Borrowed("Thermostat")),
+        ] {
             assert_eq!(
                 deserialize::<DeviceKind>(serialize(device_kind)),
                 *device_kind
@@ -346,30 +545,25 @@ mod tests {
 
     #[test]
     fn test_device_metrics() {
-        let device_metrics = DeviceMetrics::with_energy(energy()).add_economy(economy());
+        let energy_economy_metrics = DeviceMetrics::with_energy(energy()).add_economy(economy());
 
         assert_eq!(
-            deserialize::<DeviceMetrics>(serialize(&device_metrics)),
-            device_metrics
+            deserialize::<DeviceMetrics>(serialize(&energy_economy_metrics)),
+            energy_economy_metrics
         );
 
-        let device_metrics = DeviceMetrics::with_economy(economy()).add_energy(energy());
+        let economy_energy_metrics = DeviceMetrics::with_economy(economy()).add_energy(energy());
 
         assert_eq!(
-            deserialize::<DeviceMetrics>(serialize(&device_metrics)),
-            device_metrics
+            deserialize::<DeviceMetrics>(serialize(&economy_energy_metrics)),
+            economy_energy_metrics
         );
     }
 
     #[test]
     fn test_device_description() {
-        let device_description = DeviceDescription::new(
-            DeviceKindId::from(&DeviceKind::Light),
-            "/light",
-            routes(),
-            2,
-        )
-        .text_description("A light device.");
+        let device_description = DeviceDescription::new(LIGHT_SCHEME, "/light", routes())
+            .text_description("A light device.");
 
         assert_eq!(
             deserialize::<DeviceDescription>(serialize(&device_description)),
