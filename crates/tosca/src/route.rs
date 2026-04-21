@@ -69,8 +69,8 @@ impl PartialEq for RouteData {
 impl RouteData {
     fn new(route: Route) -> Self {
         Self {
-            name: route.name.into(),
-            path: route.path.into(),
+            name: Cow::Borrowed(route.name),
+            path: Cow::Borrowed(route.path),
             description: route.description.map(core::convert::Into::into),
             hazards: route.hazards,
             parameters: route.parameters.serialize_data(),
