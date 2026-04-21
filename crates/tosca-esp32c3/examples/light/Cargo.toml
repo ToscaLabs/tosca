@@ -1,6 +1,6 @@
 [package]
 name = "light"
-version = "0.1.0"
+version = "0.2.0"
 edition = "2024"
 authors = ["Michele Valsesia <michele.valsesia@toscalabs.org>"]
 description = "A simple stateless light for an ESP32-C3 board."
@@ -9,8 +9,8 @@ publish = false
 
 [dependencies]
 # Tosca crates
-tosca = { path = "../../../tosca", version = "0.1.0", default-features = false }
-tosca-esp32c3 = { path = "../../", version = "0.1.0" }
+tosca = { path = "../../../tosca", version = "0.2.0", default-features = false }
+tosca-esp32c3 = { path = "../../", version = "0.2.0" }
 
 # Embassy framework
 embassy-executor = { version = "0.9.1", features = ["log"] }

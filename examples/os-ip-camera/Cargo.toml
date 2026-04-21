@@ -1,6 +1,6 @@
 [package]
 name = "os-ip-camera"
-version = "0.1.0"
+version = "0.2.0"
 edition = "2024"
 authors = ["Michele Valsesia <michele.valsesia@toscalabs.org>"]
 description = "An ip-camera implemented with the tosca-os crate."
