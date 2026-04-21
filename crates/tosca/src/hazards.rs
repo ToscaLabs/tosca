@@ -448,6 +448,8 @@ impl Category {
 #[cfg(test)]
 #[cfg(feature = "deserialize")]
 mod tests {
+    use serde_json::json;
+
     use crate::{deserialize, serialize};
 
     use super::{ALL_CATEGORIES, ALL_HAZARDS, Category, Hazard};
@@ -462,7 +464,7 @@ mod tests {
             assert_eq!(Hazard::from_id(hazard.id()), Some(*hazard));
             assert_eq!(
                 serialize(hazard.data()),
-                serde_json::json!({
+                json!({
                         "id": hazard.id(),
                         "name": hazard.name(),
                         "description": hazard.description(),
