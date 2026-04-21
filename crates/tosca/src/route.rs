@@ -13,7 +13,6 @@ use crate::parameters::{Parameters, ParametersData};
 use crate::response::ResponseKind;
 
 use crate::macros::set;
-use crate::mandatory_route;
 
 /// The kind of `REST` request.
 #[derive(Debug, Clone, Copy, PartialEq, Eq, Hash, Serialize)]
@@ -327,8 +326,6 @@ set! {
   pub struct Routes(IndexSet<Route, DefaultHashBuilder>);
 }
 
-mandatory_route!(LightOnRoute, "/on", methods: [post, put]);
-mandatory_route!(LightOffRoute, "/off", methods: [post, put]);
 
 #[cfg(test)]
 #[cfg(feature = "deserialize")]
