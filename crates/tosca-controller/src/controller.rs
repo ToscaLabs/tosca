@@ -349,9 +349,9 @@ mod tests {
     use crate::policy::Policy;
     use crate::response::Response;
 
-    use crate::device::tests::{create_light, create_unknown};
+    use crate::device::tests::{create_custom_device, create_light};
     use crate::discovery::tests::configure_discovery;
-    use crate::tests::{Brightness, check_function_with_device};
+    use crate::tests::{Brightness, light_with_toggle, run_one_device};
 
     use super::{Controller, DeviceSender, RequestSender, sender_error};
 
@@ -374,7 +374,7 @@ mod tests {
 
     #[test]
     fn controller_from_devices() {
-        let devices = Devices::from_devices(vec![create_light(), create_unknown()]);
+        let devices = Devices::from_devices(vec![create_light(), create_custom_device()]);
 
         let controller = Controller::from_devices(configure_discovery(), devices);
 
@@ -382,7 +382,7 @@ mod tests {
             controller,
             Controller {
                 discovery: configure_discovery(),
-                devices: Devices::from_devices(vec![create_light(), create_unknown()]),
+                devices: Devices::from_devices(vec![create_light(), create_custom_device()]),
                 privacy_policy: Policy::init(),
             }
         );
@@ -573,7 +573,7 @@ mod tests {
     }
 
     #[inline]
-    async fn run_controller_function<F, Fut>(name: &str, function: F)
+    async fn controller_test<F, Fut>(name: &str, function: F)
     where
         F: FnOnce() -> Fut,
         Fut: Future<Output = ()>,
@@ -584,9 +584,14 @@ mod tests {
                 name
             );
         } else {
-            check_function_with_device(|| async {
-                function().await;
-            })
+            run_one_device(
+                |close_rx| async {
+                    light_with_toggle(close_rx).await;
+                },
+                || async {
+                    function().await;
+                },
+            )
             .await;
         }
     }
@@ -594,7 +599,7 @@ mod tests {
     #[tokio::test(flavor = "multi_thread", worker_threads = 2)]
     #[serial]
     async fn test_without_policy_controller() {
-        run_controller_function("controller_without_policy", || async {
+        controller_test("controller_without_policy", || async {
             controller_without_policy().await;
         })
         .await;
@@ -603,7 +608,7 @@ mod tests {
     #[tokio::test(flavor = "multi_thread", worker_threads = 2)]
     #[serial]
     async fn test_with_policy_controller() {
-        run_controller_function("controller_with_policy", || async {
+        controller_test("controller_with_policy", || async {
             controller_with_policy().await;
         })
         .await;

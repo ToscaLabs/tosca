@@ -6,7 +6,7 @@ use serde::Serialize;
 use tokio::sync::broadcast::{self, Receiver};
 use tokio::task::JoinHandle;
 
-use tosca::device::{DeviceEnvironment, DeviceKindId};
+use tosca::device::{DeviceEnvironment, DeviceSchemeOwned};
 use tosca::events::{Events as ToscaEvents, EventsDescription};
 use tosca::route::RouteConfigs;
 
@@ -84,13 +84,13 @@ impl NetworkInformation {
     }
 }
 
-/// Device description.
+/// Device metadata.
 ///
 /// All properties defining a device.
 #[derive(Debug, PartialEq, Serialize)]
-pub struct Description {
-    /// Device kind.
-    pub kind: DeviceKindId,
+pub struct Metadata {
+    /// Device scheme.
+    pub scheme: DeviceSchemeOwned,
     /// Device environment.
     pub environment: DeviceEnvironment,
     /// Device main route.
@@ -100,16 +100,16 @@ pub struct Description {
     pub description: Option<String>,
 }
 
-impl Description {
-    /// Creates a [`Description`].
+impl Metadata {
+    /// Creates a [`Metadata`].
     #[must_use]
     pub const fn new(
-        kind: DeviceKindId,
+        scheme: DeviceSchemeOwned,
         environment: DeviceEnvironment,
         main_route: String,
     ) -> Self {
         Self {
-            kind,
+            scheme,
             environment,
             main_route,
             #[cfg(feature = "metadata")]
@@ -132,8 +132,8 @@ impl Description {
 pub struct Device {
     // Information needed to contact a device in a network.
     network_info: NetworkInformation,
-    // All data needed to describe a device.
-    description: Description,
+    // All metadata needed to describe a device.
+    metadata: Metadata,
     // All device requests.
     requests: HashMap<String, Request>,
     // All device events.
@@ -149,13 +149,13 @@ pub struct Device {
 impl PartialEq for Device {
     fn eq(&self, other: &Self) -> bool {
         self.network_info == other.network_info
-            && self.description == other.description
+            && self.metadata == other.metadata
             && self.requests == other.requests
     }
 }
 
 impl Device {
-    /// Creates a [`Device`] from [`NetworkInformation`], [`Description`],
+    /// Creates a [`Device`] from [`NetworkInformation`], [`Matadata`],
     /// and [`RouteConfigs`].
     ///
     /// This method can be useful when creating a device from data stored
@@ -163,14 +163,14 @@ impl Device {
     #[must_use]
     pub fn new(
         network_info: NetworkInformation,
-        description: Description,
+        metadata: Metadata,
         route_configs: RouteConfigs,
     ) -> Self {
         let requests = create_requests(
             route_configs,
             &network_info.last_reachable_address,
-            &description.main_route,
-            description.environment,
+            &metadata.main_route,
+            metadata.environment,
         );
 
         // TODO: Check if the last reachable address works or it is better to
@@ -179,7 +179,7 @@ impl Device {
 
         Self {
             network_info,
-            description,
+            metadata,
             requests,
             events: None,
             event_handle: None,
@@ -192,10 +192,10 @@ impl Device {
         &self.network_info
     }
 
-    /// Returns an immutable reference to [`Description`].
+    /// Returns an immutable reference to [`Metadata`].
     #[must_use]
-    pub const fn description(&self) -> &Description {
-        &self.description
+    pub const fn metadata(&self) -> &Metadata {
+        &self.metadata
     }
 
     /// Returns an immutable reference to [`EventsDescription`].
@@ -300,13 +300,13 @@ impl Device {
 
     pub(crate) const fn init(
         network_info: NetworkInformation,
-        description: Description,
+        metadata: Metadata,
         requests: HashMap<String, Request>,
         events: Option<Events>,
     ) -> Self {
         Self {
             network_info,
-            description,
+            metadata,
             requests,
             events,
             event_handle: None,
@@ -407,12 +407,14 @@ impl Devices {
 pub(crate) mod tests {
     use std::collections::{HashMap, HashSet};
 
-    use tosca::device::{DeviceEnvironment, DeviceKindId};
+    use tosca::device::{
+        DeviceEnvironment, DeviceScheme, DeviceSchemeOwned, schemes::LIGHT_SCHEME,
+    };
     use tosca::hazards::{Hazard, Hazards};
     use tosca::parameters::Parameters;
     use tosca::route::{Route, RouteConfigs};
 
-    use super::{Description, Device, Devices, NetworkInformation, build_device_address};
+    use super::{Device, Devices, Metadata, NetworkInformation, build_device_address};
 
     fn create_network_info(address: &str, port: u16) -> NetworkInformation {
         let ip_address = address.parse().unwrap();
@@ -437,21 +439,25 @@ pub(crate) mod tests {
         .ethernet_mac([0x06, 0xAA, 0xBB, 0xCC, 0xDD, 0xEE])
     }
 
-    fn create_description(
-        device_kind: DeviceKindId,
+    fn define_device_metadata(
+        device_scheme: DeviceScheme,
         main_route: &str,
         #[cfg(feature = "metadata")] description: Option<&str>,
-    ) -> Description {
-        let desc = Description::new(device_kind, DeviceEnvironment::Os, main_route.into());
+    ) -> Metadata {
+        let meta = Metadata::new(
+            DeviceSchemeOwned::from(device_scheme),
+            DeviceEnvironment::Os,
+            main_route.into(),
+        );
         #[cfg(feature = "metadata")]
-        let desc = desc.description(description.map(std::convert::Into::into));
-        desc
+        let meta = meta.description(description.map(std::convert::Into::into));
+        meta
     }
 
     pub(crate) fn create_light() -> Device {
         let network_info = create_network_info("192.168.1.174", 5000);
-        let description = create_description(
-            DeviceKindId::new("Light"),
+        let metadata = define_device_metadata(
+            LIGHT_SCHEME,
             "light/",
             #[cfg(feature = "metadata")]
             Some("A smart light"),
@@ -479,13 +485,13 @@ pub(crate) mod tests {
             .insert(light_off_route.serialize_data())
             .insert(toggle_route.serialize_data());
 
-        Device::new(network_info, description, route_configs)
+        Device::new(network_info, metadata, route_configs)
     }
 
-    pub(crate) fn create_unknown() -> Device {
+    pub(crate) fn create_custom_device() -> Device {
         let network_info = create_network_info("192.168.1.176", 5500);
-        let description = create_description(
-            DeviceKindId::new("Unknown"),
+        let description = define_device_metadata(
+            DeviceScheme::base_custom_scheme("Thermostat"),
             "ip-camera/",
             #[cfg(feature = "metadata")]
             None,
@@ -518,7 +524,7 @@ pub(crate) mod tests {
 
     #[test]
     fn check_devices() {
-        let devices_vector = vec![create_light(), create_unknown()];
+        let devices_vector = vec![create_light(), create_custom_device()];
 
         let devices_from_vector = Devices::from_devices(devices_vector);
 
@@ -528,7 +534,7 @@ pub(crate) mod tests {
         assert!(devices.is_empty());
 
         devices.add(create_light());
-        devices.add(create_unknown());
+        devices.add(create_custom_device());
 
         // Compare devices created with two different methods.
         assert_eq!(devices_from_vector, devices);
@@ -543,6 +549,6 @@ pub(crate) mod tests {
         assert_eq!(devices.get(1000), None);
 
         // Get a reference to a device. The order is important.
-        assert_eq!(devices.get(1), Some(&create_unknown()));
+        assert_eq!(devices.get(1), Some(&create_custom_device()));
     }
 }

@@ -2,7 +2,7 @@ use std::borrow::Cow;
 use std::net::IpAddr;
 use std::time::Duration;
 
-use tosca::device::DeviceDescription;
+use tosca::device::{DeviceDescription, DeviceKind};
 
 use flume::RecvTimeoutError;
 
@@ -12,7 +12,7 @@ use tokio::time::sleep;
 
 use tracing::{info, warn};
 
-use crate::device::{Description, Device, Devices, NetworkInformation, build_device_address};
+use crate::device::{Device, Devices, Metadata, NetworkInformation, build_device_address};
 use crate::error::Error;
 use crate::events::Events;
 use crate::request::create_requests;
@@ -61,6 +61,7 @@ pub struct Discovery {
     disable_ipv6: bool,
     disable_ip: Option<IpAddr>,
     disable_network_interface: Option<&'static str>,
+    strict_mode: bool,
 }
 
 impl Discovery {
@@ -76,6 +77,7 @@ impl Discovery {
             disable_ipv6: false,
             disable_ip: None,
             disable_network_interface: None,
+            strict_mode: false,
         }
     }
 
@@ -137,11 +139,25 @@ impl Discovery {
         self
     }
 
+    /// Enables strict mode on the controller.
+    ///
+    /// In strict mode, only devices with a predefined
+    /// [`tosca::scheme::DeviceScheme`] are accepted.
+    ///
+    /// When this mode is active, **all** devices with a custom structure
+    /// are discarded, keeping in memory only devices that adhere to a
+    /// determined [`tosca::device::DeviceScheme`].
+    #[must_use]
+    pub const fn strict_mode(mut self) -> Self {
+        self.strict_mode = true;
+        self
+    }
+
     pub(crate) async fn discover(&self) -> Result<Devices, Error> {
         // Discover devices.
         let discovery_info = self.discover_devices().await?;
 
-        Self::obtain_devices_data(discovery_info).await
+        Self::obtain_devices_data(discovery_info, self.strict_mode).await
     }
 
     async fn discover_devices(&self) -> Result<Vec<ResolvedService>, Error> {
@@ -223,6 +239,7 @@ impl Discovery {
 
     async fn obtain_devices_data(
         discovery_service: Vec<ResolvedService>,
+        strict_mode: bool,
     ) -> Result<Devices, Error> {
         // Devices collection.
         let mut devices = Devices::new();
@@ -263,6 +280,15 @@ impl Discovery {
                             continue;
                         }
 
+                        if let DeviceKind::Custom(kind) = device_desc.data.scheme.kind()
+                            && strict_mode
+                        {
+                            warn!(
+                                "Strict mode is enabled and the device is a custom `{kind}`, therefore discarding it"
+                            );
+                            continue;
+                        }
+
                         let requests = create_requests(
                             device_desc.route_configs,
                             &complete_address,
@@ -270,8 +296,8 @@ impl Discovery {
                             device_desc.data.environment,
                         );
 
-                        let description = Description::new(
-                            device_desc.data.kind,
+                        let description = Metadata::new(
+                            device_desc.data.scheme,
                             device_desc.data.environment,
                             device_desc.main_route.into_owned(),
                         );
@@ -363,7 +389,8 @@ pub(crate) mod tests {
     use serial_test::serial;
 
     use crate::tests::{
-        DOMAIN, check_function_with_device, check_function_with_two_devices, compare_device_data,
+        DOMAIN, analyze_light_data, custom_device, light_with_toggle, light_without_toggle,
+        run_one_device, run_two_devices,
     };
 
     use super::Discovery;
@@ -375,20 +402,28 @@ pub(crate) mod tests {
             .disable_network_interface("docker0")
     }
 
-    async fn discovery_comparison(devices_len: usize) {
-        let devices = configure_discovery().discover().await.unwrap();
+    #[inline]
+    async fn run_discovery(strict_mode: bool, number_of_devices: usize) {
+        let devices = if strict_mode {
+            configure_discovery().strict_mode()
+        } else {
+            configure_discovery()
+        }
+        .discover()
+        .await
+        .unwrap();
 
         // Count devices.
-        assert_eq!(devices.len(), devices_len);
+        assert_eq!(devices.len(), number_of_devices);
 
-        // Iterate over devices and compare data.
+        // Analyze light data.
         for device in devices {
-            compare_device_data(&device);
+            analyze_light_data(&device);
         }
     }
 
     #[inline]
-    async fn run_discovery_function<F, Fut>(name: &str, function: F)
+    async fn discovery_test<F, Fut>(name: &str, function: F)
     where
         F: FnOnce() -> Fut,
         Fut: Future<Output = ()>,
@@ -406,10 +441,15 @@ pub(crate) mod tests {
     #[tokio::test(flavor = "multi_thread", worker_threads = 2)]
     #[serial]
     async fn test_single_device_discovery() {
-        run_discovery_function("discovery_with_single_device", || async {
-            check_function_with_device(|| async {
-                discovery_comparison(1).await;
-            })
+        discovery_test("discovery_with_single_device", || async {
+            run_one_device(
+                |close_rx| async {
+                    light_with_toggle(close_rx).await;
+                },
+                || async {
+                    run_discovery(false, 1).await;
+                },
+            )
             .await;
         })
         .await;
@@ -418,10 +458,38 @@ pub(crate) mod tests {
     #[tokio::test(flavor = "multi_thread", worker_threads = 3)]
     #[serial]
     async fn test_more_devices_discovery() {
-        run_discovery_function("discovery_with_more_devices", || async {
-            check_function_with_two_devices(|| async {
-                discovery_comparison(2).await;
-            })
+        discovery_test("discovery_with_more_devices", || async {
+            run_two_devices(
+                |close_rx| async {
+                    light_with_toggle(close_rx).await;
+                },
+                |close_rx| async {
+                    light_without_toggle(close_rx).await;
+                },
+                || async {
+                    run_discovery(false, 2).await;
+                },
+            )
+            .await;
+        })
+        .await;
+    }
+
+    #[tokio::test(flavor = "multi_thread", worker_threads = 3)]
+    #[serial]
+    async fn test_more_devices_strict_discovery() {
+        discovery_test("strict_discovery_with_more_devices", || async {
+            run_two_devices(
+                |close_rx| async {
+                    light_with_toggle(close_rx).await;
+                },
+                |close_rx| async {
+                    custom_device(close_rx).await;
+                },
+                || async {
+                    run_discovery(true, 1).await;
+                },
+            )
             .await;
         })
         .await;
