@@ -7,6 +7,8 @@ pub enum ErrorKind {
     EmptyEventsManager,
     /// `DNS` error.
     Dns,
+    /// Mandatory routes are missing or invalid.
+    MandatoryRoutes,
     /// `mDNS` error.
     MDns,
     /// `MQTT` error.
@@ -30,6 +32,7 @@ impl ErrorKind {
         match self {
             Self::EmptyEventsManager => "Empty events manager",
             Self::Dns => "DNS",
+            Self::MandatoryRoutes => "Mandatory Routes",
             Self::MDns => "mDNS",
             Self::Mqtt => "MQTT",
             Self::Server => "Server",

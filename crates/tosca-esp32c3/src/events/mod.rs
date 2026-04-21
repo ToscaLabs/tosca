@@ -28,7 +28,7 @@ use tosca::events::{
     BrokerData as ToscaBrokerData, Event, Events, EventsDescription, PeriodicEvent, Topic,
 };
 
-use crate::device::Device;
+use crate::device::DeviceVerified;
 use crate::error::{Error, ErrorKind};
 use crate::state::ValueFromRef;
 use crate::wifi::WIFI_RECONNECT_DELAY;
@@ -104,7 +104,7 @@ where
     stack: Stack<'static>,
     broker: BrokerData,
     topic: Topic,
-    device: Device<S>,
+    device: DeviceVerified<S>,
 }
 
 impl<S> EventsConfig<S>
@@ -119,7 +119,7 @@ where
         stack: Stack<'static>,
         broker: BrokerData,
         topic_prefix: &str,
-        device: Device<S>,
+        device: DeviceVerified<S>,
     ) -> Self {
         Self {
             spawner,
@@ -128,7 +128,7 @@ where
             topic: TopicBuilder::new()
                 .prefix(topic_prefix)
                 .suffix("events")
-                .mac(device.wifi_mac)
+                .mac(device.0.wifi_mac)
                 .build(),
             device,
         }
@@ -1047,7 +1047,7 @@ where
     /// - The broker domain cannot be resolved via a `DNS` query.
     /// - The task responsible for network transmission cannot interact with
     ///   the scheduler or the network.
-    pub async fn run_network_task(self) -> Result<Device<S>, Error> {
+    pub async fn run_network_task(self) -> Result<DeviceVerified<S>, Error> {
         if self.events.is_empty() {
             return Err(Error::new(
                 ErrorKind::EmptyEventsManager,

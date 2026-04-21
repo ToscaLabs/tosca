@@ -27,7 +27,7 @@ use embedded_io_async::{Read, Write};
 
 use log::{error, info};
 
-use crate::device::{Device, InternalDevice};
+use crate::device::{DeviceVerified, InternalDevice};
 use crate::error::Error;
 use crate::mdns::Mdns;
 use crate::net::get_ip;
@@ -222,7 +222,7 @@ where
 {
     /// Creates a [`Server`] from the given [`Device`].
     #[inline]
-    pub fn new(device: Device<S>, mdns: Mdns) -> Self {
+    pub fn new(device: DeviceVerified<S>, mdns: Mdns) -> Self {
         Self {
             port: DEFAULT_SERVER_PORT,
             handler: ServerHandler::new(device.into_internal()),
