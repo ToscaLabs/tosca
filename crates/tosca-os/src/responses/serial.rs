@@ -12,7 +12,7 @@ use axum::{
 
 use serde::Serialize;
 
-use super::{BaseResponse, MandatoryResponse, error::ErrorResponse};
+use super::{BaseResponse, error::ErrorResponse};
 
 /// A response which transmits a JSON message over the network containing
 /// the data produced during a device operation.
@@ -62,26 +62,6 @@ macro_rules! impl_serial_type_name {
 
 super::all_the_tuples!(impl_serial_type_name);
 
-/// Creates a stateful [`MandatoryResponse`] from a [`SerialResponse`].
-#[inline]
-pub fn mandatory_serial_stateful<H, T, S>(
-    handler: H,
-) -> impl FnOnce(Route, S) -> MandatoryResponse<false>
-where
-    H: Handler<T, S> + private::SerialTypeName<T>,
-    T: 'static,
-    S: Clone + Send + Sync + 'static,
-{
-    move |route: Route, state: S| {
-        MandatoryResponse::new(BaseResponse::stateful(
-            route,
-            ResponseKind::Serial,
-            handler,
-            state,
-        ))
-    }
-}
-
 /// Creates a stateful [`BaseResponse`] from a [`SerialResponse`].
 #[inline]
 pub fn serial_stateful<H, T, S>(route: Route, handler: H) -> impl FnOnce(S) -> BaseResponse
@@ -91,25 +71,6 @@ where
     S: Clone + Send + Sync + 'static,
 {
     move |state: S| BaseResponse::stateful(route, ResponseKind::Serial, handler, state)
-}
-
-/// Creates a stateless [`MandatoryResponse`] from a [`SerialResponse`].
-#[inline]
-pub fn mandatory_serial_stateless<H, T, S>(
-    handler: H,
-) -> impl FnOnce(Route, S) -> MandatoryResponse<false>
-where
-    H: Handler<T, ()> + private::SerialTypeName<T>,
-    T: 'static,
-    S: Clone + Send + Sync + 'static,
-{
-    move |route: Route, _state: S| {
-        MandatoryResponse::new(BaseResponse::stateless(
-            route,
-            ResponseKind::Serial,
-            handler,
-        ))
-    }
 }
 
 /// Creates a stateless [`BaseResponse`] from a [`SerialResponse`].

@@ -4,20 +4,26 @@ use std::borrow::Cow;
 #[derive(Debug, Copy, Clone)]
 #[cfg_attr(test, derive(PartialEq))]
 pub enum ErrorKind {
-    /// Errors encountered while configuring the discovery service.
-    Service,
+    /// Failed to find a device ID.
+    NoIdFound,
     /// Not found address.
     NotFoundAddress,
+    /// Mandatory routes are missing or invalid.
+    MandatoryRoutes,
     /// Errors encountered while serializing or deserializing a file.
     Serialization,
+    /// Errors encountered while configuring the discovery service.
+    Service,
 }
 
 impl ErrorKind {
     pub(crate) const fn description(self) -> &'static str {
         match self {
-            Self::Service => "Service",
+            Self::NoIdFound => "No Device ID Found",
             Self::NotFoundAddress => "Not Found Address",
+            Self::MandatoryRoutes => "Mandatory Routes",
             Self::Serialization => "Serialization",
+            Self::Service => "Service",
         }
     }
 }
