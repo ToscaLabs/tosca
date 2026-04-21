@@ -2,6 +2,7 @@ use std::borrow::Cow;
 
 /// All possible error kinds.
 #[derive(Debug, Copy, Clone)]
+#[cfg_attr(test, derive(PartialEq))]
 pub enum ErrorKind {
     /// Errors encountered while configuring the discovery service.
     Service,
@@ -28,6 +29,7 @@ impl std::fmt::Display for ErrorKind {
 }
 
 /// A library error.
+#[cfg_attr(test, derive(PartialEq))]
 pub struct Error {
     kind: ErrorKind,
     description: Cow<'static, str>,
