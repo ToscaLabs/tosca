@@ -6,6 +6,7 @@ mod stream;
 use std::net::Ipv4Addr;
 use std::sync::Arc;
 
+use tosca::device::DeviceScheme;
 use tosca::hazards::Hazard;
 use tosca::parameters::Parameters;
 use tosca::route::Route;
@@ -380,14 +381,17 @@ async fn main() -> Result<(), Error> {
         Route::get("View info", "/view-info").description("View current camera data.");
 
     // A camera device which is going to be run on the server.
-    let device = Device::with_state(InternalState::new(camera))
-        .main_route("/camera")
-        .route(stream_stateful(camera_stream_route, show_camera_stream))
-        .route(serial_stateless(view_cameras_route, show_available_cameras))
-        .route(serial_stateful(camera_info_route, show_camera_info));
+    let device = Device::with_state(
+        DeviceScheme::base_custom_scheme("Camera"),
+        InternalState::new(camera),
+    )
+    .main_route("/camera")
+    .route(stream_stateful(camera_stream_route, show_camera_stream))
+    .route(serial_stateless(view_cameras_route, show_available_cameras))
+    .route(serial_stateful(camera_info_route, show_camera_info));
 
     let device = change_format(device);
-    let device = screenshot(device);
+    let device = screenshot(device).build().map_err(Error::Tosca)?;
 
     Server::new(device)
         .address(cli.address)
