@@ -326,6 +326,33 @@ set! {
   pub struct Routes(IndexSet<Route, DefaultHashBuilder>);
 }
 
+#[cfg(test)]
+#[cfg(not(feature = "deserialize"))]
+mod tests {
+    use crate::route::{Hazard, Hazards};
+
+    use super::Route;
+
+    #[test]
+    fn test_allowed_hazards() {
+        const ALLOWED_HAZARDS: &[Hazard] = &[Hazard::FireHazard, Hazard::ElectricEnergyConsumption];
+
+        // Wrong AirPoisoning hazard.
+        let route = Route::get("Route", "/route")
+            .description("A GET route")
+            .with_hazards(
+                Hazards::new()
+                    .insert(Hazard::FireHazard)
+                    .insert(Hazard::AirPoisoning),
+            );
+
+        let expected_hazards = Hazards::init(Hazard::FireHazard);
+        assert_eq!(
+            route.remove_prohibited_hazards(ALLOWED_HAZARDS).hazards,
+            expected_hazards
+        );
+    }
+}
 
 #[cfg(test)]
 #[cfg(feature = "deserialize")]
@@ -489,34 +516,6 @@ mod tests {
                     .serialize_data()
             )),
             expected
-        );
-    }
-}
-
-#[cfg(test)]
-#[cfg(not(feature = "deserialize"))]
-mod tests {
-    use crate::route::{Hazard, Hazards};
-
-    use super::Route;
-
-    #[test]
-    fn test_allowed_hazards() {
-        const ALLOWED_HAZARDS: &[Hazard] = &[Hazard::FireHazard, Hazard::ElectricEnergyConsumption];
-
-        // Wrong AirPoisoning hazard.
-        let route = Route::get("Route", "/route")
-            .description("A GET route")
-            .with_hazards(
-                Hazards::new()
-                    .insert(Hazard::FireHazard)
-                    .insert(Hazard::AirPoisoning),
-            );
-
-        let expected_hazards = Hazards::init(Hazard::FireHazard);
-        assert_eq!(
-            route.remove_prohibited_hazards(ALLOWED_HAZARDS).hazards,
-            expected_hazards
         );
     }
 }
