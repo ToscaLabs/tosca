@@ -2,7 +2,7 @@ use hashbrown::DefaultHashBuilder;
 
 use indexmap::set::{IndexSet, IntoIter, Iter};
 
-use serde::{Deserialize, Serialize};
+use serde::Serialize;
 
 use crate::macros::set;
 
@@ -363,7 +363,8 @@ pub struct HazardData {
 pub const ALL_CATEGORIES: &[Category] = &[Category::Safety, Category::Privacy, Category::Financial];
 
 /// Hazard categories.
-#[derive(Clone, Copy, PartialEq, Eq, Hash, Serialize, Deserialize)]
+#[derive(Clone, Copy, PartialEq, Eq, Hash, Serialize)]
+#[cfg_attr(feature = "deserialize", derive(serde::Deserialize))]
 pub enum Category {
     /// Category including all financial-related hazards.
     Financial,
