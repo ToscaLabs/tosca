@@ -220,7 +220,7 @@ impl<const TX_SIZE: usize, const RX_SIZE: usize, const MAXIMUM_HEADERS_COUNT: us
 where
     S: ValueFromRef + Send + Sync + 'static,
 {
-    /// Creates a [`Server`] from the given [`Device`].
+    /// Creates a [`Server`] from the given [`DeviceVerified`].
     #[inline]
     pub fn new(device: DeviceVerified<S>, mdns: Mdns) -> Self {
         Self {

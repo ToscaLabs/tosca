@@ -1038,7 +1038,7 @@ where
 
     /// Runs the task that transmits events over the network.
     ///
-    /// Returns a [`Device`] updated with [`EventsDescription`] data.
+    /// Returns a [`DeviceVerified`] updated with [`EventsDescription`] data.
     ///
     /// # Errors
     ///
