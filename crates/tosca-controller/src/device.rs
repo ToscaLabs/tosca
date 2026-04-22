@@ -155,7 +155,7 @@ impl PartialEq for Device {
 }
 
 impl Device {
-    /// Creates a [`Device`] from [`NetworkInformation`], [`Matadata`],
+    /// Creates a [`Device`] from [`NetworkInformation`], [`Metadata`],
     /// and [`RouteConfigs`].
     ///
     /// This method can be useful when creating a device from data stored

@@ -142,7 +142,7 @@ impl Discovery {
     /// Enables strict mode on the controller.
     ///
     /// In strict mode, only devices with a predefined
-    /// [`tosca::scheme::DeviceScheme`] are accepted.
+    /// [`tosca::device::DeviceScheme`] are accepted.
     ///
     /// When this mode is active, **all** devices with a custom structure
     /// are discarded, keeping in memory only devices that adhere to a
