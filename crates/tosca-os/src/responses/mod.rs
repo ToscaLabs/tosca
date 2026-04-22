@@ -124,59 +124,16 @@ impl BaseResponse {
         }
     }
 
-    pub(crate) fn finalize_with_hazards(self, allowed_hazards: &[Hazard]) -> (RouteConfig, Router) {
-        (
+    pub(crate) fn finalize(self, allowed_hazards: &[Hazard]) -> (RouteConfig, Router) {
+        let route = if allowed_hazards.is_empty() {
+            self.route.serialize_data()
+        } else {
             self.route
                 .remove_prohibited_hazards(allowed_hazards)
                 .serialize_data()
-                .change_response_kind(self.response_kind),
-            self.router,
-        )
-    }
+        };
 
-    pub(crate) fn finalize(self) -> (RouteConfig, Router) {
-        (
-            self.route
-                .serialize_data()
-                .change_response_kind(self.response_kind),
-            self.router,
-        )
-    }
-}
-
-/// A mandatory [`BaseResponse`].
-///
-/// This structure acts as a wrapper for a [`BaseResponse`], making it
-/// mandatory.
-pub struct MandatoryResponse<const SET: bool> {
-    pub(crate) base_response: BaseResponse,
-}
-
-impl MandatoryResponse<false> {
-    pub(crate) fn empty() -> Self {
-        Self {
-            base_response: BaseResponse {
-                router: Router::new(),
-                route: Route::get("", ""),
-                response_kind: ResponseKind::Ok,
-            },
-        }
-    }
-
-    pub(super) const fn new(base_response: BaseResponse) -> Self {
-        Self { base_response }
-    }
-}
-
-impl MandatoryResponse<true> {
-    /// Returns a reference to the internal [`BaseResponse`].
-    #[must_use]
-    pub const fn base_response_as_ref(&self) -> &BaseResponse {
-        &self.base_response
-    }
-
-    pub(crate) const fn init(base_response: BaseResponse) -> Self {
-        Self { base_response }
+        (route.change_response_kind(self.response_kind), self.router)
     }
 }
 

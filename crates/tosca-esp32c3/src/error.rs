@@ -1,3 +1,5 @@
+use alloc::borrow::Cow;
+
 /// All possible error kinds.
 #[derive(Copy, Clone)]
 pub enum ErrorKind {
@@ -5,6 +7,8 @@ pub enum ErrorKind {
     EmptyEventsManager,
     /// `DNS` error.
     Dns,
+    /// Mandatory routes are missing or invalid.
+    MandatoryRoutes,
     /// `mDNS` error.
     MDns,
     /// `MQTT` error.
@@ -28,6 +32,7 @@ impl ErrorKind {
         match self {
             Self::EmptyEventsManager => "Empty events manager",
             Self::Dns => "DNS",
+            Self::MandatoryRoutes => "Mandatory Routes",
             Self::MDns => "mDNS",
             Self::Mqtt => "MQTT",
             Self::Server => "Server",
@@ -55,7 +60,7 @@ impl core::fmt::Display for ErrorKind {
 /// A library error.
 pub struct Error {
     kind: ErrorKind,
-    info: &'static str,
+    info: Cow<'static, str>,
 }
 
 impl core::fmt::Debug for Error {
@@ -71,8 +76,11 @@ impl core::fmt::Display for Error {
 }
 
 impl Error {
-    pub(crate) fn new(kind: ErrorKind, info: &'static str) -> Self {
-        Self { kind, info }
+    pub(crate) fn new(kind: ErrorKind, info: impl Into<Cow<'static, str>>) -> Self {
+        Self {
+            kind,
+            info: info.into(),
+        }
     }
 
     fn error(&self, f: &mut core::fmt::Formatter<'_>) -> core::fmt::Result {

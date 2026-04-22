@@ -5,7 +5,7 @@ members = ["crates/*", "examples/*"]
 exclude = ["crates/tosca-esp32c3"]
 
 [workspace.package]
-version = "0.1.1"
+version = "0.2.0"
 authors = ["Michele Valsesia <michele.valsesia@toscalabs.org>"]
 description = "A versatile, customizable, and secure IoT framework."
 edition = "2024"
@@ -18,10 +18,10 @@ rust-version = "1.90"
 readme = "README.md"
 
 [workspace.dependencies]
-tosca = { version = "0.1.1", path = "crates/tosca", default-features = false }
-tosca-os = { version = "0.1.1", path = "crates/tosca-os", default-features = false }
-tosca-drivers = { version = "0.1.1", path = "crates/tosca-drivers", default-features = false }
-tosca-controller = { version = "0.1.1", path = "crates/tosca-controller" }
+tosca = { version = "0.2.0", path = "crates/tosca", default-features = false }
+tosca-os = { version = "0.2.0", path = "crates/tosca-os", default-features = false }
+tosca-drivers = { version = "0.2.0", path = "crates/tosca-drivers", default-features = false }
+tosca-controller = { version = "0.2.0", path = "crates/tosca-controller" }
 
 hashbrown = { version = "0.17", default-features = false, features = ["default-hasher"] }
 indexmap = { version = "2.12", default-features = false }

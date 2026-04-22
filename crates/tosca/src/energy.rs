@@ -7,7 +7,7 @@ use serde::Serialize;
 use crate::macros::set;
 
 /// Energy efficiency class.
-#[derive(Debug, PartialEq, Eq, Hash, Clone, Copy, Serialize)]
+#[derive(Debug, Clone, Copy, PartialEq, Eq, Hash, Serialize)]
 #[cfg_attr(feature = "deserialize", derive(serde::Deserialize))]
 pub enum EnergyClass {
     /// A+++
@@ -63,7 +63,7 @@ const fn decimal_percentage(percentage: i8) -> f64 {
 }
 
 /// Energy efficiency.
-#[derive(Debug, PartialEq, Eq, Hash, Clone, Copy, Serialize)]
+#[derive(Debug, Clone, Copy, PartialEq, Eq, Hash, Serialize)]
 #[cfg_attr(feature = "deserialize", derive(serde::Deserialize))]
 pub struct EnergyEfficiency {
     /// Represents the energy efficiency of an [`EnergyClass`] as a percentage.
@@ -124,7 +124,7 @@ set! {
 }
 
 /// Carbon footprint.
-#[derive(Debug, PartialEq, Eq, Hash, Clone, Copy, Serialize)]
+#[derive(Debug, Clone, Copy, PartialEq, Eq, Hash, Serialize)]
 #[cfg_attr(feature = "deserialize", derive(serde::Deserialize))]
 pub struct CarbonFootprint {
     /// Represents the amount of greenhouse gases emitted into the atmosphere
@@ -189,7 +189,7 @@ set! {
 ///
 /// Metrics taken from:
 /// <https://www.frontiersin.org/journals/plant-science/articles/10.3389/fpls.2019.00103/full>
-#[derive(Debug, PartialEq, Clone, Copy, Serialize)]
+#[derive(Debug, Clone, Copy, PartialEq, Serialize)]
 #[cfg_attr(feature = "deserialize", derive(serde::Deserialize))]
 pub struct WaterUseEfficiency {
     /// Gross Primary Productivity (GPP).
@@ -265,7 +265,7 @@ impl WaterUseEfficiency {
 }
 
 /// Energy information of a device.
-#[derive(Debug, PartialEq, Clone, Serialize)]
+#[derive(Debug, Clone, PartialEq, Serialize)]
 #[cfg_attr(feature = "deserialize", derive(serde::Deserialize))]
 pub struct Energy {
     /// Energy efficiencies.

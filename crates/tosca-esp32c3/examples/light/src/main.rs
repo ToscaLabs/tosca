@@ -13,10 +13,10 @@ extern crate alloc;
 
 use core::sync::atomic::{AtomicBool, AtomicU32, Ordering};
 
-use tosca::device::DeviceMetrics;
+use tosca::device::{DeviceMetrics, schemes::LIGHT_SCHEME};
 use tosca::energy::Energy;
 use tosca::parameters::Parameters;
-use tosca::route::{LightOffRoute, LightOnRoute, Route};
+use tosca::route::Route;
 
 use esp_hal::Config;
 use esp_hal::clock::CpuClock;
@@ -32,7 +32,7 @@ use embassy_sync::{blocking_mutex::raw::CriticalSectionRawMutex, signal::Signal}
 use embassy_time::Timer;
 
 use tosca_esp32c3::{
-    devices::light::Light,
+    device::Device,
     mdns::Mdns,
     net::NetworkStack,
     parameters::ParametersPayloads,
@@ -296,13 +296,13 @@ async fn main(spawner: Spawner) {
         .spawn(change_led(led))
         .expect("Impossible to spawn the task to change the led");
 
-    let device = Light::new(&interfaces.ap)
-        .turn_light_on_stateless_serial(
-            LightOnRoute::put("On").description("Turn light on."),
+    let device = Device::new(&interfaces.ap, LIGHT_SCHEME)
+        .stateless_serial_route(
+            Route::put("On", "/on").description("Turn light on."),
             turn_light_on,
         )
-        .turn_light_off_stateless_serial(
-            LightOffRoute::put("Off")
+        .stateless_serial_route(
+            Route::put("Off", "/off")
                 .description("Turn light off.")
                 .with_parameters(Parameters::new().u8("test-value", 42)),
             turn_light_off,
@@ -330,7 +330,8 @@ async fn main(spawner: Spawner) {
                 )))
             },
         )
-        .build();
+        .build()
+        .expect("Failed to validate device data");
 
     #[allow(clippy::large_futures)]
     Server::<TX_SIZE, RX_SIZE, MAXIMUM_HEADERS_COUNT, _>::new(device, Mdns::new(rng))

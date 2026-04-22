@@ -34,10 +34,7 @@
 //!
 //! An `std` environment is required to obtain full crate functionality.
 
-/// All supported device types.
-pub mod devices;
-
-/// General device definition along with its methods.
+/// A device definition along with its methods.
 pub mod device;
 /// Error management.
 pub mod error;

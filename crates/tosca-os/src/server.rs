@@ -5,7 +5,7 @@ use axum::{Router, response::Redirect};
 
 use tracing::info;
 
-use crate::device::Device;
+use crate::device::DeviceVerified;
 use crate::error::Result;
 use crate::services::{Service, ServiceConfig};
 
@@ -29,10 +29,7 @@ const DEFAULT_SCHEME: &str = "http";
 const DEFAULT_WELL_KNOWN_SERVICE: &str = "tosca";
 
 #[derive(Debug)]
-struct ServerData<'a, S>
-where
-    S: Clone + Send + Sync + 'static,
-{
+struct ServerData<'a> {
     // HTTP address.
     http_address: Ipv4Addr,
     // Server port.
@@ -44,24 +41,19 @@ where
     // Service configurator.
     service_config: Option<ServiceConfig<'a>>,
     // Device.
-    device: Device<S>,
+    device: DeviceVerified,
 }
 
 /// A server running indefinitely on the firmware.
 #[derive(Debug)]
-pub struct Server<'a, S = ()>
-where
-    S: Clone + Send + Sync + 'static,
-{
-    data: ServerData<'a, S>,
+pub struct Server<'a> {
+    data: ServerData<'a>,
 }
 
-impl<'a, S> Server<'a, S>
-where
-    S: Clone + Send + Sync + 'static,
-{
-    /// Creates a [`Server`] from the given [`Device`].
-    pub const fn new(device: Device<S>) -> Self {
+impl<'a> Server<'a> {
+    /// Creates a [`Server`] from the given [`DeviceVerified`].
+    #[must_use]
+    pub const fn new(device: DeviceVerified) -> Self {
         Self {
             data: ServerData {
                 http_address: DEFAULT_HTTP_ADDRESS,
@@ -116,7 +108,7 @@ where
     /// the server.
     #[must_use]
     #[inline]
-    pub fn with_graceful_shutdown<F>(self, signal: F) -> GracefulShutdownServer<'a, S, F>
+    pub fn with_graceful_shutdown<F>(self, signal: F) -> GracefulShutdownServer<'a, F>
     where
         F: Future<Output = ()> + Send + 'static,
     {
@@ -143,19 +135,15 @@ where
 /// Aside from the graceful shutdown functionality, it behaves the same as
 /// [`Server`].
 #[derive(Debug)]
-pub struct GracefulShutdownServer<'a, S, F>
-where
-    S: Clone + Send + Sync + 'static,
-{
+pub struct GracefulShutdownServer<'a, F> {
     // Server data.
-    data: ServerData<'a, S>,
+    data: ServerData<'a>,
     // Graceful shutdown signal.
     signal: F,
 }
 
-impl<S, F> GracefulShutdownServer<'_, S, F>
+impl<F> GracefulShutdownServer<'_, F>
 where
-    S: Clone + Send + Sync + 'static,
     F: Future<Output = ()> + Send + 'static,
 {
     /// Runs the server with graceful shutdown.

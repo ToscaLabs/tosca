@@ -13,7 +13,6 @@ use crate::parameters::{Parameters, ParametersData};
 use crate::response::ResponseKind;
 
 use crate::macros::set;
-use crate::mandatory_route;
 
 /// The kind of `REST` request.
 #[derive(Debug, Clone, Copy, PartialEq, Eq, Hash, Serialize)]
@@ -70,8 +69,8 @@ impl PartialEq for RouteData {
 impl RouteData {
     fn new(route: Route) -> Self {
         Self {
-            name: route.name.into(),
-            path: route.path.into(),
+            name: Cow::Borrowed(route.name),
+            path: Cow::Borrowed(route.path),
             description: route.description.map(core::convert::Into::into),
             hazards: route.hazards,
             parameters: route.parameters.serialize_data(),
@@ -327,8 +326,33 @@ set! {
   pub struct Routes(IndexSet<Route, DefaultHashBuilder>);
 }
 
-mandatory_route!(LightOnRoute, "/on", methods: [post, put]);
-mandatory_route!(LightOffRoute, "/off", methods: [post, put]);
+#[cfg(test)]
+#[cfg(not(feature = "deserialize"))]
+mod tests {
+    use crate::route::{Hazard, Hazards};
+
+    use super::Route;
+
+    #[test]
+    fn test_allowed_hazards() {
+        const ALLOWED_HAZARDS: &[Hazard] = &[Hazard::FireHazard, Hazard::ElectricEnergyConsumption];
+
+        // Wrong AirPoisoning hazard.
+        let route = Route::get("Route", "/route")
+            .description("A GET route")
+            .with_hazards(
+                Hazards::new()
+                    .insert(Hazard::FireHazard)
+                    .insert(Hazard::AirPoisoning),
+            );
+
+        let expected_hazards = Hazards::init(Hazard::FireHazard);
+        assert_eq!(
+            route.remove_prohibited_hazards(ALLOWED_HAZARDS).hazards,
+            expected_hazards
+        );
+    }
+}
 
 #[cfg(test)]
 #[cfg(feature = "deserialize")]
@@ -469,15 +493,25 @@ mod tests {
             RestKind::Get,
             Hazards::new(),
             "A GET route",
-            ParametersData::new().insert(
-                "rangeu64".into(),
-                ParameterKind::RangeU64 {
-                    min: 0,
-                    max: 20,
-                    step: 1,
-                    default: 5,
-                },
-            ),
+            ParametersData::new()
+                .insert(
+                    "rangeu64".into(),
+                    ParameterKind::RangeU64 {
+                        min: 0,
+                        max: 20,
+                        step: 1,
+                        default: 5,
+                    },
+                )
+                .insert(
+                    "rangef64".into(),
+                    ParameterKind::RangeF64 {
+                        min: 0.,
+                        max: 20.,
+                        step: 0.1,
+                        default: 0.,
+                    },
+                ),
         );
 
         assert_eq!(
@@ -492,34 +526,6 @@ mod tests {
                     .serialize_data()
             )),
             expected
-        );
-    }
-}
-
-#[cfg(test)]
-#[cfg(not(feature = "deserialize"))]
-mod tests {
-    use crate::route::{Hazard, Hazards};
-
-    use super::Route;
-
-    #[test]
-    fn test_allowed_hazards() {
-        const ALLOWED_HAZARDS: &[Hazard] = &[Hazard::FireHazard, Hazard::ElectricEnergyConsumption];
-
-        // Wrong AirPoisoning hazard.
-        let route = Route::get("Route", "/route")
-            .description("A GET route")
-            .with_hazards(
-                Hazards::new()
-                    .insert(Hazard::FireHazard)
-                    .insert(Hazard::AirPoisoning),
-            );
-
-        let expected_hazards = Hazards::init(Hazard::FireHazard);
-        assert_eq!(
-            route.remove_prohibited_hazards(ALLOWED_HAZARDS).hazards,
-            expected_hazards
         );
     }
 }

@@ -1,6 +1,6 @@
 [package]
 name = "tosca-esp32c3"
-version = "0.1.1"
+version = "0.2.0"
 edition = "2024"
 authors = ["Michele Valsesia <michele.valsesia@toscalabs.org>"]
 description = "A library for building Tosca firmware that runs on ESP32-C3 boards."
@@ -17,7 +17,7 @@ rustdoc-args = ["--cfg", "docsrs"]
 
 [dependencies]
 # Tosca workspace crate
-tosca = { path = "../tosca", version = "0.1.0", default-features = false }
+tosca = { path = "../tosca", version = "0.2.0", default-features = false }
 
 # Multithread critical section
 critical-section = "1.2.0"

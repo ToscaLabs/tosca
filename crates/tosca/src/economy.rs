@@ -8,7 +8,7 @@ use crate::energy::EnergyClass;
 use crate::macros::set;
 
 /// Timespan selected to estimate the device costs.
-#[derive(Debug, PartialEq, Eq, Hash, Clone, Copy, Serialize)]
+#[derive(Debug, Clone, Copy, PartialEq, Eq, Hash, Serialize)]
 #[cfg_attr(feature = "deserialize", derive(serde::Deserialize))]
 pub enum CostTimespan {
     /// Week.
@@ -36,7 +36,7 @@ impl core::fmt::Display for CostTimespan {
 }
 
 /// Device cost.
-#[derive(Debug, PartialEq, Eq, Hash, Clone, Copy, Serialize)]
+#[derive(Debug, Clone, Copy, PartialEq, Eq, Hash, Serialize)]
 #[cfg_attr(feature = "deserialize", derive(serde::Deserialize))]
 pub struct Cost {
     /// Amount of money in USD currency.
@@ -84,7 +84,7 @@ set! {
 }
 
 /// Return on investments (ROI).
-#[derive(Debug, PartialEq, Eq, Hash, Clone, Copy, Serialize)]
+#[derive(Debug, Clone, Copy, PartialEq, Eq, Hash, Serialize)]
 #[cfg_attr(feature = "deserialize", derive(serde::Deserialize))]
 pub struct Roi {
     /// Number of years used to calculate the ROI.
@@ -136,7 +136,7 @@ set! {
 }
 
 /// Economy data related to a device.
-#[derive(Debug, PartialEq, Clone, Serialize)]
+#[derive(Debug, Clone, PartialEq, Serialize)]
 #[cfg_attr(feature = "deserialize", derive(serde::Deserialize))]
 pub struct Economy {
     /// Costs.
