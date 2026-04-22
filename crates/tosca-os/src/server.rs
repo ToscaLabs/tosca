@@ -51,7 +51,7 @@ pub struct Server<'a> {
 }
 
 impl<'a> Server<'a> {
-    /// Creates a [`Server`] from the given [`Device`].
+    /// Creates a [`Server`] from the given [`DeviceVerified`].
     #[must_use]
     pub const fn new(device: DeviceVerified) -> Self {
         Self {
