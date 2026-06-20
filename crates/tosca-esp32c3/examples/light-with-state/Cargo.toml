@@ -14,7 +14,7 @@ tosca-esp32c3 = { path = "../../", version = "0.1.0" }
 
 # Embassy framework
 embassy-executor = { version = "0.9.1", features = ["log"] }
-embassy-sync = "0.7.2"
+embassy-sync = "0.8.0"
 embassy-time = { version = "0.5.0", features = ["log"] }
 
 # ESP dependencies
