@@ -12,7 +12,7 @@ use axum::{
 
 use serde::Serialize;
 
-use super::{BaseResponse, MandatoryResponse, error::ErrorResponse};
+use super::{BaseResponse, error::ErrorResponse};
 
 /// A response which transmits a concise JSON message over the network to notify
 /// a controller that an operation completed successfully.
@@ -60,26 +60,6 @@ macro_rules! impl_ok_type_name {
 }
 super::all_the_tuples!(impl_ok_type_name);
 
-/// Creates a stateful [`MandatoryResponse`] from an [`OkResponse`].
-#[inline]
-pub fn mandatory_ok_stateful<H, T, S>(
-    handler: H,
-) -> impl FnOnce(Route, S) -> MandatoryResponse<false>
-where
-    H: Handler<T, S> + private::OkTypeName<T>,
-    T: 'static,
-    S: Clone + Send + Sync + 'static,
-{
-    move |route: Route, state: S| {
-        MandatoryResponse::new(BaseResponse::stateful(
-            route,
-            ResponseKind::Ok,
-            handler,
-            state,
-        ))
-    }
-}
-
 /// Creates a stateful [`BaseResponse`] from an [`OkResponse`].
 #[inline]
 pub fn ok_stateful<H, T, S>(route: Route, handler: H) -> impl FnOnce(S) -> BaseResponse
@@ -89,21 +69,6 @@ where
     S: Clone + Send + Sync + 'static,
 {
     move |state: S| BaseResponse::stateful(route, ResponseKind::Ok, handler, state)
-}
-
-/// Creates a stateless [`MandatoryResponse`] from an [`OkResponse`].
-#[inline]
-pub fn mandatory_ok_stateless<H, T, S>(
-    handler: H,
-) -> impl FnOnce(Route, S) -> MandatoryResponse<false>
-where
-    H: Handler<T, ()> + private::OkTypeName<T>,
-    T: 'static,
-    S: Clone + Send + Sync + 'static,
-{
-    move |route: Route, _state: S| {
-        MandatoryResponse::new(BaseResponse::stateless(route, ResponseKind::Ok, handler))
-    }
 }
 
 /// Creates a stateless [`BaseResponse`] from an [`OkResponse`].

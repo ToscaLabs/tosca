@@ -44,9 +44,6 @@
 
 extern crate alloc;
 
-/// All supported device types.
-pub mod devices;
-
 /// General device definition along with its methods.
 pub mod device;
 /// Error management.

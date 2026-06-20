@@ -2,7 +2,7 @@
 #![allow(clippy::trivially_copy_pass_by_ref)]
 
 use alloc::borrow::Cow;
-use alloc::string::String;
+use alloc::string::{String, ToString};
 
 use hashbrown::DefaultHashBuilder;
 
@@ -116,11 +116,11 @@ pub enum ParameterKind {
         /// when the parameter is missing.
         default: u8,
         /// The minimum allowed [`u8`] value.
-        #[serde(skip_serializing_if = "is_u8_max")]
+        #[serde(skip_serializing_if = "is_u8_min")]
         #[serde(default)]
         min: u8,
         /// The maximum allowed [`u8`] value.
-        #[serde(skip_serializing_if = "is_u8_min")]
+        #[serde(skip_serializing_if = "is_u8_max")]
         #[serde(default = "u8_max")]
         max: u8,
     },
@@ -130,11 +130,11 @@ pub enum ParameterKind {
         /// when the parameter is missing.
         default: u16,
         /// The minimum allowed [`u16`] value.
-        #[serde(skip_serializing_if = "is_u16_max")]
+        #[serde(skip_serializing_if = "is_u16_min")]
         #[serde(default)]
         min: u16,
         /// The maximum allowed [`u16`] value.
-        #[serde(skip_serializing_if = "is_u16_min")]
+        #[serde(skip_serializing_if = "is_u16_max")]
         #[serde(default = "u16_max")]
         max: u16,
     },
@@ -144,11 +144,11 @@ pub enum ParameterKind {
         /// when the parameter is missing.
         default: u32,
         /// The minimum allowed [`u32`] value.
-        #[serde(skip_serializing_if = "is_u32_max")]
+        #[serde(skip_serializing_if = "is_u32_min")]
         #[serde(default)]
         min: u32,
         /// The maximum allowed [`u32`] value.
-        #[serde(skip_serializing_if = "is_u32_min")]
+        #[serde(skip_serializing_if = "is_u32_max")]
         #[serde(default = "u32_max")]
         max: u32,
     },
@@ -158,11 +158,11 @@ pub enum ParameterKind {
         /// when the parameter is missing.
         default: u64,
         /// The minimum allowed [`u64`] value.
-        #[serde(skip_serializing_if = "is_u64_max")]
+        #[serde(skip_serializing_if = "is_u64_min")]
         #[serde(default)]
         min: u64,
         /// The maximum allowed [`u64`] value.
-        #[serde(skip_serializing_if = "is_u64_min")]
+        #[serde(skip_serializing_if = "is_u64_max")]
         #[serde(default = "u64_max")]
         max: u64,
     },
@@ -172,11 +172,11 @@ pub enum ParameterKind {
         /// when the parameter is missing.
         default: f32,
         /// The minimum allowed [`f32`] value.
-        #[serde(skip_serializing_if = "is_f32_max")]
+        #[serde(skip_serializing_if = "is_f32_min")]
         #[serde(default = "f32_min")]
         min: f32,
         /// The maximum allowed [`f32`] value.
-        #[serde(skip_serializing_if = "is_f32_min")]
+        #[serde(skip_serializing_if = "is_f32_max")]
         #[serde(default = "f32_max")]
         max: f32,
         /// The decimal step for the [`f32`] value.
@@ -190,11 +190,11 @@ pub enum ParameterKind {
         /// when the parameter is missing.
         default: f64,
         /// The minimum allowed [`f64`] value.
-        #[serde(skip_serializing_if = "is_f64_max")]
+        #[serde(skip_serializing_if = "is_f64_min")]
         #[serde(default = "f64_min")]
         min: f64,
         /// The maximum allowed [`f64`] value.
-        #[serde(skip_serializing_if = "is_f64_min")]
+        #[serde(skip_serializing_if = "is_f64_max")]
         #[serde(default = "f64_max")]
         max: f64,
         /// The decimal step for the [`f64`] value.
@@ -317,7 +317,7 @@ map! {
   /// corresponding [`ParameterKind`].
   #[derive(Debug, Clone, PartialEq, Serialize)]
   #[cfg_attr(feature = "deserialize", derive(serde::Deserialize))]
-  pub struct ParametersData(IndexMap<String, ParameterKind, DefaultHashBuilder>);
+  pub struct ParametersData(IndexMap<Cow<'static, str>, ParameterKind, DefaultHashBuilder>);
 }
 
 impl ParametersData {
@@ -363,8 +363,8 @@ impl Parameters {
             name,
             ParameterKind::U8 {
                 default,
-                min: u8::MAX,
-                max: u8::MIN,
+                min: u8::MIN,
+                max: u8::MAX,
             },
         )
     }
@@ -384,8 +384,8 @@ impl Parameters {
             name,
             ParameterKind::U16 {
                 default,
-                min: u16::MAX,
-                max: u16::MIN,
+                min: u16::MIN,
+                max: u16::MAX,
             },
         )
     }
@@ -405,8 +405,8 @@ impl Parameters {
             name,
             ParameterKind::U32 {
                 default,
-                min: u32::MAX,
-                max: u32::MIN,
+                min: u32::MIN,
+                max: u32::MAX,
             },
         )
     }
@@ -426,8 +426,8 @@ impl Parameters {
             name,
             ParameterKind::U64 {
                 default,
-                min: u64::MAX,
-                max: u64::MIN,
+                min: u64::MIN,
+                max: u64::MAX,
             },
         )
     }
@@ -447,8 +447,8 @@ impl Parameters {
             name,
             ParameterKind::F32 {
                 default,
-                min: f32::MAX,
-                max: f32::MIN,
+                min: f32::MIN,
+                max: f32::MAX,
                 step: 0.,
             },
         )
@@ -597,15 +597,11 @@ impl Parameters {
     /// Adds a sequence of characters.
     #[must_use]
     #[inline]
-    pub fn characters_sequence(
-        self,
-        name: &'static str,
-        default: impl Into<Cow<'static, str>>,
-    ) -> Self {
+    pub fn characters_sequence(self, name: &'static str, default: &'static str) -> Self {
         self.create_parameter(
             name,
             ParameterKind::CharsSequence {
-                default: default.into(),
+                default: Cow::Borrowed(default),
             },
         )
     }
@@ -663,7 +659,7 @@ pub enum ParameterValue {
     /// A [`f64`] value.
     F64(f64),
     /// A sequence of characters.
-    CharsSequence(Cow<'static, str>),
+    CharsSequence(String),
 }
 
 impl core::fmt::Display for ParameterValue {
@@ -700,7 +696,9 @@ impl ParameterValue {
             ParameterKind::F64 { default, .. } | ParameterKind::RangeF64 { default, .. } => {
                 Self::F64(*default)
             }
-            ParameterKind::CharsSequence { default, .. } => Self::CharsSequence(default.clone()),
+            ParameterKind::CharsSequence { default, .. } => {
+                Self::CharsSequence(default.to_string())
+            }
         }
     }
 
@@ -748,33 +746,33 @@ impl ParameterValue {
 /// A map associating each parameter name with its
 /// corresponding [`ParameterValue`].
 #[derive(Debug, PartialEq, Deserialize)]
-pub struct ParametersValues<'a>(IndexMap<Cow<'a, str>, ParameterValue, DefaultHashBuilder>);
+pub struct ParametersValues(IndexMap<String, ParameterValue, DefaultHashBuilder>);
 
-impl Default for ParametersValues<'_> {
+impl Default for ParametersValues {
     fn default() -> Self {
         Self::new()
     }
 }
 
-impl<'a> IntoIterator for ParametersValues<'a> {
-    type Item = (Cow<'a, str>, ParameterValue);
-    type IntoIter = IntoIter<Cow<'a, str>, ParameterValue>;
+impl IntoIterator for ParametersValues {
+    type Item = (String, ParameterValue);
+    type IntoIter = IntoIter<String, ParameterValue>;
 
     fn into_iter(self) -> Self::IntoIter {
         self.0.into_iter()
     }
 }
 
-impl<'a> IntoIterator for &'a ParametersValues<'a> {
-    type Item = (&'a Cow<'a, str>, &'a ParameterValue);
-    type IntoIter = Iter<'a, Cow<'a, str>, ParameterValue>;
+impl<'a> IntoIterator for &'a ParametersValues {
+    type Item = (&'a String, &'a ParameterValue);
+    type IntoIter = Iter<'a, String, ParameterValue>;
 
     fn into_iter(self) -> Self::IntoIter {
         self.iter()
     }
 }
 
-impl<'a> ParametersValues<'a> {
+impl ParametersValues {
     /// Creates [`ParametersValues`].
     #[must_use]
     #[inline]
@@ -784,65 +782,57 @@ impl<'a> ParametersValues<'a> {
 
     /// Adds a [`ParameterValue`].
     #[inline]
-    pub fn parameter_value(
-        &mut self,
-        name: impl Into<Cow<'a, str>>,
-        parameter_value: ParameterValue,
-    ) -> &mut Self {
+    pub fn parameter_value(&mut self, name: &str, parameter_value: ParameterValue) -> &mut Self {
         let _ = self.0.insert(name.into(), parameter_value);
         self
     }
 
     /// Adds a [`bool`] value.
     #[inline]
-    pub fn bool(&mut self, name: impl Into<Cow<'a, str>>, value: bool) -> &mut Self {
+    pub fn bool(&mut self, name: &str, value: bool) -> &mut Self {
         self.parameter_value(name, ParameterValue::Bool(value))
     }
 
     /// Adds an [`u8`] parameter.
     #[inline]
-    pub fn u8(&mut self, name: impl Into<Cow<'a, str>>, value: u8) -> &mut Self {
+    pub fn u8(&mut self, name: &str, value: u8) -> &mut Self {
         self.parameter_value(name, ParameterValue::U8(value))
     }
 
     /// Adds an [`u16`] parameter.
     #[inline]
-    pub fn u16(&mut self, name: impl Into<Cow<'a, str>>, value: u16) -> &mut Self {
+    pub fn u16(&mut self, name: &str, value: u16) -> &mut Self {
         self.parameter_value(name, ParameterValue::U16(value))
     }
 
     /// Adds an [`u32`] parameter.
     #[inline]
-    pub fn u32(&mut self, name: impl Into<Cow<'a, str>>, value: u32) -> &mut Self {
+    pub fn u32(&mut self, name: &str, value: u32) -> &mut Self {
         self.parameter_value(name, ParameterValue::U32(value))
     }
 
     /// Adds an [`u64`] parameter.
     #[inline]
-    pub fn u64(&mut self, name: impl Into<Cow<'a, str>>, value: u64) -> &mut Self {
+    pub fn u64(&mut self, name: &str, value: u64) -> &mut Self {
         self.parameter_value(name, ParameterValue::U64(value))
     }
 
     /// Adds a [`f32`] parameter.
     #[inline]
-    pub fn f32(&mut self, name: impl Into<Cow<'a, str>>, value: f32) -> &mut Self {
+    pub fn f32(&mut self, name: &str, value: f32) -> &mut Self {
         self.parameter_value(name, ParameterValue::F32(value))
     }
 
     /// Adds a [`f64`] parameter.
     #[inline]
-    pub fn f64(&mut self, name: impl Into<Cow<'a, str>>, value: f64) -> &mut Self {
+    pub fn f64(&mut self, name: &str, value: f64) -> &mut Self {
         self.parameter_value(name, ParameterValue::F64(value))
     }
 
     /// Adds a sequence of characters.
     #[inline]
-    pub fn characters_sequence(
-        &mut self,
-        name: impl Into<Cow<'a, str>>,
-        value: String,
-    ) -> &mut Self {
-        self.parameter_value(name, ParameterValue::CharsSequence(value.into()))
+    pub fn characters_sequence(&mut self, name: &str, value: String) -> &mut Self {
+        self.parameter_value(name, ParameterValue::CharsSequence(value))
     }
 
     /// Retrieves a [`ParameterValue`] by name.
@@ -850,8 +840,8 @@ impl<'a> ParametersValues<'a> {
     /// Returns [`None`] if the parameter does not exist.
     #[must_use]
     #[inline]
-    pub fn get<'b>(&'b self, name: impl Into<Cow<'b, str>>) -> Option<&'b ParameterValue> {
-        self.0.get(&name.into())
+    pub fn get<'b>(&'b self, name: &str) -> Option<&'b ParameterValue> {
+        self.0.get(name)
     }
 
     /// Returns an iterator over [`ParameterValue`]s.
@@ -859,7 +849,7 @@ impl<'a> ParametersValues<'a> {
     /// **Iterates over the elements in the order they were inserted.**
     #[must_use]
     #[inline]
-    pub fn iter(&self) -> Iter<'_, Cow<'_, str>, ParameterValue> {
+    pub fn iter(&self) -> Iter<'_, String, ParameterValue> {
         self.0.iter()
     }
 }
@@ -884,17 +874,17 @@ impl ParameterPayload {
 map! {
   /// A map associating each parameter name with its
   /// corresponding [`ParameterPayload`].
-  pub struct ParametersPayloads<'a>(IndexMap<Cow<'a, str>, ParameterPayload, DefaultHashBuilder>);
+  pub struct ParametersPayloads(IndexMap<String, ParameterPayload, DefaultHashBuilder>);
 }
 
-impl<'a> ParametersPayloads<'a> {
+impl ParametersPayloads {
     /// Retrieves a [`ParameterPayload`] by name.
     ///
     /// Returns [`None`] if the parameter does not exist.
     #[must_use]
     #[inline]
-    pub fn get<'b>(&'b self, name: impl Into<Cow<'b, str>>) -> Option<&'b ParameterPayload> {
-        self.0.get(&name.into())
+    pub fn get<'b>(&'b self, name: &str) -> Option<&'b ParameterPayload> {
+        self.0.get(name)
     }
 
     /// Extracts a [`ParameterPayload`] by name.
@@ -904,16 +894,14 @@ impl<'a> ParametersPayloads<'a> {
     /// Returns [`None`] if the parameter does not exist.
     #[must_use]
     #[inline]
-    pub fn extract(&mut self, name: impl Into<Cow<'a, str>>) -> Option<ParameterPayload> {
-        self.0.swap_remove(&name.into())
+    pub fn extract(&mut self, name: &str) -> Option<ParameterPayload> {
+        self.0.swap_remove(name)
     }
 }
 
 #[cfg(test)]
 #[cfg(feature = "deserialize")]
 mod tests {
-    use alloc::string::String;
-
     use crate::{deserialize, serialize};
 
     use super::{ParameterKind, Parameters, ParametersData, ParametersValues};
@@ -1026,7 +1014,7 @@ mod tests {
             .rangeu64_with_default("rangeu64", (0, 20, 1), 5)
             .rangef64_with_default("rangef64", (0., 20., 0.1), 5.)
             .characters_sequence("greeting", "hello")
-            .characters_sequence("greeting2", String::from("hello"))
+            .characters_sequence("greeting2", "hello")
             // Adds a duplicate to see whether that value is maintained or
             // removed.
             .u16("u16", 0);
@@ -1050,6 +1038,6 @@ mod tests {
             "three": 3.0,
         });
 
-        assert_eq!(deserialize::<ParametersValues<'_>>(json_value), parameters);
+        assert_eq!(deserialize::<ParametersValues>(json_value), parameters);
     }
 }

@@ -13,8 +13,9 @@ extern crate alloc;
 
 use core::sync::atomic::{AtomicBool, Ordering};
 
+use tosca::device::schemes::LIGHT_SCHEME;
 use tosca::parameters::Parameters;
-use tosca::route::{LightOffRoute, LightOnRoute, Route};
+use tosca::route::Route;
 
 use esp_hal::Config;
 use esp_hal::clock::CpuClock;
@@ -31,7 +32,7 @@ use embassy_sync::{blocking_mutex::raw::CriticalSectionRawMutex, signal::Signal}
 use embassy_time::Timer;
 
 use tosca_esp32c3::{
-    devices::light::Light,
+    device::Device,
     events::{EventsConfig, EventsManager, broker::BrokerData, interrupt::Notifier},
     mdns::Mdns,
     net::NetworkStack,
@@ -278,13 +279,13 @@ async fn main(spawner: Spawner) {
         .spawn(press_button(button))
         .expect("Impossible to spawn the task to press the button task");
 
-    let device = Light::new(&interfaces.ap)
-        .turn_light_on_stateless_serial(
-            LightOnRoute::put("On").description("Turn light on."),
+    let device = Device::new(&interfaces.ap, LIGHT_SCHEME)
+        .stateless_serial_route(
+            Route::put("On", "/on").description("Turn light on."),
             turn_light_on,
         )
-        .turn_light_off_stateless_serial(
-            LightOffRoute::put("Off")
+        .stateless_serial_route(
+            Route::put("Off", "/off")
                 .description("Turn light off.")
                 .with_parameters(Parameters::new().u8("test-value", 42)),
             turn_light_off,
@@ -293,7 +294,8 @@ async fn main(spawner: Spawner) {
             Route::get("Toggle", "/toggle").description("Toggle the light on and off."),
             toggle,
         )
-        .build();
+        .build()
+        .expect("Failed to validate device data");
 
     let events_config = EventsConfig::new(
         spawner,

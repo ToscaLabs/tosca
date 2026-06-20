@@ -4,18 +4,19 @@ use std::net::Ipv4Addr;
 use std::sync::Arc;
 
 use tosca::device::DeviceMetrics;
+use tosca::device::schemes::LIGHT_SCHEME;
 use tosca::energy::{Energy, EnergyClass, EnergyEfficiencies, EnergyEfficiency};
 use tosca::hazards::Hazard;
 use tosca::parameters::Parameters;
-use tosca::route::{LightOffRoute, LightOnRoute, Route};
+use tosca::route::Route;
 
-use tosca_os::devices::light::Light;
+use tosca_os::device::Device;
 use tosca_os::error::Error;
 use tosca_os::extract::{FromRef, Json, State};
 use tosca_os::responses::error::ErrorResponse;
 use tosca_os::responses::info::{InfoResponse, info_stateful};
-use tosca_os::responses::ok::{OkResponse, mandatory_ok_stateful, ok_stateful};
-use tosca_os::responses::serial::{SerialResponse, mandatory_serial_stateful, serial_stateful};
+use tosca_os::responses::ok::{OkResponse, ok_stateful};
+use tosca_os::responses::serial::{SerialResponse, serial_stateful};
 use tosca_os::server::Server;
 use tosca_os::service::{ServiceConfig, TransportProtocol};
 
@@ -225,7 +226,7 @@ async fn main() -> Result<(), Error> {
     );
 
     // Turn light on `PUT` route.
-    let light_on_route = LightOnRoute::put("On")
+    let light_on_route = Route::put("On", "/on")
         .description("Turn light on.")
         .with_hazard(Hazard::ElectricEnergyConsumption)
         .with_parameters(
@@ -245,7 +246,7 @@ async fn main() -> Result<(), Error> {
         );
 
     // Turn light off `PUT` route.
-    let light_off_route = LightOffRoute::put("Off").description("Turn light off.");
+    let light_off_route = Route::put("Off", "/off").description("Turn light off.");
 
     // Toggle `PUT` route.
     let toggle_route = Route::put("Toggle", "/toggle")
@@ -262,20 +263,18 @@ async fn main() -> Result<(), Error> {
         .description("Update energy efficiency.")
         .with_hazard(Hazard::LogEnergyConsumption);
 
-    // A light device which is going to be run on the server.
-    let device = Light::with_state(state)
-        // This method is mandatory, if not called, a compiler error is raised.
-        .turn_light_on(light_on_route, mandatory_serial_stateful(turn_light_on))
-        // This method is mandatory, if not called, a compiler error is raised.
-        .turn_light_off(light_off_route, mandatory_ok_stateful(turn_light_off))
-        .route(serial_stateful(light_on_post_route, turn_light_on))?
-        .route(ok_stateful(toggle_route, toggle))?
+    // A light device.
+    let device = Device::with_state(LIGHT_SCHEME, state)
+        .route(serial_stateful(light_on_route, turn_light_on))
+        .route(ok_stateful(light_off_route, turn_light_off))
+        .route(serial_stateful(light_on_post_route, turn_light_on))
+        .route(ok_stateful(toggle_route, toggle))
         .info_route(info_stateful(info_route, info))
         .info_route(info_stateful(
             update_energy_efficiency_route,
             update_energy_efficiency,
         ))
-        .build();
+        .build()?;
 
     // Run a discovery service and the device on the server.
     Server::new(device)

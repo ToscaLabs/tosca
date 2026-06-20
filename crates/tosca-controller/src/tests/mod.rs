@@ -1,16 +1,16 @@
 use std::net::Ipv4Addr;
 use std::time::Duration;
 
-use tosca::device::{DeviceEnvironment, DeviceKindId};
+use tosca::device::{DeviceEnvironment, DeviceScheme, DeviceSchemeOwned, schemes::LIGHT_SCHEME};
 use tosca::hazards::{Hazard, Hazards};
 use tosca::parameters::{ParameterKind, Parameters, ParametersData};
 use tosca::response::ResponseKind;
-use tosca::route::{LightOffRoute, LightOnRoute, RestKind, Route};
+use tosca::route::{RestKind, Route};
 
-use tosca_os::devices::light::Light;
+use tosca_os::device::Device as ToscaOsDevice;
 use tosca_os::extract::Path;
 use tosca_os::responses::error::ErrorResponse;
-use tosca_os::responses::ok::{OkResponse, mandatory_ok_stateless};
+use tosca_os::responses::ok::{OkResponse, ok_stateless};
 use tosca_os::responses::serial::{SerialResponse, serial_stateless};
 use tosca_os::server::Server;
 use tosca_os::service::ServiceConfig;
@@ -57,21 +57,19 @@ async fn light(
     close_rx: tokio::sync::oneshot::Receiver<()>,
 ) {
     // Turn light on `PUT` route.
-    let light_on_route = LightOnRoute::put("On")
+    let light_on_route = Route::put("On", "/on")
         .description("Turn light on.")
         .with_hazard(Hazard::ElectricEnergyConsumption);
 
     // Turn light off `PUT` route.
-    let light_off_route = LightOffRoute::put("Off")
+    let light_off_route = Route::put("Off", "/off")
         .description("Turn light off.")
         .with_hazard(Hazard::LogEnergyConsumption);
 
     // A light device which is going to be run on the server.
-    let light = Light::new()
-        // This method is mandatory, if not called, a compiler error is raised.
-        .turn_light_on(light_on_route, mandatory_ok_stateless(turn_light_on))
-        // This method is mandatory, if not called, a compiler error is raised.
-        .turn_light_off(light_off_route, mandatory_ok_stateless(turn_light_off));
+    let light = ToscaOsDevice::new(LIGHT_SCHEME)
+        .route(ok_stateless(light_on_route, turn_light_on))
+        .route(ok_stateless(light_off_route, turn_light_off));
 
     let light = if with_toggle {
         // Toggle `PUT` route.
@@ -87,7 +85,6 @@ async fn light(
         light
             .main_route(FIRST_DEVICE_ROUTE)
             .route(serial_stateless(toggle_route, toggle))
-            .unwrap()
     } else {
         light.main_route(SECOND_DEVICE_ROUTE)
     };
@@ -98,7 +95,7 @@ async fn light(
     );
 
     // Run a discovery service and the device on the server.
-    Server::new(light.build())
+    Server::new(light.build().expect("Failed to validate device data"))
         .address(Ipv4Addr::UNSPECIFIED)
         .port(port)
         .well_known_service(id)
@@ -111,19 +108,71 @@ async fn light(
         .expect("Error in running a device server.");
 }
 
+#[inline]
 pub(crate) async fn light_with_toggle(close_rx: tokio::sync::oneshot::Receiver<()>) {
     light(PORT_ONE, "light-with-toggle", true, close_rx).await;
 }
 
+#[inline]
 pub(crate) async fn light_without_toggle(close_rx: tokio::sync::oneshot::Receiver<()>) {
     light(PORT_TWO, "light-without-toggle", false, close_rx).await;
+}
+
+async fn turn_thermostat_on() -> Result<OkResponse, ErrorResponse> {
+    println!("Thermostat on");
+    Ok(OkResponse::ok())
+}
+
+async fn turn_thermostat_off() -> Result<OkResponse, ErrorResponse> {
+    println!("Thermostat off");
+    Ok(OkResponse::ok())
+}
+
+pub(crate) async fn custom_device(close_rx: tokio::sync::oneshot::Receiver<()>) {
+    // Turn thermostat on `PUT` route.
+    let thermostat_on_route = Route::put("On", "/on")
+        .description("Turn thermostat on.")
+        .with_hazard(Hazard::ElectricEnergyConsumption);
+
+    // Turn thermostat off `PUT` route.
+    let thermostat_off_route = Route::put("Off", "/off")
+        .description("Turn thermostat off.")
+        .with_hazard(Hazard::LogEnergyConsumption);
+
+    // Create base scheme for custom thermostat.
+    let scheme = DeviceScheme::base_custom_scheme("Thermostat");
+
+    // A custom thermostat device which is going to be run on the server.
+    let light = ToscaOsDevice::new(scheme)
+        .route(ok_stateless(thermostat_on_route, turn_thermostat_on))
+        .route(ok_stateless(thermostat_off_route, turn_thermostat_off))
+        .main_route("/thermostat");
+
+    info!("Inside the custom thermostat device with port {PORT_TWO}");
+
+    // Run a discovery service and the device on the server.
+    Server::new(light.build().expect("Failed to validate device data"))
+        .address(Ipv4Addr::UNSPECIFIED)
+        .port(PORT_TWO)
+        .well_known_service("thermostat")
+        .discovery_service(
+            ServiceConfig::mdns_sd("thermostat")
+                .hostname("tosca")
+                .domain(DOMAIN),
+        )
+        .with_graceful_shutdown(async move {
+            _ = close_rx.await;
+        })
+        .run()
+        .await
+        .expect("Error in running a device server.");
 }
 
 fn build_route(device: &Device, route: &str) -> String {
     format!(
         "{}{}{}",
         device.network_info().last_reachable_address,
-        device.description().main_route,
+        device.metadata().main_route,
         route
     )
 }
@@ -156,13 +205,13 @@ fn check_request(
 
 // Device addresses are not considered in the comparisons, because they
 // depend on the machine this test is being run on.
-pub(crate) fn compare_device_data(device: &Device) {
+pub(crate) fn analyze_light_data(device: &Device) {
     // Check port.
     assert!(device.network_info().port == PORT_ONE || device.network_info().port == PORT_TWO);
 
-    // Check scheme.
-    let scheme = device.network_info().properties.get("scheme");
-    assert!(scheme.is_some_and(|scheme| scheme == "http"));
+    // Check protocol scheme.
+    let protocol_scheme = device.network_info().properties.get("scheme");
+    assert!(protocol_scheme.is_some_and(|protocol_scheme| protocol_scheme == "http"));
 
     // Check path.
     let path = device.network_info().properties.get("path");
@@ -173,22 +222,24 @@ pub(crate) fn compare_device_data(device: &Device) {
 
     // Check device main route.
     assert!(
-        device.description().main_route == FIRST_DEVICE_ROUTE
-            || device.description().main_route == SECOND_DEVICE_ROUTE
+        device.metadata().main_route == FIRST_DEVICE_ROUTE
+            || device.metadata().main_route == SECOND_DEVICE_ROUTE
     );
 
     // Check device information.
-    assert_eq!(device.description().kind, DeviceKindId::new("Light"));
-    assert_eq!(device.description().environment, DeviceEnvironment::Os);
+    assert_eq!(
+        device.metadata().scheme,
+        DeviceSchemeOwned::from(LIGHT_SCHEME)
+    );
+    assert_eq!(device.metadata().environment, DeviceEnvironment::Os);
 
     // Check requests number.
     assert!(
-        device.description().main_route == FIRST_DEVICE_ROUTE && device.requests_count() == 3
-            || device.description().main_route == SECOND_DEVICE_ROUTE
-                && device.requests_count() == 2
+        device.metadata().main_route == FIRST_DEVICE_ROUTE && device.requests_count() == 3
+            || device.metadata().main_route == SECOND_DEVICE_ROUTE && device.requests_count() == 2
     );
 
-    if device.description().main_route == FIRST_DEVICE_ROUTE {
+    if device.metadata().main_route == FIRST_DEVICE_ROUTE {
         let parameters_data = ParametersData::new().insert(
             "brightness".into(),
             ParameterKind::RangeU64 {
@@ -238,32 +289,38 @@ pub(crate) fn compare_device_data(device: &Device) {
     );
 }
 
-pub(crate) async fn check_function_with_device<F>(function: F)
+pub(crate) async fn run_one_device<D, Fut, F>(device: D, task: F)
 where
+    D: Fn(tokio::sync::oneshot::Receiver<()>) -> Fut + Send + 'static,
+    Fut: Future<Output = ()> + Send + 'static,
     F: AsyncFnOnce(),
 {
     let _ = tracing_subscriber::fmt().try_init();
 
-    let (close_tx, close_rx) = tokio::sync::oneshot::channel();
+    let (device_tx, device_rx) = tokio::sync::oneshot::channel();
 
     // Run a device task.
-    let device_handle = tokio::spawn(async { light_with_toggle(close_rx).await });
+    let device_handle = tokio::spawn(device(device_rx));
 
     // Wait for device task to be configured.
     tokio::time::sleep(Duration::from_millis(100)).await;
 
-    // Run function.
-    function().await;
+    // Run task.
+    task().await;
 
     // Shutdown device server.
-    _ = close_tx.send(());
+    _ = device_tx.send(());
 
     // Wait for device server to gracefully shutdown.
     _ = device_handle.await;
 }
 
-pub(crate) async fn check_function_with_two_devices<F>(function: F)
+pub(crate) async fn run_two_devices<D1, D2, Fut1, Fut2, F>(device1: D1, device2: D2, task: F)
 where
+    D1: Fn(tokio::sync::oneshot::Receiver<()>) -> Fut1 + Send + 'static,
+    D2: Fn(tokio::sync::oneshot::Receiver<()>) -> Fut2 + Send + 'static,
+    Fut1: Future<Output = ()> + Send + 'static,
+    Fut2: Future<Output = ()> + Send + 'static,
     F: AsyncFnOnce(),
 {
     let _ = tracing_subscriber::fmt().try_init();
@@ -272,19 +329,19 @@ where
     let (device2_tx, device2_rx) = tokio::sync::oneshot::channel();
 
     // Run first device task.
-    let device1_handle = tokio::spawn(async { light_without_toggle(device1_rx).await });
+    let device1_handle = tokio::spawn(device1(device1_rx));
 
     // Wait for first device task to be configured.
     tokio::time::sleep(Duration::from_millis(100)).await;
 
     // Run second device task.
-    let device2_handle = tokio::spawn(async { light_with_toggle(device2_rx).await });
+    let device2_handle = tokio::spawn(device2(device2_rx));
 
     // Wait for second device task to be configured.
     tokio::time::sleep(Duration::from_millis(100)).await;
 
-    // Run function.
-    function().await;
+    // Run task.
+    task().await;
 
     // Shutdown first device server.
     _ = device1_tx.send(());

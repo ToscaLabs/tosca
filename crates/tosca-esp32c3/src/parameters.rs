@@ -1,5 +1,6 @@
 use alloc::borrow::Cow;
 use alloc::format;
+use alloc::string::String;
 
 use tosca::parameters::{
     ParameterKind, ParameterPayload, ParameterValue, ParametersPayloads as ToscaParametersPayloads,
@@ -169,19 +170,19 @@ impl F64Payload {
 /// A payload consisting of a sequence of characters.
 pub struct CharsSequencePayload<'a> {
     /// Value.
-    pub value: Cow<'a, str>,
+    pub value: String,
     /// Default value.
     pub default: Cow<'a, str>,
 }
 
 impl<'a> CharsSequencePayload<'a> {
-    const fn new(value: Cow<'a, str>, default: Cow<'a, str>) -> Self {
+    const fn new(value: String, default: Cow<'a, str>) -> Self {
         Self { value, default }
     }
 }
 
 /// A container for storing route parameter payloads.
-pub struct ParametersPayloads(pub(crate) ToscaParametersPayloads<'static>);
+pub struct ParametersPayloads(pub(crate) ToscaParametersPayloads);
 
 impl ParametersPayloads {
     /// Retrieves the [`BoolPayload`] associated with the given parameter name.

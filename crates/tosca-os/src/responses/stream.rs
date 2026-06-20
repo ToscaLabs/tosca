@@ -16,7 +16,7 @@ use futures_core::TryStream;
 use tokio::io::AsyncRead;
 use tokio_util::io::ReaderStream;
 
-use super::{BaseResponse, MandatoryResponse, error::ErrorResponse};
+use super::{BaseResponse, error::ErrorResponse};
 
 /// A response that transmits a stream of data as a sequence of bytes
 /// over the network.
@@ -105,26 +105,6 @@ macro_rules! impl_empty_type_name {
 }
 super::all_the_tuples!(impl_empty_type_name);
 
-/// Creates a stateful [`MandatoryResponse`] from a [`StreamResponse`].
-#[inline]
-pub fn mandatory_stream_stateful<H, T, S>(
-    handler: H,
-) -> impl FnOnce(Route, S) -> MandatoryResponse<false>
-where
-    H: Handler<T, S> + private::StreamTypeName<T>,
-    T: 'static,
-    S: Clone + Send + Sync + 'static,
-{
-    move |route: Route, state: S| {
-        MandatoryResponse::new(BaseResponse::stateful(
-            route,
-            ResponseKind::Stream,
-            handler,
-            state,
-        ))
-    }
-}
-
 /// Creates a stateful [`BaseResponse`] from a [`StreamResponse`].
 #[inline]
 pub fn stream_stateful<H, T, S>(route: Route, handler: H) -> impl FnOnce(S) -> BaseResponse
@@ -134,25 +114,6 @@ where
     S: Clone + Send + Sync + 'static,
 {
     move |state: S| BaseResponse::stateful(route, ResponseKind::Stream, handler, state)
-}
-
-/// Creates a stateless [`MandatoryResponse`] from a [`StreamResponse`].
-#[inline]
-pub fn mandatory_stream_stateless<H, T, S>(
-    handler: H,
-) -> impl FnOnce(Route, S) -> MandatoryResponse<false>
-where
-    H: Handler<T, ()> + private::StreamTypeName<T>,
-    T: 'static,
-    S: Clone + Send + Sync + 'static,
-{
-    move |route: Route, _state: S| {
-        MandatoryResponse::new(BaseResponse::stateless(
-            route,
-            ResponseKind::Stream,
-            handler,
-        ))
-    }
 }
 
 /// Creates a stateless [`BaseResponse`] from a [`StreamResponse`].

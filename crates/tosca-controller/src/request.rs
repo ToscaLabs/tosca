@@ -36,7 +36,7 @@ fn slash_start_end(s: &str) -> &str {
 }
 
 fn compare_values_with_params_data(
-    parameter_values: &ParametersValues<'_>,
+    parameter_values: &ParametersValues,
     parameters_data: &ParametersData,
 ) -> Result<(), Error> {
     for (name, parameter_value) in parameter_values {
@@ -239,7 +239,7 @@ impl Request {
 
     pub(crate) async fn create_response(
         &self,
-        parameters: &ParametersValues<'_>,
+        parameters: &ParametersValues,
     ) -> Result<reqwest::Response, Error> {
         let request_data = self.create_request(parameters)?;
         self.parameters_send(request_data).await
@@ -319,7 +319,7 @@ impl Request {
         RequestData::new(request, parameters)
     }
 
-    fn create_request(&self, parameters: &ParametersValues<'_>) -> Result<RequestData, Error> {
+    fn create_request(&self, parameters: &ParametersValues) -> Result<RequestData, Error> {
         // Compare parameters values with parameters data.
         compare_values_with_params_data(parameters, &self.parameters_data)?;
 
@@ -349,7 +349,7 @@ impl Request {
         let mut params = HashMap::new();
         for (name, parameter_kind) in &self.parameters_data {
             let _ = params.insert(
-                name.clone(),
+                name.to_string(),
                 format!("{}", ParameterValue::from_parameter_kind(parameter_kind)),
             );
         }
@@ -358,7 +358,7 @@ impl Request {
 
     // Axum parameters: hello/{{1}}/{{2}}
     //                  hello/0.5/1
-    fn axum_get(&self, parameters: &ParametersValues<'_>) -> String {
+    fn axum_get(&self, parameters: &ParametersValues) -> String {
         let mut route = String::from(&self.route);
         for (name, parameter_kind) in &self.parameters_data {
             let value = if let Some(value) = parameters.get(name) {
@@ -376,7 +376,7 @@ impl Request {
         route
     }
 
-    fn create_params(&self, parameters: &ParametersValues<'_>) -> HashMap<String, String> {
+    fn create_params(&self, parameters: &ParametersValues) -> HashMap<String, String> {
         let mut params = HashMap::new();
         for (name, parameter_kind) in &self.parameters_data {
             let (name, value) = if let Some(value) = parameters.get(name) {
@@ -387,7 +387,7 @@ impl Request {
                     format!("{}", ParameterValue::from_parameter_kind(parameter_kind)),
                 )
             };
-            let _ = params.insert(name.clone(), value);
+            let _ = params.insert(name.to_string(), value);
         }
         params
     }
