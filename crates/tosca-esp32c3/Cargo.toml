@@ -9,7 +9,7 @@ documentation = "https://docs.rs/tosca-esp32c3"
 readme = "README.md"
 license = "Apache-2.0 OR MIT"
 repository = "https://github.com/ToscaLabs/tosca/tree/master/crates/tosca-esp32c3"
-rust-version = "1.90"
+rust-version = "1.96"
 
 [package.metadata.docs.rs]
 default-target = "riscv32imc-unknown-none-elf"
@@ -23,43 +23,43 @@ tosca = { path = "../tosca", version = "0.2.0", default-features = false }
 critical-section = "1.2.0"
 
 # HTTP server
-edge-http = "0.6.1"
+edge-http = { version = "0.8.0", features = ["io"] }
 
 # mDNS service
-edge-mdns = "0.6.1"
+edge-mdns = { version = "0.8.0", default-features = false, features = ["io"] }
 
 # Networking traits
-edge-nal = "0.5.0"
-edge-nal-embassy = "0.7.0"
+edge-nal = "0.7.0"
+edge-nal-embassy = "0.9.0"
 
 # Embassy framework
-embassy-executor = { version = "0.9.1", features = ["log"] }
-embassy-net = { version = "0.7.1", features = ["dhcpv4", "log", "medium-ethernet", "tcp", "udp"] }
-embassy-sync = "0.7.2"
-embassy-time = { version = "0.5.0", features = ["log"] }
+embassy-executor = { version = "0.10.0", default-features = false, features = ["log"] }
+embassy-net = { version = "0.9.1", default-features = false, features = ["dhcpv4", "dns", "log", "medium-ethernet", "tcp", "udp"] }
+embassy-sync = { version = "0.8.0", default-features = false }
+embassy-time = { version = "0.5.1", default-features = false, features = ["log"] }
 
 # Async IO traits
-embedded-io-async = "0.6.1"
+embedded-io-async = "0.7.0"
 
 # ESP dependencies
-esp-alloc = "0.9.0"
-esp-hal = { version = "1.0.0", features = ["esp32c3", "log-04", "unstable"] }
-esp-rtos = { version = "0.2.0", features = ["embassy", "esp-alloc", "esp-radio", "esp32c3", "log-04"] }
-esp-println = { version = "0.16.1", features = ["esp32c3", "log-04"] }
-esp-radio = { version = "0.17.0", features = ["esp-alloc", "esp32c3", "log-04", "wifi"] }
+esp-alloc = "0.10.0"
+esp-hal = { version = "1.1.1", features = ["esp32c3", "log-04", "unstable"] }
+esp-rtos = { version = "0.3.0", features = ["embassy", "esp-alloc", "esp-radio", "esp32c3", "log-04"] }
+esp-println = { version = "0.17.0", features = ["esp32c3", "log-04"] }
+esp-radio = { version = "0.18.0", features = ["esp-alloc", "esp32c3", "log-04", "wifi"] }
 
 # Logging
-log = "0.4.29"
+log = "0.4.33"
+
+# Random traits
+rand_core = "0.10.1"
 
 # MQTT protocol
-rust-mqtt = { version = "0.3.1", default-features = false }
+rust-mqtt = { version = "0.5.1", default-features = false, features = ["v5", "alloc"] }
 
 # Serialization
 serde = { version = "1.0", default-features = false, features = ["derive"] }
 serde_json = { version = "1", default-features = false, features = ["alloc"] }
-
-# Static cell
-static_cell = "2.1.1"
 
 [lints.rust]
 rust_2018_idioms = { level = "deny", priority = -1 }

@@ -4,7 +4,7 @@ use alloc::boxed::Box;
 
 use esp_hal::rng::Rng;
 
-use esp_radio::wifi::WifiDevice;
+use esp_radio::wifi::Interface;
 
 use embassy_executor::Spawner;
 use embassy_net::{Config, DhcpConfig, Runner, Stack, StackResources};
@@ -37,7 +37,7 @@ pub(crate) async fn get_ip(stack: Stack<'static>) -> Ipv4Addr {
 }
 
 #[embassy_executor::task]
-async fn task(mut runner: Runner<'static, WifiDevice<'static>>) {
+async fn task(mut runner: Runner<'static, Interface<'static>>) {
     runner.run().await;
 }
 
@@ -52,7 +52,7 @@ impl NetworkStack {
     /// Failure to spawn the network stack task.
     pub async fn build<const SOCKET_STACK_SIZE: usize>(
         rng: Rng,
-        wifi_interface: WifiDevice<'static>,
+        wifi_interface: Interface<'static>,
         spawner: Spawner,
     ) -> Result<Stack<'static>> {
         let config = Config::dhcpv4(DhcpConfig::default());
@@ -65,7 +65,7 @@ impl NetworkStack {
 
         let (stack, runner) = embassy_net::new(wifi_interface, config, resources, seed);
 
-        spawner.spawn(task(runner))?;
+        spawner.spawn(task(runner)?);
 
         // Wait until the stack has a valid IP configuration.
         while !stack.is_config_up() {

@@ -265,7 +265,7 @@ async fn main(spawner: Spawner) {
     // - 1 task to check if a button is pressed
     // - 1 task to check if a led state is changed
     // - 1 task to send data to an external broker
-    let stack = NetworkStack::build::<7>(rng, interfaces.sta, spawner)
+    let stack = NetworkStack::build::<7>(rng, interfaces.station, spawner)
         .await
         .expect("Failed to create network stack.");
 
@@ -275,11 +275,10 @@ async fn main(spawner: Spawner) {
         InputConfig::default().with_pull(Pull::Up),
     );
 
-    spawner
-        .spawn(press_button(button))
-        .expect("Impossible to spawn the task to press the button task");
+    spawner.spawn(press_button(button).expect("Impossible to create the task to press the button"));
 
-    let device = Device::new(&interfaces.ap, LIGHT_SCHEME)
+    let device = Device::new(interfaces.access_point, LIGHT_SCHEME)
+        .main_route("/light")
         .stateless_serial_route(
             Route::put("On", "/on").description("Turn light on."),
             turn_light_on,
