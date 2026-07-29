@@ -100,11 +100,49 @@ impl From<embassy_net::dns::Error> for Error {
     }
 }
 
+const fn from_io_error(e: embedded_io_async::ErrorKind) -> &'static str {
+    use embedded_io_async::ErrorKind;
+    match e {
+        ErrorKind::Other => "I/O: Unspecified error kind",
+        ErrorKind::NotFound => "I/O: An entity was not found, often a file",
+        ErrorKind::PermissionDenied => {
+            "I/O: The operation lacked the necessary privileges to complete"
+        }
+        ErrorKind::ConnectionRefused => "I/O: The connection was refused by the remote server",
+        ErrorKind::ConnectionReset => "I/O: The connection was reset by the remote server",
+        ErrorKind::ConnectionAborted => {
+            "I/O: The connection was aborted (terminated) by the remote server"
+        }
+        ErrorKind::NotConnected => {
+            "I/O: The network operation failed because it was not connected yet"
+        }
+        ErrorKind::AddrInUse => {
+            "I/O: A socket address could not be bound because the address is already in use elsewhere"
+        }
+        ErrorKind::AddrNotAvailable => {
+            "I/O: A nonexistent interface was requested or the requested address was not local"
+        }
+        ErrorKind::BrokenPipe => "I/O: The operation failed because a pipe was closed",
+        ErrorKind::AlreadyExists => "I/O: An entity already exists, often a file",
+        ErrorKind::InvalidInput => "I/O: A parameter was incorrect",
+        ErrorKind::InvalidData => "I/O: Data not valid for the operation were encountered",
+        ErrorKind::TimedOut => {
+            "I/O: The I/O operation’s timeout expired, causing it to be canceled"
+        }
+        ErrorKind::Interrupted => "I/O: This operation was interrupted",
+        ErrorKind::Unsupported => "I/O: This operation is unsupported on this platform",
+        ErrorKind::OutOfMemory => {
+            "I/O: An operation could not be completed, because it failed to allocate enough memory"
+        }
+        ErrorKind::WriteZero => "I/O: An attempted write could not write any data",
+        _ => "I/O: Unknown or still non-existent error",
+    }
+}
+
 impl<E: edge_nal::io::Error> From<edge_mdns::io::MdnsIoError<E>> for Error {
     fn from(e: edge_mdns::io::MdnsIoError<E>) -> Self {
         use edge_mdns::MdnsError;
         use edge_mdns::io::MdnsIoError;
-        use edge_nal::io::ErrorKind;
         let err = match e {
             MdnsIoError::MdnsError(mdns_error) => match mdns_error {
                 MdnsError::ShortBuf => "Internal: Short buffer",
@@ -112,52 +150,65 @@ impl<E: edge_nal::io::Error> From<edge_mdns::io::MdnsIoError<E>> for Error {
             },
             MdnsIoError::NoRecvBufError => "No receiving buffer error",
             MdnsIoError::NoSendBufError => "No sending buffer error",
-            MdnsIoError::IoError(io_error) => match io_error.kind() {
-                ErrorKind::Other => "I/O: Unspecified error kind",
-                ErrorKind::NotFound => "I/O: An entity was not found, often a file",
-                ErrorKind::PermissionDenied => {
-                    "I/O: The operation lacked the necessary privileges to complete"
-                }
-                ErrorKind::ConnectionRefused => {
-                    "I/O: The connection was refused by the remote server"
-                }
-                ErrorKind::ConnectionReset => "I/O: The connection was reset by the remote server",
-                ErrorKind::ConnectionAborted => {
-                    "I/O: The connection was aborted (terminated) by the remote server"
-                }
-                ErrorKind::NotConnected => {
-                    "I/O: The network operation failed because it was not connected yet"
-                }
-                ErrorKind::AddrInUse => {
-                    "I/O: A socket address could not be bound because the address is already in use elsewhere"
-                }
-                ErrorKind::AddrNotAvailable => {
-                    "I/O: A nonexistent interface was requested or the requested address was not local"
-                }
-                ErrorKind::BrokenPipe => "I/O: The operation failed because a pipe was closed",
-                ErrorKind::AlreadyExists => "I/O: An entity already exists, often a file",
-                ErrorKind::InvalidInput => "I/O: A parameter was incorrect",
-                ErrorKind::InvalidData => "I/O: Data not valid for the operation were encountered",
-                ErrorKind::TimedOut => {
-                    "I/O: The I/O operation’s timeout expired, causing it to be canceled"
-                }
-                ErrorKind::Interrupted => "I/O: This operation was interrupted",
-                ErrorKind::Unsupported => "I/O: This operation is unsupported on this platform",
-                ErrorKind::OutOfMemory => {
-                    "I/O: An operation could not be completed, because it failed to allocate enough memory"
-                }
-                ErrorKind::WriteZero => "I/O: An attempted write could not write any data",
-                _ => "I/O: Unknown or still non-existent error",
-            },
+            MdnsIoError::IoError(io_error) => from_io_error(io_error.kind()),
         };
 
         Self::new(self::ErrorKind::MDns, err)
     }
 }
 
-impl From<rust_mqtt::packet::v5::reason_codes::ReasonCode> for Error {
-    fn from(e: rust_mqtt::packet::v5::reason_codes::ReasonCode) -> Self {
-        use rust_mqtt::packet::v5::reason_codes::ReasonCode;
+impl<'e> From<rust_mqtt::client::MqttError<'e>> for Error {
+    fn from(e: rust_mqtt::client::MqttError<'e>) -> Self {
+        use rust_mqtt::client::MqttError;
+        let err = match e {
+            MqttError::Network(e) => from_io_error(e),
+            MqttError::Server => {
+                "The remote server did something the client does not understand / does not match the specification"
+            }
+            MqttError::Alloc => "A buffer provision failed",
+            MqttError::AuthPacketReceived => {
+                "An AUTH packet header has been received by the client"
+            }
+            MqttError::Disconnect { .. } => {
+                "The client could not connect to the broker or the broker has sent a DISCONNECT packet"
+            }
+            MqttError::RecoveryRequired => "Another unrecoverable error has been returned earlier",
+            MqttError::PacketIdentifierNotInFlight => {
+                "A republish of a packet without an in flight entry was attempted"
+            }
+            MqttError::RepublishQoSNotMatching => {
+                "A republish of a packet with a quality of service that does not match the quality of service of the original publication was attempted"
+            }
+            MqttError::PacketIdentifierAwaitingPubcomp => {
+                "A republish of a packet whose corresponding PUBREL packet has already been sent was attempted"
+            }
+            MqttError::PacketMaximumLengthExceeded => {
+                "A packet was too long to encode its length with the variable byte integer"
+            }
+            MqttError::ServerMaximumPacketSizeExceeded => {
+                "A packet is too long and would exceed the servers maximum packet size"
+            }
+            MqttError::InvalidTopicAlias => {
+                "The value of a topic alias in an outgoing PUBLISH packet was 0 or greater than the server’s maximum allowed value"
+            }
+            MqttError::SessionBuffer => {
+                "An action was rejected because an internal buffer used for tracking session state is full"
+            }
+            MqttError::SendQuotaExceeded => {
+                "A publish now would exceed the server’s receive maximum and ultimately cause a protocol error"
+            }
+            MqttError::IllegalDisconnectSessionExpiryInterval => {
+                "A disconnect now with the given session expiry interval would cause a protocol error"
+            }
+        };
+
+        Self::new(ErrorKind::Mqtt, err)
+    }
+}
+
+impl From<rust_mqtt::types::ReasonCode> for Error {
+    fn from(e: rust_mqtt::types::ReasonCode) -> Self {
+        use rust_mqtt::types::ReasonCode;
         let err = match e {
             ReasonCode::Success => "Success",
             ReasonCode::GrantedQoS1 => "Granted Qo S1",
@@ -165,23 +216,23 @@ impl From<rust_mqtt::packet::v5::reason_codes::ReasonCode> for Error {
             ReasonCode::DisconnectWithWillMessage => "Disconnect with will message",
             ReasonCode::NoMatchingSubscribers => "No matching subscribers",
             ReasonCode::NoSubscriptionExisted => "No subscription existed",
-            ReasonCode::ContinueAuth => "Continue authentication",
+            ReasonCode::ContinueAuthentication => "Continue authentication",
             ReasonCode::ReAuthenticate => "Reauthenticate",
             ReasonCode::UnspecifiedError => "Unspecified error",
             ReasonCode::MalformedPacket => "Malformed packet",
             ReasonCode::ProtocolError => "Protocol error",
             ReasonCode::ImplementationSpecificError => "Implementation specific error",
             ReasonCode::UnsupportedProtocolVersion => "Unsupported protocol version",
-            ReasonCode::ClientIdNotValid => "Client ID not valid",
+            ReasonCode::ClientIdentifierNotValid => "Client ID not valid",
             ReasonCode::BadUserNameOrPassword => "Bad username or password",
             ReasonCode::NotAuthorized => "Not authorized",
             ReasonCode::ServerUnavailable => "Server unavailable",
             ReasonCode::ServerBusy => "Server busy",
             ReasonCode::Banned => "Banned",
             ReasonCode::ServerShuttingDown => "Server shutting down",
-            ReasonCode::BadAuthMethod => "Bad authentication method",
+            ReasonCode::BadAuthenticationMethod => "Bad authentication method",
             ReasonCode::KeepAliveTimeout => "Keep alive timeout",
-            ReasonCode::SessionTakeOver => "Sessions take over",
+            ReasonCode::SessionTakenOver => "Sessions take over",
             ReasonCode::TopicFilterInvalid => "Topic filter invalid",
             ReasonCode::TopicNameInvalid => "Topic name invalid",
             ReasonCode::PacketIdentifierInUse => "Packet identifier in use",
@@ -197,16 +248,13 @@ impl From<rust_mqtt::packet::v5::reason_codes::ReasonCode> for Error {
             ReasonCode::QoSNotSupported => "QoS not supported",
             ReasonCode::UseAnotherServer => "Use another server",
             ReasonCode::ServerMoved => "Server moved",
-            ReasonCode::SharedSubscriptionNotSupported => "Shared subscription not supported",
+            ReasonCode::SharedSubscriptionsNotSupported => "Shared subscription not supported",
             ReasonCode::ConnectionRateExceeded => "Connection rate exceeded",
             ReasonCode::MaximumConnectTime => "Maximum connect time",
             ReasonCode::SubscriptionIdentifiersNotSupported => {
                 "Subscription identifiers not supported"
             }
-            ReasonCode::WildcardSubscriptionNotSupported => "Wildcard subscription not supported",
-            ReasonCode::TimerNotSupported => "Timer not supported",
-            ReasonCode::BuffError => "Buffering error",
-            ReasonCode::NetworkError => "Network error",
+            ReasonCode::WildcardSubscriptionsNotSupported => "Wildcard subscription not supported",
         };
 
         Self::new(ErrorKind::Mqtt, err)
@@ -315,70 +363,20 @@ impl From<edge_nal::WithTimeoutError<edge_nal_embassy::TcpError>> for Error {
     }
 }
 
-impl From<esp_radio::InitializationError> for Error {
-    fn from(e: esp_radio::InitializationError) -> Self {
-        use esp_radio::InitializationError;
-        match e {
-            InitializationError::General(_) => Self::new(ErrorKind::WiFi, "General error"),
-            InitializationError::WifiError(e) => Self::from(e),
-            InitializationError::WrongClockConfig => Self::new(
-                ErrorKind::WiFi,
-                "The current CPU clock frequency is too low",
-            ),
-            InitializationError::InterruptsDisabled => Self::new(
-                ErrorKind::WiFi,
-                "Tried to initialize while interrupts are disabled. This is not supported",
-            ),
-            _ => Self::new(ErrorKind::WiFi, "Unknown or still non-existent error"),
-        }
-    }
-}
-
 impl From<esp_radio::wifi::WifiError> for Error {
     fn from(e: esp_radio::wifi::WifiError) -> Self {
-        use esp_radio::wifi::InternalWifiError;
         use esp_radio::wifi::WifiError;
         let err = match e {
-            WifiError::NotInitialized => "Not initialized module",
-            WifiError::InternalError(internal_wifi_error) => match internal_wifi_error {
-                InternalWifiError::NoMem => "Internal: Out of memory",
-                InternalWifiError::InvalidArg => "Internal: Invalid argument",
-                InternalWifiError::NotInit => "Internal: Wi-Fi driver was not installed",
-                InternalWifiError::NotStarted => "Internal: Wi-Fi driver was not started",
-                InternalWifiError::NotStopped => "Internal: Wi-Fi driver was not stopped",
-                InternalWifiError::Interface => "Internal: Wi-Fi interface error",
-                InternalWifiError::Mode => "Internal: Wi-Fi mode error",
-                InternalWifiError::State => "Internal: Wi-Fi internal state error",
-                InternalWifiError::Conn => {
-                    "Internal: Wi-Fi internal control block of station or soft-AP error"
-                }
-                InternalWifiError::Nvs => "Internal: Wi-Fi internal NVS module error",
-                InternalWifiError::InvalidMac => "Internal: MAC address is invalid",
-                InternalWifiError::InvalidSsid => "Internal: SSID is invalid",
-                InternalWifiError::InvalidPassword => "Internal: Password is invalid",
-                InternalWifiError::Timeout => "Internal: Timeout error",
-                InternalWifiError::WakeFail => {
-                    "Internal: WiFi is in sleep state(RF closed) and wakeup fail"
-                }
-                InternalWifiError::WouldBlock => "Internal: The caller would block",
-                InternalWifiError::NotConnected => "Internal: Station still in disconnect status",
-                InternalWifiError::PostFail => "Internal: Failed to post the event to WiFi task",
-                InternalWifiError::InvalidInitState => {
-                    "Internal: Invalid WiFi state when init/deinit is called"
-                }
-                InternalWifiError::StopState => "Internal: Returned when WiFi is stopping",
-                InternalWifiError::NotAssociated => {
-                    "Internal: The WiFi connection is not associated"
-                }
-                InternalWifiError::TxDisallowed => "Internal: The WiFi TX is disallowed",
-                _ => "Internal: Unknown or still non-existent error",
-            },
-            WifiError::Disconnected => {
+            WifiError::Disconnected(_) => {
                 "Device disconnected from the network or failed to connect to it"
             }
-            WifiError::UnknownWifiMode => "Unknown Wi-Fi mode (not Sta/Ap/ApSta)",
             WifiError::Unsupported => "Unsupported operation or mode ",
             WifiError::InvalidArguments => "Invalid Arguments",
+            WifiError::Failed => "General Wi-Fi failure",
+            WifiError::OutOfMemory => "Internal: Out of memory",
+            WifiError::InvalidSsid => "Internal: SSID is invalid",
+            WifiError::InvalidPassword => "Internal: Password is invalid",
+            WifiError::NotConnected => "Internal: Station still in disconnect status",
             _ => "Unknown or still non-existent error",
         };
         Self::new(ErrorKind::WiFi, err)

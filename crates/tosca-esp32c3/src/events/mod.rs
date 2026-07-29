@@ -13,7 +13,7 @@ use core::time::Duration;
 
 use alloc::boxed::Box;
 
-use embassy_executor::{SpawnToken, Spawner};
+use embassy_executor::{SpawnError, SpawnToken, Spawner};
 use embassy_net::{IpAddress, Stack, dns::DnsQueryType};
 use embassy_sync::blocking_mutex::raw::CriticalSectionRawMutex;
 use embassy_sync::mutex::Mutex;
@@ -75,17 +75,16 @@ const CAPACITY: usize = 4;
 // Time to wait, in milliseconds, after completing a task operation
 const WAIT_FOR_MILLISECONDS: u64 = 200;
 
-// Time to wait, in seconds, before reconnecting to the broker
+// Time to wait, in seconds, before reconnecting to the broker.
 const RETRY_INTERVAL: u64 = 120;
 
 // Time, in seconds, to wait before starting the network write task.
 //
 // To be on the safe side, this value should be twice the WiFi reconnection
-// interval (in seconds), plus an additional two
+// interval (in seconds), plus an additional two.
 const LOWER_PRIORITY: u64 = (WIFI_RECONNECT_DELAY * 2) + 2;
 
-// Time, in seconds, to wait before pinging the broker again to check if the
-// connection is still active
+// Time, in seconds, to wait before pinging the broker again.
 const PING_BROKER_AGAIN: u64 = 10;
 
 // All events to be transmitted over the network
@@ -140,28 +139,14 @@ async fn write_on_network(stack: Stack<'static>, remote_endpoint: (IpAddress, u1
     // This task is scheduled to run last, so it is assigned a lower priority.
     Timer::after_secs(LOWER_PRIORITY).await;
 
-    let mut mqtt_publisher = loop {
-        // Create a `MQTT` publisher.
-        //
-        // If an error occurs, retry creation after a specified time interval.
-        match Mqtt::new(stack, remote_endpoint).await {
-            Ok(mqtt_publisher) => {
-                info!("Created the `MQTT` publisher");
-                break mqtt_publisher;
-            }
-            Err(e) => {
-                error!("Error while creating the `MQTT` publisher: {e}");
-            }
-        }
-        Timer::after_secs(RETRY_INTERVAL).await;
-    };
+    let mut mqtt = Mqtt::new();
 
     loop {
         // Connect to the broker.
         //
-        // If an error occurs, retry the connection after
-        // a specified time interval.
-        match mqtt_publisher.connect().await {
+        // If an error occurs, retry the connection after the configured
+        // interval.
+        match mqtt.connect(stack, remote_endpoint).await {
             Ok(()) => {
                 info!("`MQTT` publisher connected to the broker");
                 break;
@@ -170,32 +155,25 @@ async fn write_on_network(stack: Stack<'static>, remote_endpoint: (IpAddress, u1
                 error!("Error while connecting the `MQTT` publisher to the broker: {e}");
             }
         }
+
         Timer::after_secs(RETRY_INTERVAL).await;
     }
 
-    // Count the number of ping failures
+    // Count the number of ping failures.
     let mut ping_failure_counter: u8 = 0;
+
     loop {
-        // Ping the broker to check if it is still alive
-        if let Err(e) = mqtt_publisher.send_ping().await {
+        // Ping the broker to check if it is still alive.
+        if let Err(e) = mqtt.send_ping().await {
             error!("Error while pinging the `MQTT` broker: {e}");
 
-            // After five consecutive ping failures, reinitialize the `MQTT`
+            // After five consecutive ping failures, reinitialize the MQTT
             // publisher, as the socket may have been closed.
             if ping_failure_counter == 5 {
-                mqtt_publisher = match Mqtt::new(stack, remote_endpoint).await {
-                    Ok(mqtt_publisher) => {
-                        info!("Reinitialize the `MQTT` publisher");
-                        mqtt_publisher
-                    }
-                    Err(e) => {
-                        error!("Error while reinitializing the `MQTT` publisher: {e}");
-                        Timer::after_secs(RETRY_INTERVAL).await;
-                        continue;
-                    }
-                };
+                mqtt = Mqtt::new();
+                info!("Reinitialize the `MQTT` publisher");
 
-                match mqtt_publisher.connect().await {
+                match mqtt.connect(stack, remote_endpoint).await {
                     Ok(()) => {
                         info!("`MQTT` publisher reconnected to the broker");
                     }
@@ -205,24 +183,24 @@ async fn write_on_network(stack: Stack<'static>, remote_endpoint: (IpAddress, u1
                         continue;
                     }
                 }
+
                 ping_failure_counter = 0;
                 continue;
             }
+
             ping_failure_counter += 1;
             Timer::after_secs(PING_BROKER_AGAIN).await;
             continue;
         }
 
-        // The lock will be released at the end of this scope.
-        {
-            // Wait until a signal is received.
-            let _ = WRITE_ON_NETWORK.wait().await;
-        }
-        // The lock will be released at the end of this scope,
-        // once the JSON data has been retrieved.
+        // Wait until an event task signals that data is ready.
+        let _ = WRITE_ON_NETWORK.wait().await;
+
+        // Serialize the events while holding the lock only for the time needed
+        // to read them.
         let json_data = { serde_json::to_vec(&*EVENTS.lock().await) };
 
-        // Serialize data
+        // Serialize data.
         let data = match json_data {
             Ok(data) => data,
             Err(e) => {
@@ -236,8 +214,8 @@ async fn write_on_network(stack: Stack<'static>, remote_endpoint: (IpAddress, u1
         // Transmit the data over the network.
         //
         // Skip the operation if any subscriber errors are detected, and issue
-        // a warning
-        if let Err(e) = mqtt_publisher.publish(topic.as_str(), &data).await {
+        // a warning.
+        if let Err(e) = mqtt.publish(topic.as_str(), &data).await {
             error!("Error while publishing data over the network: {e}");
         }
 
@@ -1073,7 +1051,7 @@ where
             self.config.stack,
             remote_endpoint,
             self.config.topic.clone(),
-        ))?;
+        )?);
 
         Ok(self
             .config
@@ -1085,14 +1063,23 @@ where
             )))
     }
 
-    fn spawn<F, T>(mut self, name: &'static str, task: SpawnToken<T>, add_event: F) -> Self
+    fn spawn<F>(
+        mut self,
+        name: &'static str,
+        task: Result<SpawnToken<impl Sized>, SpawnError>,
+        add_event: F,
+    ) -> Self
     where
         F: FnOnce(&mut Events),
     {
-        if let Err(e) = self.config.spawner.spawn(task) {
-            error!("Impossible to spawn the event `{name}`: {e}");
-            return self;
-        }
+        let task = match task {
+            Ok(task) => task,
+            Err(e) => {
+                error!("Failed to define spawn token for event `{name}`: {e}");
+                return self;
+            }
+        };
+        self.config.spawner.spawn(task);
         add_event(&mut self.events);
         info!("Spawned the task for event `{name}`");
         self
