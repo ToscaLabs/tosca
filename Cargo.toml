@@ -26,7 +26,7 @@ tosca-controller = { version = "0.2.0", path = "crates/tosca-controller" }
 hashbrown = { version = "0.17", default-features = false, features = ["default-hasher"] }
 indexmap = { version = "2.12", default-features = false }
 
-mdns-sd = { version = "0.20.3", default-features = false }
+mdns-sd = { version = "0.21.3", default-features = false }
 serde = { version = "1.0", default-features = false }
 serde_json = { version = "1", default-features = false }
 
