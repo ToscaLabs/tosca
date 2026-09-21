@@ -9,8 +9,9 @@ use askama::Template;
 use axum::{
     Router,
     extract::{Path, State},
+    http::StatusCode,
     response::sse::{Event, KeepAlive, Sse},
-    response::{ErrorResponse, Html, IntoResponse},
+    response::{Html, IntoResponse},
     routing::get,
 };
 
@@ -105,11 +106,11 @@ async fn index(State(state): State<AppState>) -> impl IntoResponse {
 async fn event_stream(
     Path(device_id): Path<usize>,
     State(state): State<AppState>,
-) -> Result<Sse<impl Stream<Item = Result<Event, Infallible>>>, ErrorResponse> {
+) -> Result<Sse<impl Stream<Item = Result<Event, Infallible>>>, (StatusCode, String)> {
     let receiver = state.devices_receivers.get(&device_id).ok_or_else(|| {
         let err = format!("Device `{device_id}` does not exist");
         error!(err);
-        ErrorResponse::from(err)
+        (StatusCode::NOT_FOUND, err)
     })?;
 
     let receiver = receiver.resubscribe();
