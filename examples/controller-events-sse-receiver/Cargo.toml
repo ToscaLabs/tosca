@@ -17,7 +17,7 @@ tosca = { workspace = true, features = ["deserialize"] }
 tosca-controller = { workspace = true }
 
 # Template engine
-askama = "0.15"
+askama = "0.16"
 
 # Web framework
 axum = { version = "0.8", default-features = false, features = ["tokio", "http1"] }
