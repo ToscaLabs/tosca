@@ -31,7 +31,7 @@ tokio = { version = "1.0", default-features = false, features = ["rt", "rt-multi
 tokio-stream = { version = "0.1.17", features = ["sync"] }
 
 # HTTP utilities
-tower-http = { version = "0.6.1", default-features = false, features = ["fs", "trace"] }
+tower-http = { version = "0.7.1", default-features = false, features = ["fs", "trace"] }
 
 # Error handling
 thiserror = "2.0.17"
