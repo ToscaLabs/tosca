@@ -11,7 +11,7 @@ use axum::{
 ///
 /// Contains an [`ErrorKind`], a general error description,
 /// and optional information about the encountered error.
-pub struct ErrorResponse(Response);
+pub struct ErrorResponse(Box<Response>);
 
 impl ErrorResponse {
     /// Generates an [`ErrorResponse`].
@@ -21,7 +21,9 @@ impl ErrorResponse {
     #[inline]
     pub fn with_description(error: ErrorKind, description: &str) -> Self {
         let value = ToscaErrorResponse::with_description(error, description);
-        Self((StatusCode::INTERNAL_SERVER_ERROR, Json(value)).into_response())
+        Self(Box::new(
+            (StatusCode::INTERNAL_SERVER_ERROR, Json(value)).into_response(),
+        ))
     }
 
     /// Generates an [`ErrorResponse`].
@@ -32,7 +34,9 @@ impl ErrorResponse {
     #[inline]
     pub fn with_description_error(error: ErrorKind, description: &str, info: &str) -> Self {
         let value = ToscaErrorResponse::with_description_error(error, description, info);
-        Self((StatusCode::INTERNAL_SERVER_ERROR, Json(value)).into_response())
+        Self(Box::new(
+            (StatusCode::INTERNAL_SERVER_ERROR, Json(value)).into_response(),
+        ))
     }
 
     /// Generates an [`ErrorResponse`] for invalid data.
@@ -77,6 +81,6 @@ impl ErrorResponse {
 
 impl IntoResponse for ErrorResponse {
     fn into_response(self) -> Response {
-        self.0
+        *self.0
     }
 }
