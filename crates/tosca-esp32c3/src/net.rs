@@ -37,7 +37,7 @@ pub(crate) async fn get_ip(stack: Stack<'static>) -> Ipv4Addr {
 }
 
 #[embassy_executor::task]
-async fn task(mut runner: Runner<'static, Interface<'static>>) {
+async fn task(mut runner: Runner<'static, Interface>) {
     runner.run().await;
 }
 
@@ -52,7 +52,7 @@ impl NetworkStack {
     /// Failure to spawn the network stack task.
     pub async fn build<const SOCKET_STACK_SIZE: usize>(
         rng: Rng,
-        wifi_interface: Interface<'static>,
+        wifi_interface: Interface,
         spawner: Spawner,
     ) -> Result<Stack<'static>> {
         let config = Config::dhcpv4(DhcpConfig::default());

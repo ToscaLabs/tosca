@@ -8,8 +8,6 @@ use tosca::events::EventsDescription;
 use tosca::response::ResponseKind;
 use tosca::route::{Route, RouteConfigs};
 
-use esp_radio::wifi::Interface;
-
 use log::error;
 
 use crate::error::{Error, ErrorKind};
@@ -42,8 +40,8 @@ impl Device<()> {
     /// Creates a [`Device`] without a state.
     #[must_use]
     #[inline]
-    pub fn new(wifi_interface: Interface<'_>, scheme: DeviceScheme) -> Self {
-        Self::with_state(wifi_interface, scheme, ())
+    pub fn new(wifi_mac: [u8; 6], scheme: DeviceScheme) -> Self {
+        Self::with_state(wifi_mac, scheme, ())
     }
 }
 
@@ -54,8 +52,8 @@ where
     /// Creates a [`Device`] with the given state.
     #[must_use]
     #[inline]
-    pub fn with_state(wifi_interface: Interface<'_>, scheme: DeviceScheme, state: S) -> Self {
-        Self::init(wifi_interface, scheme, state)
+    pub fn with_state(wifi_mac: [u8; 6], scheme: DeviceScheme, state: S) -> Self {
+        Self::init(wifi_mac, scheme, state)
     }
 
     /// Sets the main route.
@@ -251,9 +249,7 @@ where
     }
 
     #[inline]
-    fn init(wifi_interface: Interface<'_>, device_scheme: DeviceScheme, state: S) -> Self {
-        let wifi_mac = wifi_interface.mac_address();
-
+    fn init(wifi_mac: [u8; 6], device_scheme: DeviceScheme, state: S) -> Self {
         let description = DeviceDescription::new(device_scheme, MAIN_ROUTE, RouteConfigs::new())
             .environment(DeviceEnvironment::Embedded);
 
