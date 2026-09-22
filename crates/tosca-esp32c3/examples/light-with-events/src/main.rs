@@ -20,7 +20,6 @@ use tosca::route::Route;
 use esp_hal::Config;
 use esp_hal::clock::CpuClock;
 use esp_hal::gpio::{AnyPin, Input, InputConfig, Level, Output, OutputConfig, Pin, Pull};
-use esp_hal::interrupt::software::SoftwareInterruptControl;
 use esp_hal::rng::Rng;
 use esp_hal::timer::timg::TimerGroup;
 
@@ -237,8 +236,7 @@ async fn main(spawner: Spawner) {
     esp_alloc::heap_allocator!(size: MAX_HEAP_SIZE);
 
     let timg0 = TimerGroup::new(peripherals.TIMG0);
-    let sw_int = SoftwareInterruptControl::new(peripherals.SW_INTERRUPT);
-    esp_rtos::start(timg0.timer0, sw_int.software_interrupt0);
+    esp_rtos::start(timg0.timer0, peripherals.FROM_CPU_INTR0);
 
     info!("ESP RTOS started!");
 
@@ -247,11 +245,13 @@ async fn main(spawner: Spawner) {
     // Retrieve device configuration.
     let device_config = DEVICE_CONFIG;
 
-    let interfaces = Wifi::configure(peripherals.WIFI, spawner)
+    let wifi_interface = Wifi::configure(peripherals.WIFI, spawner)
         .expect("Failed to configure Wi-Fi")
         .connect(device_config.ssid, device_config.password)
         .await
         .expect("Failed to connect to Wi-Fi");
+
+    let wifi_mac = wifi_interface.mac_address();
 
     // The number of tasks in the stack must be increased depending on the
     // needs. If the number of task is less than the actual number of tasks,
@@ -265,7 +265,7 @@ async fn main(spawner: Spawner) {
     // - 1 task to check if a button is pressed
     // - 1 task to check if a led state is changed
     // - 1 task to send data to an external broker
-    let stack = NetworkStack::build::<7>(rng, interfaces.station, spawner)
+    let stack = NetworkStack::build::<7>(rng, wifi_interface, spawner)
         .await
         .expect("Failed to create network stack.");
 
@@ -277,7 +277,7 @@ async fn main(spawner: Spawner) {
 
     spawner.spawn(press_button(button).expect("Impossible to create the task to press the button"));
 
-    let device = Device::new(interfaces.access_point, LIGHT_SCHEME)
+    let device = Device::new(wifi_mac, LIGHT_SCHEME)
         .main_route("/light")
         .stateless_serial_route(
             Route::put("On", "/on").description("Turn light on."),

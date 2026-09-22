@@ -367,16 +367,13 @@ impl From<esp_radio::wifi::WifiError> for Error {
     fn from(e: esp_radio::wifi::WifiError) -> Self {
         use esp_radio::wifi::WifiError;
         let err = match e {
-            WifiError::Disconnected(_) => {
-                "Device disconnected from the network or failed to connect to it"
-            }
-            WifiError::Unsupported => "Unsupported operation or mode ",
-            WifiError::InvalidArguments => "Invalid Arguments",
-            WifiError::Failed => "General Wi-Fi failure",
+            WifiError::Unsupported => "Unsupported operation or mode",
+            WifiError::InvalidArguments => "Invalid arguments",
+            WifiError::Other => "General Wi-Fi failure",
             WifiError::OutOfMemory => "Internal: Out of memory",
             WifiError::InvalidSsid => "Internal: SSID is invalid",
             WifiError::InvalidPassword => "Internal: Password is invalid",
-            WifiError::NotConnected => "Internal: Station still in disconnect status",
+            WifiError::NotConnected => "Device is not connected to the Wi-Fi network",
             _ => "Unknown or still non-existent error",
         };
         Self::new(ErrorKind::WiFi, err)
