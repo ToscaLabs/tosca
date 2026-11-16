@@ -333,8 +333,6 @@ impl Controller {
 mod tests {
     use std::fmt::Debug;
 
-    use tracing::warn;
-
     use tosca::hazards::{Hazard, Hazards};
     use tosca::parameters::ParametersValues;
     use tosca::response::{OkResponse, SerialResponse};
@@ -342,16 +340,14 @@ mod tests {
     use serde::{Serialize, de::DeserializeOwned};
     use serde_json::json;
 
-    use serial_test::serial;
-
     use crate::device::Devices;
     use crate::error::Error;
     use crate::policy::Policy;
     use crate::response::Response;
 
     use crate::device::tests::{create_custom_device, create_light};
-    use crate::discovery::tests::configure_discovery;
-    use crate::tests::{Brightness, light_with_toggle, run_one_device};
+    use crate::discovery::tests::{configure_discovery, discover_test_devices};
+    use crate::tests::{Brightness, TestDevice, run_test_devices};
 
     use super::{Controller, DeviceSender, RequestSender, sender_error};
 
@@ -539,77 +535,34 @@ mod tests {
         .await;
     }
 
-    #[inline]
-    async fn controller_without_policy() {
-        // Create a controller.
-        let mut controller = Controller::new(configure_discovery());
-
-        // Run discovery process.
-        controller.discover().await.unwrap();
-
-        // Run controller checks.
+    async fn controller_without_policy(services: Vec<mdns_sd::ResolvedService>) {
+        let devices = discover_test_devices(services, false).await;
+        let controller = Controller::from_devices(configure_discovery(), devices);
         controller_checks(controller).await;
     }
 
-    #[inline]
-    async fn controller_with_policy() {
-        // Global blocked hazards.
+    async fn controller_with_policy(services: Vec<mdns_sd::ResolvedService>) {
         let global_hazards = Hazards::new().insert(Hazard::LogEnergyConsumption);
-
-        // Local blocked hazards for a specific device.
         let local_hazards = Hazards::new().insert(Hazard::FireHazard);
-
-        // Create both a global policy and a local one.
         let policy = Policy::new(global_hazards).block_device_on_hazards(0, local_hazards);
 
-        // Create a controller.
-        let mut controller = Controller::new(configure_discovery()).policy(policy);
-
-        // Run discovery process.
-        controller.discover().await.unwrap();
-
-        // Run controller checks.
+        let devices = discover_test_devices(services, false).await;
+        let controller = Controller::from_devices(configure_discovery(), devices).policy(policy);
         controller_checks(controller).await;
     }
 
-    #[inline]
-    async fn controller_test<F, Fut>(name: &str, function: F)
-    where
-        F: FnOnce() -> Fut,
-        Fut: Future<Output = ()>,
-    {
-        if option_env!("CI").is_some() {
-            warn!(
-                "Skipping test on CI: {} can run only on systems that expose physical MAC addresses.",
-                name
-            );
-        } else {
-            run_one_device(
-                |close_rx| async {
-                    light_with_toggle(close_rx).await;
-                },
-                || async {
-                    function().await;
-                },
-            )
-            .await;
-        }
-    }
-
-    #[tokio::test(flavor = "multi_thread", worker_threads = 2)]
-    #[serial]
+    #[tokio::test]
     async fn test_without_policy_controller() {
-        controller_test("controller_without_policy", || async {
-            controller_without_policy().await;
+        run_test_devices(&[TestDevice::LightWithToggle], |services| async move {
+            controller_without_policy(services).await;
         })
         .await;
     }
 
-    #[tokio::test(flavor = "multi_thread", worker_threads = 2)]
-    #[serial]
+    #[tokio::test]
     async fn test_with_policy_controller() {
-        controller_test("controller_with_policy", || async {
-            controller_with_policy().await;
+        run_test_devices(&[TestDevice::LightWithToggle], |services| async move {
+            controller_with_policy(services).await;
         })
         .await;
     }
