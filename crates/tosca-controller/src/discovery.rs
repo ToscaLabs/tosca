@@ -382,116 +382,58 @@ impl Discovery {
 
 #[cfg(test)]
 pub(crate) mod tests {
-    use std::time::Duration;
+    use mdns_sd::ResolvedService;
 
-    use tracing::warn;
-
-    use serial_test::serial;
-
-    use crate::tests::{
-        DOMAIN, analyze_light_data, custom_device, light_with_toggle, light_without_toggle,
-        run_one_device, run_two_devices,
-    };
+    use crate::device::Devices;
+    use crate::tests::{DOMAIN, TestDevice, analyze_light_data, run_test_devices};
 
     use super::Discovery;
 
     pub(crate) fn configure_discovery() -> Discovery {
         Discovery::new(DOMAIN)
-            .timeout(Duration::from_secs(1))
-            .disable_ipv6()
-            .disable_network_interface("docker0")
     }
 
-    #[inline]
-    async fn run_discovery(strict_mode: bool, number_of_devices: usize) {
-        let devices = if strict_mode {
-            configure_discovery().strict_mode()
-        } else {
-            configure_discovery()
-        }
-        .discover()
-        .await
-        .unwrap();
+    pub(crate) async fn discover_test_devices(
+        services: Vec<ResolvedService>,
+        strict: bool,
+    ) -> Devices {
+        Discovery::obtain_devices_data(services, strict)
+            .await
+            .unwrap()
+    }
 
-        // Count devices.
-        assert_eq!(devices.len(), number_of_devices);
+    async fn run_discovery(services: Vec<ResolvedService>, strict: bool, expected: usize) {
+        let devices = discover_test_devices(services, strict).await;
+        assert_eq!(devices.len(), expected);
 
-        // Analyze light data.
         for device in devices {
             analyze_light_data(&device);
         }
     }
 
-    #[inline]
-    async fn discovery_test<F, Fut>(name: &str, function: F)
-    where
-        F: FnOnce() -> Fut,
-        Fut: Future<Output = ()>,
-    {
-        if option_env!("CI").is_some() {
-            warn!(
-                "Skipping test on CI: {} can run only on systems that expose physical MAC addresses.",
-                name
-            );
-        } else {
-            function().await;
-        }
-    }
-
-    #[tokio::test(flavor = "multi_thread", worker_threads = 2)]
-    #[serial]
+    #[tokio::test]
     async fn test_single_device_discovery() {
-        discovery_test("discovery_with_single_device", || async {
-            run_one_device(
-                |close_rx| async {
-                    light_with_toggle(close_rx).await;
-                },
-                || async {
-                    run_discovery(false, 1).await;
-                },
-            )
-            .await;
+        run_test_devices(&[TestDevice::LightWithToggle], |services| async move {
+            run_discovery(services, false, 1).await;
         })
         .await;
     }
 
-    #[tokio::test(flavor = "multi_thread", worker_threads = 3)]
-    #[serial]
+    #[tokio::test]
     async fn test_more_devices_discovery() {
-        discovery_test("discovery_with_more_devices", || async {
-            run_two_devices(
-                |close_rx| async {
-                    light_with_toggle(close_rx).await;
-                },
-                |close_rx| async {
-                    light_without_toggle(close_rx).await;
-                },
-                || async {
-                    run_discovery(false, 2).await;
-                },
-            )
-            .await;
-        })
+        run_test_devices(
+            &[TestDevice::LightWithToggle, TestDevice::LightWithoutToggle],
+            |services| async move { run_discovery(services, false, 2).await },
+        )
         .await;
     }
 
-    #[tokio::test(flavor = "multi_thread", worker_threads = 3)]
-    #[serial]
+    #[tokio::test]
     async fn test_more_devices_strict_discovery() {
-        discovery_test("strict_discovery_with_more_devices", || async {
-            run_two_devices(
-                |close_rx| async {
-                    light_with_toggle(close_rx).await;
-                },
-                |close_rx| async {
-                    custom_device(close_rx).await;
-                },
-                || async {
-                    run_discovery(true, 1).await;
-                },
-            )
-            .await;
-        })
+        run_test_devices(
+            &[TestDevice::LightWithToggle, TestDevice::Thermostat],
+            |services| async move { run_discovery(services, true, 1).await },
+        )
         .await;
     }
 }
