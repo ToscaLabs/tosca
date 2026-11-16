@@ -124,8 +124,6 @@ jobs:
     env:
       RUSTFLAGS: "-Cinstrument-coverage"
       LLVM_PROFILE_FILE: "tosca-%p-%m.profraw"
-      # Sets the CI variable to true in order to skip those tests that cannot be executed on virtual machines.
-      CI: true
 
     steps:
       - uses: actions/checkout@v7
@@ -152,7 +150,7 @@ jobs:
       - name: Run tests
         run: cargo test --verbose
 
-      - name: Run tests (no default features)
+      - name: Run tests (all features)
         run: cargo test --verbose --all-features
 
       - name: Generate lcov report
