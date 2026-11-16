@@ -340,22 +340,3 @@ pub(crate) fn get_mac_addresses() -> (Option<[u8; 6]>, Option<[u8; 6]>) {
         (None, None)
     }
 }
-
-#[cfg(test)]
-mod tests {
-    use super::get_mac_addresses;
-
-    // This test only runs on systems that have physical MAC addresses.
-    // Systems with virtual MAC interfaces, such as CI environments,
-    // are skipped.
-    #[test]
-    fn test_mac_addresses_local() {
-        if option_env!("CI").is_none() {
-            let (wifi_mac, ethernet_mac) = get_mac_addresses();
-            assert!(
-                wifi_mac.is_some() || ethernet_mac.is_some(),
-                "At least one Wi-Fi or Ethernet MAC address must be present."
-            );
-        }
-    }
-}

@@ -91,8 +91,15 @@ where
     /// - Returns an error if no **Wi-Fi** or **Ethernet** MAC address is
     ///   available for the device ID.
     /// - Returns an error if mandatory routes are missing or invalid.
-    pub fn build(mut self) -> Result<DeviceVerified> {
-        let (wifi_mac, ethernet_mac) = get_mac_addresses();
+    #[inline]
+    pub fn build(self) -> Result<DeviceVerified> {
+        self.build_with_mac_addresses(get_mac_addresses())
+    }
+
+    fn build_with_mac_addresses(
+        mut self,
+        (wifi_mac, ethernet_mac): (Option<[u8; 6]>, Option<[u8; 6]>),
+    ) -> Result<DeviceVerified> {
         if wifi_mac.is_none() && ethernet_mac.is_none() {
             let message = "No Wi-Fi or Ethernet MAC address is available for the device ID";
             error!(message);
@@ -199,6 +206,9 @@ mod tests {
     use crate::responses::serial::{SerialResponse, serial_stateful, serial_stateless};
 
     use super::{Device, DeviceVerified};
+
+    const TEST_MAC_ADDRESSES: (Option<[u8; 6]>, Option<[u8; 6]>) =
+        (None, Some([0x02, 0, 0, 0, 0, 1]));
 
     #[derive(Clone)]
     struct DeviceState<S>
@@ -375,7 +385,20 @@ mod tests {
                 routes.route2,
                 serial_response_without_state,
             ))
-            .build()
+            .build_with_mac_addresses(TEST_MAC_ADDRESSES)
+    }
+
+    #[test]
+    fn test_device_without_mac_addresses() {
+        let result = Device::new(DeviceScheme::base_custom_scheme("Light"))
+            .build_with_mac_addresses((None, None));
+        assert!(matches!(
+            result,
+            Err(error) if error == Error::new(
+                ErrorKind::NoIdFound,
+                "No Wi-Fi or Ethernet MAC address is available for the device ID"
+            )
+        ));
     }
 
     #[test]
@@ -416,7 +439,7 @@ mod tests {
                 routes.route2,
                 serial_response_without_state,
             ))
-            .build();
+            .build_with_mac_addresses(TEST_MAC_ADDRESSES);
 
         assert!(device_verified.is_ok());
     }
@@ -442,7 +465,7 @@ mod tests {
                 routes.route2,
                 serial_response_without_state,
             ))
-            .build();
+            .build_with_mac_addresses(TEST_MAC_ADDRESSES);
 
         assert!(device_verified.is_ok());
     }
