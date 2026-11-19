@@ -1,3 +1,11 @@
+//! A camera management and streaming server built with `tosca-os` and `nokhwa`.
+//!
+//! Provides endpoints for camera discovery, information retrieval, format
+//! configuration, screenshot capture, and live video streaming.
+//!
+//! Supports configurable network settings, TCP/UDP transport, and mDNS
+//! service discovery.
+
 mod info;
 mod parameters;
 mod screenshot;
