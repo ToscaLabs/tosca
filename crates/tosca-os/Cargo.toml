@@ -12,7 +12,6 @@ repository = "https://github.com/ToscaLabs/tosca/tree/master/crates/tosca-os"
 rust-version.workspace = true
 
 [package.metadata.docs.rs]
-features = ["default"]
 rustdoc-args = ["--cfg", "docsrs"]
 
 [lints]
