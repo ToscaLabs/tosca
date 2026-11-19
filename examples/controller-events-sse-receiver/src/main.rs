@@ -1,3 +1,12 @@
+//! A web-based controller for discovering `tosca` devices on the network,
+//! subscribing to their event streams, and displaying real-time events
+//! through a web interface.
+//!
+//! Device discovery is performed using mDNS-SD, while Server-Sent Events
+//! (SSE) are used to stream device events to connected clients.
+//!
+//! The controller also serves static assets and supports graceful shutdown.
+
 use std::collections::HashMap;
 use std::convert::Infallible;
 use std::net::{IpAddr, Ipv4Addr, SocketAddr};
@@ -149,7 +158,7 @@ async fn shutdown_controller() {
 
     #[cfg(unix)]
     let terminate = async {
-        signal::unix::signal(signal::unix::SignalKind::terminate())
+        let _ = signal::unix::signal(signal::unix::SignalKind::terminate())
             .expect("failed to install signal handler")
             .recv()
             .await;
@@ -216,7 +225,7 @@ async fn main() -> Result<(), Error> {
             .start_event_receiver(id, 100)
             .await
             .map_err(Error::Tosca)?;
-        devices_receivers.insert(id, receiver);
+        let _ = devices_receivers.insert(id, receiver);
     }
 
     let state = AppState::new(devices_receivers);

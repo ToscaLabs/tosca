@@ -23,3 +23,6 @@ tokio = { version = "1.0", default-features = false, features = ["rt", "rt-multi
 
 # Logging
 tracing-subscriber = { version = "0.3", default-features = false, features = ["ansi", "fmt"] }
+
+[lints]
+workspace = true

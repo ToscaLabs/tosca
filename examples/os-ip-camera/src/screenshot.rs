@@ -39,7 +39,7 @@ async fn run_camera_screenshot(
         // Discard at least 10 camera frame before sending the correct one
         // in order to focus in lens.
         for _ in 0..10 {
-            camera
+            let _ = camera
                 .frame()
                 .map_err(|e| camera_error("Impossible to retrieve a frame for camera", e))?;
         }

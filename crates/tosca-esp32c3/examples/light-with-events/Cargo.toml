@@ -39,6 +39,9 @@ toml-cfg = { version = "0.2.0", default-features = false }
 [build-dependencies]
 toml-cfg = { version = "0.2.0", default-features = false }
 
+[lints.cargo]
+unused_dependencies = "deny"
+
 [profile.dev]
 # Rust debug is too slow.
 # For debug builds always builds with some optimization

@@ -31,7 +31,7 @@ pub(crate) async fn show_camera_stream(
 
     let (tx, rx) = unbounded_channel::<Result<Vec<u8>, &'static str>>();
 
-    spawn_blocking(move || {
+    let _ = spawn_blocking(move || {
         let mut camera = match Camera::new(camera.index, format) {
             Ok(camera) => camera,
             Err(e) => {

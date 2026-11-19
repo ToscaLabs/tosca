@@ -6,10 +6,12 @@ authors.workspace = true
 description = """
 A library acting as an interface between a fimware and its controller.
 """
+categories.workspace = true
 keywords = ["iot", "library", "interface", "firmware", "controller"]
 documentation = "https://docs.rs/tosca"
 readme.workspace = true
 license.workspace = true
+homepage.workspace = true
 repository.workspace = true
 rust-version.workspace = true
 
