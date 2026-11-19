@@ -1,3 +1,8 @@
+//! A network controller that discovers `tosca` devices using mDNS-SD,
+//! subscribes to their event brokers, and logs incoming events.
+//!
+//! Supports configurable service domains and graceful shutdown via Ctrl+C.
+
 use std::time::Duration;
 
 use tosca_controller::controller::Controller;

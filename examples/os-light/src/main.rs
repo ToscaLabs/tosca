@@ -1,3 +1,17 @@
+//! This example demonstrates how to create and run a stateful light device
+//! using `tosca-os`.
+//!
+//! It provides endpoints to turn the light on or off, toggle its state,
+//! retrieve device information, and update its energy efficiency based on
+//! brightness.
+//!
+//! It also showcases shared state management, route configuration with
+//! parameters and hazards, JSON input handling, and device information
+//! endpoints.
+//!
+//! An mDNS discovery service is configured to make the device discoverable over
+//! a customizable TCP or UDP transport protocol.
+
 mod light_mockup;
 
 use std::net::Ipv4Addr;
