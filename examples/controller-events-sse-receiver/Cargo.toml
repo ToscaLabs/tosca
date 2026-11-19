@@ -39,3 +39,6 @@ thiserror = "2.0.17"
 # Logging
 tracing = { version = "0.1", default-features = false }
 tracing-subscriber = { version = "0.3", default-features = false, features = ["ansi", "fmt"] }
+
+[lints]
+workspace = true
