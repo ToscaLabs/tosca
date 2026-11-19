@@ -7,10 +7,12 @@ description = """
 A library crate for building a controller to manage all `tosca` devices
 on a network.
 """
+categories.workspace = true
 keywords = ["iot", "library", "controller", "devices", "events"]
 documentation = "https://docs.rs/tosca-controller"
 readme = "README.md"
 license.workspace = true
+homepage.workspace = true
 repository = "https://github.com/ToscaLabs/tosca/tree/master/crates/tosca-controller"
 rust-version.workspace = true
 

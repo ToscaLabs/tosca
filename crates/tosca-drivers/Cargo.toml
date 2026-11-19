@@ -4,10 +4,12 @@ version.workspace = true
 edition.workspace = true
 authors = ["Alex Leonte <m.alex.leonte@gmail.com>"]
 description = "A library providing architecture-agnostic drivers for various sensors and devices."
+categories.workspace = true
 keywords = ["iot", "iot-library", "devices", "sensors", "data"]
 documentation = "https://docs.rs/tosca-drivers"
 readme = "README.md"
 license.workspace = true
+homepage.workspace = true
 repository = "https://github.com/ToscaLabs/tosca/tree/master/crates/tosca-drivers"
 rust-version.workspace = true
 
