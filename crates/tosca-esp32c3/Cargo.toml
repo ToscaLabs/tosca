@@ -67,6 +67,9 @@ missing_docs = "deny"
 warnings = "deny"
 unused_results = "deny"
 
+[lints.cargo]
+unused_dependencies = "deny"
+
 [lints.clippy]
 
 [lints.rustdoc]
