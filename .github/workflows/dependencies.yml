@@ -35,19 +35,3 @@ jobs:
         uses: dtolnay/rust-toolchain@nightly
         with:
           components: rustfmt
-
-      - name: Install cargo-udeps
-        env:
-          UDEPS_BASE_URL: https://github.com/est31/cargo-udeps/releases
-        run: |
-          # Get the latest release tag by:
-          # 1. Obtaining the URL of the latest release,
-          # 2. Extracting the semantic version from it,
-          # 3. Taking the first match found.
-          LATEST_TAG=$(curl -sIL -o /dev/null -w '%{url_effective}' "$UDEPS_BASE_URL/latest" | grep -oE 'v?[0-9]+\.[0-9]+\.[0-9]+' | head -n1)
-          UDEPS_URL="$UDEPS_BASE_URL/download/$LATEST_TAG/cargo-udeps-$LATEST_TAG-x86_64-unknown-linux-gnu.tar.gz"
-          curl -L "$UDEPS_URL" | tar xz -C $HOME/.cargo/bin --strip-components 2
-
-      - name: Run cargo-udeps
-        run: |
-          cargo +nightly udeps --all-targets
